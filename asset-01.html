@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AssetPulse — AI Asset Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1f2d45;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #334155;
+    --glow: 0 0 20px rgba(0,229,255,0.3);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,14,26,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse-dot 2s infinite; }
+  @keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 0 rgba(0,229,255,0.6); } 50% { box-shadow: 0 0 0 6px rgba(0,229,255,0); } }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .teams-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 20px; padding: 4px 10px;
+    font-size: 0.7rem; font-weight: 600; color: #a78bfa;
+    cursor: pointer;
+  }
+  .teams-badge svg { width: 14px; height: 14px; }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display: flex; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto; scrollbar-width: none;
+    position: sticky; top: 57px; z-index: 99;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 1; min-width: 70px;
+    padding: 12px 8px; text-align: center;
+    font-size: 0.7rem; font-weight: 600;
+    color: var(--text-muted); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s; white-space: nowrap;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .tab svg { width: 18px; height: 18px; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:active { background: rgba(0,229,255,0.05); }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 16px; animation: fadeIn 0.2s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px; margin-bottom: 12px;
+    position: relative; overflow: hidden;
+  }
+  .card-glow { border-color: rgba(0,229,255,0.3); box-shadow: 0 0 0 1px rgba(0,229,255,0.1), inset 0 0 30px rgba(0,229,255,0.03); }
+
+  /* ── DASHBOARD STATS ── */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px;
+    position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stat-card.s1::before { background: var(--accent); }
+  .stat-card.s2::before { background: var(--accent3); }
+  .stat-card.s3::before { background: var(--warn); }
+  .stat-card.s4::before { background: var(--accent2); }
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--text); line-height: 1;
+  }
+  .stat-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-trend { font-size: 0.65rem; margin-top: 6px; }
+  .stat-trend.up { color: var(--accent3); }
+  .stat-trend.warn { color: var(--warn); }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+  }
+  .badge {
+    font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+  }
+  .badge-blue { background: rgba(0,229,255,0.1); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
+  .badge-green { background: rgba(16,185,129,0.1); color: var(--accent3); border: 1px solid rgba(16,185,129,0.2); }
+  .badge-warn { background: rgba(245,158,11,0.1); color: var(--warn); border: 1px solid rgba(245,158,11,0.2); }
+  .badge-red { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+
+  /* ── ASSET LIST ── */
+  .asset-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .asset-item:active { background: var(--surface); border-color: var(--accent); transform: scale(0.99); }
+  .asset-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+  }
+  .asset-info { flex: 1; min-width: 0; }
+  .asset-name { font-weight: 600; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .asset-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+  .asset-status { flex-shrink: 0; }
+
+  /* ── SCAN PAGE ── */
+  .scan-container {
+    background: #000; border-radius: var(--radius);
+    overflow: hidden; position: relative;
+    aspect-ratio: 1; width: 100%; max-width: 360px;
+    margin: 0 auto 16px;
+  }
+  #reader { width: 100%; }
+  #reader video { width: 100% !important; }
+  #reader img { display: none; }
+
+  .scan-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .scan-frame {
+    width: 60%; aspect-ratio: 1;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    box-shadow: 0 0 0 1000px rgba(0,0,0,0.4);
+  }
+  .scan-frame::before, .scan-frame::after {
+    content: ''; position: absolute;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scan-line 2s ease-in-out infinite;
+  }
+  @keyframes scan-line {
+    0% { top: 0; } 100% { top: 100%; }
+  }
+  .scan-corners > span {
+    position: absolute; width: 20px; height: 20px; border-color: var(--accent); border-style: solid;
+  }
+  .scan-corners > span:nth-child(1) { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+  .scan-corners > span:nth-child(2) { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+  .scan-corners > span:nth-child(3) { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+  .scan-corners > span:nth-child(4) { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+  .scan-status {
+    text-align: center; padding: 12px;
+    background: var(--surface2); border-radius: var(--radius);
+    margin-bottom: 12px; font-size: 0.85rem;
+  }
+  .scan-status.scanning { color: var(--accent); }
+  .scan-status.success { color: var(--accent3); }
+  .scan-status.idle { color: var(--text-muted); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 20px; border-radius: 10px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; width: 100%; margin-bottom: 8px;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:active { background: #00c8e0; transform: scale(0.98); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:active { border-color: var(--accent); }
+  .btn-danger { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-teams { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+  .form-input, .form-select {
+    width: 100%; padding: 11px 14px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    outline: none; transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--accent); }
+  .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+  /* ── AI CHAT ── */
+  .ai-chat {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
+  }
+  .ai-chat-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; background: rgba(124,58,237,0.1);
+    border-bottom: 1px solid var(--border);
+  }
+  .ai-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #fff;
+  }
+  .ai-name { font-size: 0.8rem; font-weight: 600; }
+  .ai-subtitle { font-size: 0.65rem; color: var(--text-muted); }
+  .ai-messages { padding: 12px; max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .ai-msg {
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .ai-msg.user { flex-direction: row-reverse; }
+  .ai-bubble {
+    padding: 8px 12px; border-radius: 12px;
+    font-size: 0.82rem; line-height: 1.4; max-width: 85%;
+  }
+  .ai-msg.bot .ai-bubble { background: var(--surface); border: 1px solid var(--border); }
+  .ai-msg.user .ai-bubble { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); color: var(--accent); }
+  .ai-input-row { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border); }
+  .ai-input {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none;
+  }
+  .ai-send {
+    width: 36px; height: 36px; border-radius: 8px; border: none;
+    background: var(--accent); color: #000; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ai-send svg { width: 16px; height: 16px; }
+  .typing-dots span {
+    display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text-muted); margin: 0 1.5px;
+    animation: bounce 1s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+
+  /* ── ACTIVITY FEED ── */
+  .activity-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 5px; flex-shrink: 0;
+  }
+  .activity-text { font-size: 0.8rem; line-height: 1.4; flex: 1; }
+  .activity-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── MODAL ── */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    align-items: flex-end;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0; padding: 20px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-family: 'Space Mono', monospace; font-size: 0.9rem; font-weight: 700; margin-bottom: 16px; }
+
+  /* ── TEAMS PANEL ── */
+  .teams-panel {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(0,229,255,0.05));
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
+  }
+  .teams-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .teams-logo { font-size: 1.2rem; }
+  .teams-title { font-weight: 600; font-size: 0.85rem; }
+  .teams-sub { font-size: 0.7rem; color: var(--text-muted); }
+  .copilot-suggestion {
+    background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 8px; padding: 10px; margin-top: 8px;
+    font-size: 0.8rem; line-height: 1.5; color: #c4b5fd;
+  }
+  .copilot-suggestion strong { color: #a78bfa; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 10px 18px; border-radius: 30px; font-size: 0.82rem;
+    opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--accent3); color: var(--accent3); }
+  .toast.info { border-color: var(--accent); color: var(--accent); }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-safe { height: 80px; }
+
+  /* Progress bar */
+  .progress { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; margin-top: 4px; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  .text-muted { color: var(--text-muted); font-size: 0.8rem; }
+  .text-accent { color: var(--accent); }
+  .text-green { color: var(--accent3); }
+  .text-warn { color: var(--warn); }
+  .text-sm { font-size: 0.78rem; }
+  .mt-8 { margin-top: 8px; }
+  .mono { font-family: 'Space Mono', monospace; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    AssetPulse
+  </div>
+  <div class="header-actions">
+    <div class="teams-badge" onclick="showTeamsModal()">
+      <svg viewBox="0 0 24 24" fill="#a78bfa"><path d="M19.95 9.01C19.96 9 19.98 9 20 9a3 3 0 1 1 0 6 .1.1 0 0 1-.05 0A6.97 6.97 0 0 1 16 18.93V21l-1-.55V18.5a7 7 0 0 1-3-.88v.88H10V21l-1-.55v-2.07A7 7 0 0 1 5 12a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 .7-.1 1.37-.3 2.01H19a1 1 0 0 0 1-1V9h-.05z"/></svg>
+      Copilot
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="tab active" onclick="showPage('dashboard',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </div>
+  <div class="tab" onclick="showPage('scan',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    Scan
+  </div>
+  <div class="tab" onclick="showPage('assets',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    Assets
+  </div>
+  <div class="tab" onclick="showPage('ai',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    AI
+  </div>
+  <div class="tab" onclick="showPage('add',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    Add
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div id="page-dashboard" class="page active">
+
+  <div class="stats-grid">
+    <div class="stat-card s1">
+      <div class="stat-num" id="stat-total">247</div>
+      <div class="stat-label">Total Assets</div>
+      <div class="stat-trend up">↑ 12 this week</div>
+    </div>
+    <div class="stat-card s2">
+      <div class="stat-num" id="stat-active">231</div>
+      <div class="stat-label">Active</div>
+      <div class="stat-trend up">93.5% utilised</div>
+    </div>
+    <div class="stat-card s3">
+      <div class="stat-num" id="stat-maintenance">8</div>
+      <div class="stat-label">Maintenance</div>
+      <div class="stat-trend warn">↑ 3 flagged</div>
+    </div>
+    <div class="stat-card s4">
+      <div class="stat-num" id="stat-scanned">44</div>
+      <div class="stat-label">Scanned Today</div>
+      <div class="stat-trend up">↑ from 31</div>
+    </div>
+  </div>
+
+  <!-- Teams/Copilot -->
+  <div class="teams-panel">
+    <div class="teams-header">
+      <div class="teams-logo">🤝</div>
+      <div>
+        <div class="teams-title">Microsoft Copilot Insight</div>
+        <div class="teams-sub">Via Teams Integration</div>
+      </div>
+    </div>
+    <div class="copilot-suggestion">
+      <strong>⚡ Smart Alert:</strong> 3 assets in the <strong>Server Room</strong> are due for maintenance within 7 days. Copilot has drafted a Teams message to your IT Manager. <span class="text-accent" onclick="showToast('Teams message sent to IT Manager!','success')" style="cursor:pointer;text-decoration:underline">Send now →</span>
+    </div>
+  </div>
+
+  <!-- Recent activity -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">Live Activity</div>
+      <div class="badge badge-blue">Real-time</div>
+    </div>
+    <div id="activity-feed">
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--accent3)"></div>
+        <div class="activity-text">
+          <strong>Laptop #NZ-0142</strong> checked out by Sarah K.
+          <div class="activity-time">2 minutes ago · Floor 3</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--warn)"></div>
+        <div class="activity-text">
+          <strong>Projector #AV-008</strong> flagged for maintenance
+          <div class="activity-time">18 minutes ago · Meeting Room B</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--accent)"></div>
+        <div class="activity-text">
+          <strong>iPad Pro #MOB-034</strong> barcode scanned &amp; logged
+          <div class="activity-time">31 minutes ago · Reception</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--accent3)"></div>
+        <div class="activity-text">
+          <strong>Desk Chair #FURN-219</strong> returned to storage
+          <div class="activity-time">1 hour ago · Warehouse</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category breakdown -->
+  <div class="card">
+    <div class="section-title" style="margin-bottom:12px">Asset Categories</div>
+    <div id="categories"></div>
+  </div>
+
+  <div class="bottom-safe"></div>
+</div>
+
+<!-- ══════════════ SCAN ══════════════ -->
+<div id="page-scan" class="page">
+
+  <div class="scan-status idle" id="scan-status">
+    📷 Camera ready — tap Start Scan
+  </div>
+
+  <div class="scan-container">
+    <div id="reader"></div>
+    <div class="scan-overlay">
+      <div style="position:relative">
+        <div class="scan-frame"></div>
+        <div class="scan-corners">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="scan-btn" onclick="toggleScan()">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+    Start Scan
+  </button>
+
+  <!-- Manual entry -->
+  <div class="card">
+    <div class="section-title" style="margin-bottom:10px">Manual Entry</div>
+    <div class="form-group">
+      <label class="form-label">Barcode / Asset ID</label>
+      <input class="form-input" id="manual-barcode" placeholder="e.g. NZ-0142 or scan result" type="text">
+    </div>
+    <button class="btn btn-secondary" onclick="lookupAsset()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Look Up Asset
+    </button>
+  </div>
+
+  <!-- Last scanned result -->
+  <div class="card card-glow" id="scan-result" style="display:none">
+    <div class="section-title" style="margin-bottom:10px">✅ Asset Found</div>
+    <div id="scan-result-content"></div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn btn-primary" style="margin:0;flex:1" onclick="checkoutAsset()">Check Out</button>
+      <button class="btn btn-secondary" style="margin:0;flex:1" onclick="checkInAsset()">Check In</button>
+    </div>
+    <button class="btn btn-teams" style="margin-top:8px" onclick="sendTeamsUpdate()">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19.95 9.01C19.96 9 19.98 9 20 9a3 3 0 1 1 0 6 .1.1 0 0 1-.05 0A6.97 6.97 0 0 1 16 18.93V21l-1-.55V18.5a7 7 0 0 1-3-.88v.88H10V21l-1-.55v-2.07A7 7 0 0 1 5 12a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 .7-.1 1.37-.3 2.01H19a1 1 0 0 0 1-1V9h-.05z"/></svg>
+      Post to Teams Channel
+    </button>
+  </div>
+
+  <div class="bottom-safe"></div>
+</div>
+
+<!-- ══════════════ ASSETS ══════════════ -->
+<div id="page-assets" class="page">
+
+  <div style="margin-bottom:12px;display:flex;gap:8px">
+    <input class="form-input" placeholder="🔍 Search assets…" id="search-input" oninput="filterAssets()" style="flex:1">
+    <select class="form-select" id="filter-status" onchange="filterAssets()" style="width:auto;min-width:110px">
+      <option value="">All Status</option>
+      <option value="Active">Active</option>
+      <option value="Maintenance">Maintenance</option>
+      <option value="Checked Out">Checked Out</option>
+      <option value="In Storage">In Storage</option>
+    </select>
+  </div>
+
+  <div id="asset-list"></div>
+
+  <div class="bottom-safe"></div>
+</div>
+
+<!-- ══════════════ AI ASSISTANT ══════════════ -->
+<div id="page-ai" class="page">
+
+  <div class="teams-panel" style="margin-bottom:14px">
+    <div class="teams-header">
+      <div class="teams-logo">🤖</div>
+      <div>
+        <div class="teams-title">AI Asset Assistant</div>
+        <div class="teams-sub">Powered by Claude · Teams Copilot integrated</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-chat">
+    <div class="ai-chat-header">
+      <div class="ai-avatar">AI</div>
+      <div>
+        <div class="ai-name">AssetPulse AI</div>
+        <div class="ai-subtitle">Ask about assets, maintenance, reports…</div>
+      </div>
+      <div class="badge badge-green" style="margin-left:auto">Online</div>
+    </div>
+    <div class="ai-messages" id="ai-messages">
+      <div class="ai-msg bot">
+        <div class="ai-avatar" style="width:24px;height:24px;font-size:0.6rem;flex-shrink:0">AI</div>
+        <div class="ai-bubble">👋 Hi! I'm your AI asset assistant. I can help you find assets, generate reports, flag maintenance issues, and sync updates to your Teams channel. What would you like to know?</div>
+      </div>
+    </div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="ai-input" placeholder="Ask anything…" onkeydown="if(event.key==='Enter')sendAiMessage()">
+      <button class="ai-send" onclick="sendAiMessage()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick prompts -->
+  <div class="section-title" style="margin-bottom:8px">Quick Actions</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <button class="btn btn-secondary" style="font-size:0.75rem;padding:10px" onclick="quickPrompt('Which assets need maintenance soon?')">🔧 Maintenance due</button>
+    <button class="btn btn-secondary" style="font-size:0.75rem;padding:10px" onclick="quickPrompt('Show me all checked out assets')">📤 Checked out</button>
+    <button class="btn btn-secondary" style="font-size:0.75rem;padding:10px" onclick="quickPrompt('Generate a weekly asset summary report')">📊 Weekly report</button>
+    <button class="btn btn-teams" style="font-size:0.75rem;padding:10px" onclick="quickPrompt('Send asset status update to Teams channel')">🤝 Teams update</button>
+  </div>
+
+  <div class="bottom-safe"></div>
+</div>
+
+<!-- ══════════════ ADD ASSET ══════════════ -->
+<div id="page-add" class="page">
+
+  <div class="card card-glow">
+    <div class="section-title" style="margin-bottom:14px">Register New Asset</div>
+
+    <div class="form-group">
+      <label class="form-label">Asset Name *</label>
+      <input class="form-input" id="new-name" placeholder="e.g. MacBook Pro 16-inch">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Asset ID / Barcode *</label>
+      <div style="display:flex;gap:8px">
+        <input class="form-input" id="new-barcode" placeholder="e.g. NZ-0248" style="flex:1">
+        <button class="btn btn-secondary" style="width:auto;padding:0 14px;margin:0" onclick="showPage('scan', document.querySelectorAll('.tab')[1]);showToast('Scan to auto-fill ID','info')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+        </button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="new-category">
+          <option>💻 IT Equipment</option>
+          <option>📱 Mobile Devices</option>
+          <option>🎥 AV Equipment</option>
+          <option>🪑 Furniture</option>
+          <option>🔧 Tools</option>
+          <option>🚗 Vehicles</option>
+          <option>📦 Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="new-status">
+          <option>Active</option>
+          <option>In Storage</option>
+          <option>Maintenance</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Location</label>
+      <input class="form-input" id="new-location" placeholder="e.g. Floor 2, Office B">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Assigned To</label>
+      <input class="form-input" id="new-assignee" placeholder="Person or team name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Purchase Date</label>
+      <input class="form-input" id="new-date" type="date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="new-notes" placeholder="Serial number, warranty info…">
+    </div>
+
+    <button class="btn btn-primary" onclick="addAsset()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Register Asset
+    </button>
+    <button class="btn btn-teams" onclick="showToast('Asset synced to Teams SharePoint','success')">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19.95 9.01C19.96 9 19.98 9 20 9a3 3 0 1 1 0 6 .1.1 0 0 1-.05 0A6.97 6.97 0 0 1 16 18.93V21l-1-.55V18.5a7 7 0 0 1-3-.88v.88H10V21l-1-.55v-2.07A7 7 0 0 1 5 12a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 .7-.1 1.37-.3 2.01H19a1 1 0 0 0 1-1V9h-.05z"/></svg>
+      Sync to Teams / SharePoint
+    </button>
+  </div>
+
+  <div class="bottom-safe"></div>
+</div>
+
+<!-- ══════════ ASSET DETAIL MODAL ══════════ -->
+<div class="modal-backdrop" id="detail-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">Asset Details</div>
+    <div id="modal-body"></div>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<!-- ══════════ TEAMS MODAL ══════════ -->
+<div class="modal-backdrop" id="teams-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🤝 Microsoft Teams Integration</div>
+    <div class="card" style="background:var(--surface2);margin-bottom:10px">
+      <div style="font-size:0.82rem;line-height:1.6">
+        <div class="text-accent" style="font-weight:600;margin-bottom:6px">Connected Channels</div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span>#asset-updates</span><span class="badge badge-green">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span>#it-maintenance</span><span class="badge badge-green">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0">
+          <span>#general</span><span class="badge badge-blue">Alerts only</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="background:rgba(124,58,237,0.05);border-color:rgba(124,58,237,0.3);margin-bottom:10px">
+      <div style="font-size:0.82rem;font-weight:600;color:#a78bfa;margin-bottom:6px">⚡ Copilot Features</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.8">
+        ✅ Auto-draft maintenance alerts<br>
+        ✅ Weekly asset summary reports<br>
+        ✅ Low-stock / missing asset alerts<br>
+        ✅ Checkout/checkin notifications<br>
+        ✅ SharePoint list sync
+      </div>
+    </div>
+    <button class="btn btn-teams" onclick="closeTeamsModal();showToast('Teams sync complete','success')">Sync Now</button>
+    <button class="btn btn-secondary" onclick="closeTeamsModal()">Close</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+const CATEGORIES = [
+  { name: '💻 IT Equipment', count: 98, color: 'var(--accent)' },
+  { name: '📱 Mobile Devices', count: 54, color: 'var(--accent3)' },
+  { name: '🎥 AV Equipment', count: 32, color: 'var(--warn)' },
+  { name: '🪑 Furniture', count: 41, color: 'var(--accent2)' },
+  { name: '🔧 Tools', count: 22, color: '#f472b6' },
+];
+
+let assets = [
+  { id: 'NZ-0142', name: 'MacBook Pro 16"', cat: '💻 IT Equipment', status: 'Checked Out', location: 'Floor 3', assignee: 'Sarah K.', date: '2023-03-12', notes: 'SN: C02Z9...' },
+  { id: 'AV-008', name: 'Epson Projector', cat: '🎥 AV Equipment', status: 'Maintenance', location: 'Meeting Room B', assignee: 'Unassigned', date: '2021-07-20', notes: 'Lamp needs replacing' },
+  { id: 'MOB-034', name: 'iPad Pro 12.9"', cat: '📱 Mobile Devices', status: 'Active', location: 'Reception', assignee: 'Front Desk', date: '2022-11-05', notes: '' },
+  { id: 'NZ-0101', name: 'Dell Monitor 27"', cat: '💻 IT Equipment', status: 'Active', location: 'Floor 2', assignee: 'Tom B.', date: '2022-01-18', notes: '' },
+  { id: 'FURN-219', name: 'Ergonomic Chair', cat: '🪑 Furniture', status: 'In Storage', location: 'Warehouse', assignee: '', date: '2020-06-30', notes: 'Minor armrest wear' },
+  { id: 'MOB-011', name: 'Samsung Galaxy Tab', cat: '📱 Mobile Devices', status: 'Active', location: 'Floor 1', assignee: 'Dev Team', date: '2023-08-14', notes: '' },
+  { id: 'TOOL-042', name: 'Electric Drill Set', cat: '🔧 Tools', status: 'Active', location: 'Maintenance Bay', assignee: 'Facilities', date: '2021-03-05', notes: '' },
+];
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showPage(id, tabEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (tabEl) tabEl.classList.add('active');
+  if (id !== 'scan' && scanning) stopScan();
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD RENDER
+// ═══════════════════════════════════════════
+function renderCategories() {
+  const total = CATEGORIES.reduce((s, c) => s + c.count, 0);
+  document.getElementById('categories').innerHTML = CATEGORIES.map(c => `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:0.8rem">${c.name}</span>
+        <span class="mono">${c.count}</span>
+      </div>
+      <div class="progress">
+        <div class="progress-fill" style="width:${(c.count/total*100).toFixed(0)}%;background:${c.color}"></div>
+      </div>
+    </div>
+  `).join('');
+}
+renderCategories();
+
+// ═══════════════════════════════════════════
+// ASSET LIST
+// ═══════════════════════════════════════════
+const STATUS_COLORS = {
+  'Active': 'badge-green',
+  'Maintenance': 'badge-warn',
+  'Checked Out': 'badge-blue',
+  'In Storage': ''
+};
+
+function renderAssets(list) {
+  document.getElementById('asset-list').innerHTML = list.map(a => `
+    <div class="asset-item" onclick="showAssetDetail('${a.id}')">
+      <div class="asset-icon" style="background:var(--surface)">
+        ${a.cat.split(' ')[0]}
+      </div>
+      <div class="asset-info">
+        <div class="asset-name">${a.name}</div>
+        <div class="asset-meta">${a.id} · ${a.location || '—'}</div>
+      </div>
+      <div class="asset-status">
+        <span class="badge ${STATUS_COLORS[a.status] || ''}">${a.status}</span>
+      </div>
+    </div>
+  `).join('') || '<div class="text-muted" style="text-align:center;padding:20px">No assets found</div>';
+}
+renderAssets(assets);
+
+function filterAssets() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const s = document.getElementById('filter-status').value;
+  renderAssets(assets.filter(a =>
+    (a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q)) &&
+    (!s || a.status === s)
+  ));
+}
+
+// ═══════════════════════════════════════════
+// ASSET DETAIL MODAL
+// ═══════════════════════════════════════════
+function showAssetDetail(id) {
+  const a = assets.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('modal-title').textContent = a.name;
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="card" style="margin:0;padding:10px;background:var(--surface2)">
+        <div class="text-muted">Asset ID</div>
+        <div class="mono" style="color:var(--accent);margin-top:3px">${a.id}</div>
+      </div>
+      <div class="card" style="margin:0;padding:10px;background:var(--surface2)">
+        <div class="text-muted">Status</div>
+        <div style="margin-top:3px"><span class="badge ${STATUS_COLORS[a.status]||''}">${a.status}</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:8px;background:var(--surface2)">
+      <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+        ${[['Category',a.cat],['Location',a.location||'—'],['Assigned To',a.assignee||'Unassigned'],['Added',a.date||'—'],['Notes',a.notes||'None']].map(([k,v])=>`<tr><td style="color:var(--text-muted);padding:5px 0;width:40%">${k}</td><td style="padding:5px 0">${v}</td></tr>`).join('')}
+      </table>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="btn btn-primary" style="flex:1;margin:0" onclick="closeModal();checkoutFromDetail('${a.id}')">Check Out</button>
+      <button class="btn btn-danger" style="flex:1;margin:0" onclick="closeModal();flagMaintenance('${a.id}')">Flag Maintenance</button>
+    </div>
+  `;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('detail-modal').classList.remove('open'); }
+function checkoutFromDetail(id) { showToast(`${id} checked out successfully`, 'success'); }
+function flagMaintenance(id) {
+  const a = assets.find(x => x.id === id);
+  if (a) a.status = 'Maintenance';
+  filterAssets();
+  showToast(`${id} flagged for maintenance`, 'info');
+}
+
+// ═══════════════════════════════════════════
+// BARCODE SCANNER
+// ═══════════════════════════════════════════
+let scanner = null;
+let scanning = false;
+
+function toggleScan() {
+  if (!scanning) startScan(); else stopScan();
+}
+
+function startScan() {
+  scanning = true;
+  document.getElementById('scan-btn').innerHTML = `
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+    Stop Scan`;
+  document.getElementById('scan-status').className = 'scan-status scanning';
+  document.getElementById('scan-status').textContent = '🔍 Scanning for barcode…';
+
+  scanner = new Html5Qrcode("reader");
+  scanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 200, height: 200 } },
+    (decoded) => {
+      handleScanResult(decoded);
+      stopScan();
+    },
+    () => {}
+  ).catch(err => {
+    document.getElementById('scan-status').className = 'scan-status idle';
+    document.getElementById('scan-status').textContent = '⚠️ Camera permission denied — use manual entry below';
+    scanning = false;
+    document.getElementById('scan-btn').innerHTML = `
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+      Start Scan`;
+  });
+}
+
+function stopScan() {
+  if (scanner) {
+    scanner.stop().catch(() => {});
+    scanner = null;
+  }
+  scanning = false;
+  document.getElementById('scan-btn').innerHTML = `
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+    Start Scan`;
+  if (!document.getElementById('scan-status').textContent.includes('⚠️')) {
+    document.getElementById('scan-status').className = 'scan-status idle';
+    document.getElementById('scan-status').textContent = '📷 Camera ready — tap Start Scan';
+  }
+}
+
+function handleScanResult(code) {
+  document.getElementById('scan-status').className = 'scan-status success';
+  document.getElementById('scan-status').textContent = `✅ Scanned: ${code}`;
+  document.getElementById('manual-barcode').value = code;
+  lookupAsset(code);
+  showToast('Barcode scanned: ' + code, 'success');
+  // Update stat
+  const el = document.getElementById('stat-scanned');
+  el.textContent = parseInt(el.textContent) + 1;
+}
+
+function lookupAsset(codeOverride) {
+  const code = codeOverride || document.getElementById('manual-barcode').value.trim();
+  if (!code) return;
+  const a = assets.find(x => x.id.toLowerCase() === code.toLowerCase());
+  const res = document.getElementById('scan-result');
+  const body = document.getElementById('scan-result-content');
+  res.style.display = 'block';
+  if (a) {
+    body.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="font-size:2rem">${a.cat.split(' ')[0]}</div>
+        <div>
+          <div style="font-weight:600">${a.name}</div>
+          <div class="mono" style="color:var(--accent)">${a.id}</div>
+        </div>
+        <span class="badge ${STATUS_COLORS[a.status]||''}" style="margin-left:auto">${a.status}</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-muted)">📍 ${a.location || '—'} &nbsp;·&nbsp; 👤 ${a.assignee || 'Unassigned'}</div>
+    `;
+  } else {
+    body.innerHTML = `<div class="text-muted">Asset <strong style="color:var(--text)">${code}</strong> not found in registry. <span style="color:var(--accent);cursor:pointer" onclick="showPage('add',document.querySelectorAll('.tab')[4])">Register it →</span></div>`;
+  }
+}
+
+function checkoutAsset() { showToast('Asset checked out & logged', 'success'); }
+function checkInAsset() { showToast('Asset checked in successfully', 'success'); }
+function sendTeamsUpdate() { showToast('Update posted to #asset-updates', 'success'); }
+
+// ═══════════════════════════════════════════
+// ADD ASSET
+// ═══════════════════════════════════════════
+function addAsset() {
+  const name = document.getElementById('new-name').value.trim();
+  const id = document.getElementById('new-barcode').value.trim();
+  if (!name || !id) { showToast('Name and ID are required', 'info'); return; }
+  if (assets.find(a => a.id === id)) { showToast('Asset ID already exists', 'info'); return; }
+
+  assets.unshift({
+    id, name,
+    cat: document.getElementById('new-category').value,
+    status: document.getElementById('new-status').value,
+    location: document.getElementById('new-location').value,
+    assignee: document.getElementById('new-assignee').value,
+    date: document.getElementById('new-date').value,
+    notes: document.getElementById('new-notes').value,
+  });
+
+  // Clear form
+  ['new-name','new-barcode','new-location','new-assignee','new-date','new-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('stat-total').textContent = parseInt(document.getElementById('stat-total').textContent) + 1;
+  filterAssets();
+  showToast(`${name} registered!`, 'success');
+  showPage('assets', document.querySelectorAll('.tab')[2]);
+}
+
+// ═══════════════════════════════════════════
+// AI ASSISTANT (Claude API)
+// ═══════════════════════════════════════════
+const aiHistory = [];
+
+async function sendAiMessage() {
+  const input = document.getElementById('ai-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addAiMessage('user', msg);
+  aiHistory.push({ role: 'user', content: msg });
+
+  // Typing indicator
+  const typingId = 'typing-' + Date.now();
+  document.getElementById('ai-messages').insertAdjacentHTML('beforeend', `
+    <div class="ai-msg bot" id="${typingId}">
+      <div class="ai-avatar" style="width:24px;height:24px;font-size:0.6rem;flex-shrink:0">AI</div>
+      <div class="ai-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+    </div>
+  `);
+  scrollAiMessages();
+
+  const assetContext = `Current asset registry (${assets.length} assets): ${assets.map(a=>`[${a.id}] ${a.name} - ${a.status} @ ${a.location}`).join('; ')}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are AssetPulse AI, a smart asset tracking assistant integrated with Microsoft Teams and Copilot. Be concise (2-4 sentences max), practical, and proactive. Always reference real asset data when provided. Suggest Teams/Copilot actions where relevant. Context: ${assetContext}`,
+        messages: aiHistory
+      })
+    });
+    const data = await res.json();
+    document.getElementById(typingId)?.remove();
+    const reply = data.content?.map(b => b.text || '').join('') || 'Sorry, I could not get a response.';
+    addAiMessage('bot', reply);
+    aiHistory.push({ role: 'assistant', content: reply });
+  } catch {
+    document.getElementById(typingId)?.remove();
+    addAiMessage('bot', '⚠️ Connection error. Check your network and try again.');
+  }
+}
+
+function addAiMessage(role, text) {
+  document.getElementById('ai-messages').insertAdjacentHTML('beforeend', `
+    <div class="ai-msg ${role}">
+      ${role === 'bot' ? '<div class="ai-avatar" style="width:24px;height:24px;font-size:0.6rem;flex-shrink:0">AI</div>' : ''}
+      <div class="ai-bubble">${text}</div>
+    </div>
+  `);
+  scrollAiMessages();
+}
+
+function scrollAiMessages() {
+  const el = document.getElementById('ai-messages');
+  el.scrollTop = el.scrollHeight;
+}
+
+function quickPrompt(prompt) {
+  document.getElementById('ai-input').value = prompt;
+  sendAiMessage();
+}
+
+// ═══════════════════════════════════════════
+// TEAMS MODAL
+// ═══════════════════════════════════════════
+function showTeamsModal() { document.getElementById('teams-modal').classList.add('open'); }
+function closeTeamsModal() { document.getElementById('teams-modal').classList.remove('open'); }
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = type === 'success' ? '✅ ' + msg : 'ℹ️ ' + msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+// ═══════════════════════════════════════════
+// REAL-TIME SIMULATION
+// ═══════════════════════════════════════════
+const EVENTS = [
+  () => `<strong>Laptop #NZ-${100+Math.floor(Math.random()*100)}</strong> scanned at reception`,
+  () => `<strong>iPad #MOB-${10+Math.floor(Math.random()*50)}</strong> checked out`,
+  () => `AI flagged <strong>${assets[Math.floor(Math.random()*assets.length)]?.name}</strong> for review`,
+  () => `Teams Copilot sent maintenance reminder to #it-maintenance`,
+];
+setInterval(() => {
+  const feed = document.getElementById('activity-feed');
+  const items = feed.querySelectorAll('.activity-item');
+  if (items.length > 6) items[items.length-1].remove();
+  const colors = ['var(--accent)', 'var(--accent3)', 'var(--warn)', 'var(--accent2)'];
+  feed.insertAdjacentHTML('afterbegin', `
+    <div class="activity-item" style="opacity:0;transition:opacity 0.5s">
+      <div class="activity-dot" style="background:${colors[Math.floor(Math.random()*colors.length)]}"></div>
+      <div class="activity-text">
+        ${EVENTS[Math.floor(Math.random()*EVENTS.length)]()}
+        <div class="activity-time">Just now</div>
+      </div>
+    </div>
+  `);
+  setTimeout(() => { feed.querySelector('.activity-item').style.opacity = '1'; }, 50);
+}, 12000);
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) { el.classList.remove('open'); } });
+});
+</script>
+</body>
+</html>
