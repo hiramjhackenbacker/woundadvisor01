@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Wound Care Advisor — HITH v2</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0A55A8;--teal-light:#E3EDF8;--teal-mid:#9DBFE8;--teal-dark:#062D5C;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#633806;
+  --red:#E24B4A;--red-light:#FCEBEB;--red-dark:#501313;
+  --green:#639922;--green-light:#EAF3DE;--green-dark:#27500A;
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-dark:#042C53;
+  --purple:#7B3FA0;--purple-light:#F2E8FA;--purple-dark:#3B1454;
+  --gray-50:#F4F3EF;--gray-100:#E8E6DF;--gray-200:#B4B2A9;
+  --gray-400:#888780;--gray-600:#5F5E5A;--gray-900:#2C2C2A;
+  --text-primary:#1a1a18;--text-secondary:#5F5E5A;--text-muted:#888780;
+  --bg-page:#f4f3ef;--bg-card:#ffffff;--bg-secondary:#f1efe8;
+  --border:rgba(0,0,0,0.09);--border-med:rgba(0,0,0,0.16);
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:18px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.07);--shadow-md:0 3px 12px rgba(0,0,0,0.10);
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-page);color:var(--text-primary);min-height:100vh;line-height:1.5}
+
+/* Shell */
+#shell{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg-page);position:relative}
+
+/* Top bar */
+#topbar{position:sticky;top:0;z-index:200;background:var(--bg-card);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px}
+#tb-logo{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+#tb-logo svg{flex-shrink:0}
+#tb-title{font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap}
+#tb-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.tb-btn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text-secondary);background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:6px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.tb-btn:hover{background:var(--gray-100)}
+.tb-btn.teal{background:var(--teal);color:white;border-color:var(--teal)}
+.tb-btn.teal:hover{background:#084792}
+
+/* Progress */
+#progress-wrap{display:none;background:var(--bg-card);border-bottom:1px solid var(--border);padding:8px 14px 10px}
+#progress-track{height:4px;background:var(--gray-100);border-radius:2px;overflow:hidden}
+#progress-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .35s ease;width:0%}
+#progress-label{font-size:11px;color:var(--text-muted);margin-top:5px;display:flex;justify-content:space-between}
+
+/* Screens */
+.screen{display:none;padding:18px 15px 40px}
+.screen.active{display:block}
+
+/* Phase badge */
+.phase-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:12px}
+.phase-stride{background:var(--blue-light);color:var(--blue-dark)}
+.phase-timer{background:var(--amber-light);color:var(--amber-dark)}
+.phase-result{background:var(--teal-light);color:var(--teal-dark)}
+.phase-patient{background:var(--purple-light);color:var(--purple-dark)}
+.phase-history{background:var(--gray-100);color:var(--gray-600)}
+
+/* Step header */
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.step-disc{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0;color:white}
+.disc-stride{background:var(--blue)}.disc-timer{background:var(--amber)}.disc-patient{background:var(--purple)}
+.step-meta{flex:1}
+.step-name{font-size:19px;font-weight:600;color:var(--text-primary);line-height:1.2}
+.step-of{font-size:12px;color:var(--text-muted);margin-top:1px}
+.screen-body{font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:18px}
+
+/* Options */
+.options{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+.opt-btn{width:100%;text-align:left;padding:13px 15px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s;box-shadow:var(--shadow-sm)}
+.opt-btn:hover{border-color:var(--teal);background:#fafcff}
+.opt-btn.selected{border:2px solid var(--teal);background:var(--teal-light)}
+.opt-btn .oi{font-size:19px;flex-shrink:0;margin-top:1px;line-height:1}
+.opt-btn .ob{flex:1}
+.opt-btn .ol{font-size:15px;font-weight:500;color:var(--text-primary);display:block}
+.opt-btn .od{font-size:12px;color:var(--text-muted);margin-top:2px;line-height:1.4}
+.opt-btn.selected .ol{color:var(--teal-dark)}
+.opt-btn.selected .od{color:var(--teal-dark);opacity:.75}
+
+/* Level buttons */
+.level-options{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+.lvl-btn{width:100%;text-align:left;padding:13px 15px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s}
+.lvl-btn:hover{border-color:var(--teal)}
+.lvl-icon{font-size:21px;flex-shrink:0}
+.lvl-label{font-size:15px;font-weight:500;color:var(--text-primary);display:block}
+.lvl-desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+.lvl-btn.sel-low{border:2px solid var(--green);background:var(--green-light)}
+.lvl-btn.sel-moderate{border:2px solid var(--amber);background:var(--amber-light)}
+.lvl-btn.sel-high{border:2px solid var(--red);background:var(--red-light)}
+.lvl-btn.sel-low .lvl-label{color:var(--green-dark)}
+.lvl-btn.sel-moderate .lvl-label{color:var(--amber-dark)}
+.lvl-btn.sel-high .lvl-label{color:var(--red-dark)}
+
+/* Yes/No */
+.yn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.yn-btn{padding:17px 12px;text-align:center;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s}
+.yn-btn:hover{border-color:var(--teal)}
+.yn-yes.selected{border:2px solid var(--red);background:var(--red-light);color:var(--red-dark)}
+.yn-no.selected{border:2px solid var(--green);background:var(--green-light);color:var(--green-dark)}
+
+/* Checkboxes */
+.check-options{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.ck-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;box-shadow:var(--shadow-sm)}
+.ck-row:hover{border-color:var(--teal)}
+.ck-row input[type="checkbox"]{width:20px;height:20px;accent-color:var(--teal);flex-shrink:0;cursor:pointer}
+.ck-row label{font-size:14px;color:var(--text-primary);cursor:pointer;flex:1}
+
+/* Text / number inputs */
+.input-group{margin-bottom:16px}
+.input-label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:block}
+.text-input{width:100%;padding:13px 14px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);font-size:15px;color:var(--text-primary);font-family:inherit;outline:none;transition:border-color .15s}
+.text-input:focus{border-color:var(--teal)}
+.text-input::placeholder{color:var(--text-muted)}
+.dim-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.dim-cell{display:flex;flex-direction:column;gap:5px}
+.dim-label{font-size:12px;font-weight:600;color:var(--text-secondary);text-align:center}
+.dim-input{padding:12px 8px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:15px;color:var(--text-primary);font-family:inherit;text-align:center;outline:none;transition:border-color .15s;width:100%}
+.dim-input:focus{border-color:var(--teal)}
+.dim-unit{font-size:11px;color:var(--text-muted);text-align:center}
+
+/* Nav */
+.nav-row{display:flex;gap:10px;margin-top:4px}
+.btn-back{flex:0 0 auto;padding:13px 17px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;font-size:17px;color:var(--text-secondary)}
+.btn-back:hover{background:var(--gray-100)}
+.btn-next{flex:1;padding:14px 20px;background:var(--teal);border:none;border-radius:var(--radius-lg);cursor:pointer;font-size:15px;font-weight:600;color:white;letter-spacing:.01em;transition:opacity .15s,background .15s;box-shadow:0 2px 8px rgba(10,85,168,.22)}
+.btn-next:disabled{opacity:.3;cursor:default;box-shadow:none}
+.btn-next:not(:disabled):hover{background:#084792}
+
+/* Notices */
+.notice{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:var(--radius-md);margin-bottom:12px;font-size:13px;line-height:1.5}
+.notice-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.notice-warn{background:var(--amber-light);border:1px solid rgba(186,117,23,.25);color:var(--amber-dark)}
+.notice-alert{background:var(--red-light);border:1px solid rgba(226,75,74,.25);color:var(--red-dark)}
+.notice-info{background:var(--blue-light);border:1px solid rgba(24,95,165,.25);color:var(--blue-dark)}
+.notice-mod{background:var(--gray-50);border:1px solid var(--border);color:var(--text-secondary)}
+.notice-green{background:var(--green-light);border:1px solid rgba(99,153,34,.25);color:var(--green-dark)}
+
+/* Sub question */
+.sub-question{background:var(--bg-secondary);border-radius:var(--radius-md);padding:13px;margin-bottom:14px}
+.sub-q-label{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:10px}
+#odour-block{display:none;margin-top:13px}
+
+/* Welcome */
+#welcome{padding:22px 18px 32px}
+.wlc-logo{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.wlc-disc{width:50px;height:50px;background:var(--teal);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center}
+.wlc-disc svg{width:28px;height:28px}
+.wlc-title{font-size:21px;font-weight:700;color:var(--text-primary)}
+.wlc-sub{font-size:12px;color:var(--text-muted);margin-top:1px}
+.wlc-intro{font-size:14px;color:var(--text-secondary);line-height:1.65;margin-bottom:18px}
+.fw-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:18px}
+.fw-pill{padding:11px 6px;border-radius:var(--radius-md);text-align:center;border:1px solid transparent}
+.fw-stride{background:var(--blue-light);color:var(--blue-dark);border-color:rgba(24,95,165,.2)}
+.fw-timer{background:var(--amber-light);color:var(--amber-dark);border-color:rgba(186,117,23,.2)}
+.fw-rec{background:var(--teal-light);color:var(--teal-dark);border-color:rgba(10,85,168,.2)}
+.fw-code{font-size:13px;font-weight:700;letter-spacing:.04em}
+.fw-name{font-size:10px;margin-top:2px;opacity:.8}
+.btn-start{width:100%;padding:16px;background:var(--teal);border:none;border-radius:var(--radius-lg);cursor:pointer;font-size:16px;font-weight:600;color:white;box-shadow:0 3px 12px rgba(10,85,168,.28);transition:background .15s;margin-bottom:10px}
+.btn-start:hover{background:#084792}
+.btn-secondary-full{width:100%;padding:13px;background:var(--bg-secondary);border:1px solid var(--border-med);border-radius:var(--radius-lg);cursor:pointer;font-size:14px;font-weight:500;color:var(--text-secondary);transition:background .15s}
+.btn-secondary-full:hover{background:var(--gray-100)}
+.doh-credit{text-align:center;font-size:11px;color:var(--text-muted);margin-top:12px;line-height:1.5}
+
+/* Patient card on welcome */
+.patient-pill{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--purple-light);border:1px solid rgba(123,63,160,.2);border-radius:var(--radius-md);margin-bottom:14px;cursor:pointer}
+.pp-icon{font-size:18px;flex-shrink:0}
+.pp-body{flex:1;min-width:0}
+.pp-name{font-size:14px;font-weight:600;color:var(--purple-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-meta{font-size:11px;color:var(--purple-dark);opacity:.7;margin-top:1px}
+.pp-arrow{color:var(--purple-dark);opacity:.5;font-size:16px}
+
+/* Results */
+.results-section{margin-bottom:18px}
+.rs-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px}
+.summary-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:14px;border-bottom:1px solid var(--border)}
+.summary-row:last-child{border-bottom:none}
+.sr-lbl{color:var(--text-secondary)}
+.sr-val{font-weight:500;color:var(--text-primary);text-align:right}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-low{background:var(--green-light);color:var(--green-dark)}
+.badge-moderate{background:var(--amber-light);color:var(--amber-dark)}
+.badge-high{background:var(--red-light);color:var(--red-dark)}
+.badge-yes{background:var(--red-light);color:var(--red-dark)}
+.badge-no{background:var(--green-light);color:var(--green-dark)}
+.badge-teal{background:var(--teal-light);color:var(--teal-dark)}
+.pathway-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--teal-light);border:1px solid rgba(10,85,168,.25);border-radius:var(--radius-md);margin-bottom:13px}
+.pathway-num{width:36px;height:36px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.pathway-title{font-size:13px;font-weight:600;color:var(--teal-dark)}
+.pathway-sub{font-size:11px;color:var(--teal-dark);opacity:.75;margin-top:1px}
+.dressing-list{display:flex;flex-direction:column;gap:6px}
+.dressing-item{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);font-size:14px;color:var(--text-primary);box-shadow:var(--shadow-sm)}
+.di-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.di-primary .di-dot{background:var(--teal)}
+.di-secondary .di-dot{background:var(--gray-400)}
+
+/* History / longitudinal */
+.visit-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow-sm)}
+.visit-header{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;cursor:pointer;user-select:none}
+.vh-left{display:flex;align-items:center;gap:10px}
+.vh-num{width:28px;height:28px;border-radius:50%;background:var(--teal);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.vh-date{font-size:14px;font-weight:600;color:var(--text-primary)}
+.vh-meta{font-size:12px;color:var(--text-muted);margin-top:1px}
+.vh-arrow{font-size:14px;color:var(--text-muted);transition:transform .2s}
+.visit-body{display:none;padding:0 13px 13px;border-top:1px solid var(--border)}
+.visit-body.open{display:block}
+.vb-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.vb-cell{background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px}
+.vb-cell-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+.vb-cell-val{font-size:13px;font-weight:500;color:var(--text-primary);margin-top:2px}
+.vb-dressings{margin-top:10px}
+.vb-dress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:5px}
+.vb-dress-item{font-size:13px;color:var(--text-secondary);padding:3px 0;border-bottom:1px solid var(--border)}
+.vb-dress-item:last-child{border-bottom:none}
+
+/* Trend indicators */
+.trend{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:12px}
+.trend-better{background:var(--green-light);color:var(--green-dark)}
+.trend-worse{background:var(--red-light);color:var(--red-dark)}
+.trend-same{background:var(--gray-100);color:var(--gray-600)}
+
+/* SVG Chart */
+.chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;overflow-x:auto}
+.chart-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:10px}
+.chart-svg{display:block;width:100%;overflow:visible}
+.chart-empty{text-align:center;padding:24px;font-size:14px;color:var(--text-muted)}
+
+/* Patient list */
+.patient-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.patient-row{display:flex;align-items:center;gap:11px;padding:12px 13px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;box-shadow:var(--shadow-sm);transition:border-color .15s}
+.patient-row:hover{border-color:var(--teal)}
+.pr-icon{font-size:22px;flex-shrink:0}
+.pr-body{flex:1;min-width:0}
+.pr-name{font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr-meta{font-size:12px;color:var(--text-muted);margin-top:1px}
+.pr-arrow{color:var(--text-muted);font-size:15px}
+.pr-badge{flex-shrink:0}
+
+/* Action row */
+.action-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.action-btn{display:flex;align-items:center;gap:5px;padding:9px 13px;background:var(--bg-card);border:1px solid var(--border-med);border-radius:var(--radius-md);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary);box-shadow:var(--shadow-sm)}
+.action-btn:hover{background:var(--gray-100)}
+.action-btn.danger{color:var(--red-dark);border-color:rgba(226,75,74,.3)}
+.action-btn.danger:hover{background:var(--red-light)}
+.action-btn.primary-action{background:var(--teal);color:white;border-color:var(--teal)}
+.action-btn.primary-action:hover{background:#084792}
+
+/* Modal overlay */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:var(--bg-card);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:20px 18px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:14px}
+.modal-body{font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:18px}
+.modal-actions{display:flex;gap:9px}
+.modal-btn{flex:1;padding:13px;border-radius:var(--radius-lg);cursor:pointer;font-size:14px;font-weight:600;border:none}
+.modal-cancel{background:var(--bg-secondary);color:var(--text-secondary)}
+.modal-cancel:hover{background:var(--gray-100)}
+.modal-confirm{background:var(--red);color:white}
+.modal-confirm:hover{background:#c73b3a}
+
+/* Export/import area */
+.import-area{width:100%;min-height:100px;padding:10px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:12px;font-family:monospace;color:var(--text-primary);background:var(--bg-secondary);resize:vertical;outline:none}
+.import-area:focus{border-color:var(--teal)}
+
+/* Segment control */
+.seg-ctrl{display:grid;background:var(--bg-secondary);border-radius:var(--radius-md);padding:3px;margin-bottom:16px;border:1px solid var(--border)}
+.seg-btn{padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--text-secondary);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;border:none;background:transparent}
+.seg-btn.active{background:var(--bg-card);color:var(--text-primary);font-weight:600;box-shadow:var(--shadow-sm)}
+
+/* Dot legend */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Utility */
+.btn-restart{width:100%;padding:14px;background:var(--bg-secondary);border:1px solid var(--border-med);border-radius:var(--radius-lg);cursor:pointer;font-size:14px;font-weight:500;color:var(--text-secondary);margin-top:8px;transition:background .15s}
+.btn-restart:hover{background:var(--gray-100)}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.empty-state{text-align:center;padding:32px 20px;color:var(--text-muted)}
+.empty-state .es-icon{font-size:36px;margin-bottom:10px}
+.empty-state .es-text{font-size:14px;line-height:1.6}
+
+@media print{
+  body{background:white}
+  #topbar,#progress-wrap,.nav-row,.action-row,.btn-restart,.tb-btn{display:none!important}
+  .screen{padding:10px}
+  .visit-body{display:block!important}
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div id="tb-logo">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <rect width="26" height="26" rx="6" fill="#0A55A8"/>
+      <path d="M6 13 Q9 7 13 13 Q17 19 20 13" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="13" cy="13" r="2.3" fill="white"/>
+    </svg>
+    <div><div id="tb-title">Wound Care Advisor</div><div id="tb-sub">HITH Community Nursing</div></div>
+  </div>
+  <button class="tb-btn" id="tb-patients" style="display:none" onclick="showScreen('patients')">👥 Patients</button>
+  <button class="tb-btn" id="tb-restart" style="display:none" onclick="restart()">↺ New</button>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress-wrap">
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <div id="progress-label"><span id="progress-phase"></span><span id="progress-step"></span></div>
+</div>
+
+<!-- ══ WELCOME ══ -->
+<div class="screen active" id="welcome">
+  <div class="wlc-logo">
+    <div class="wlc-disc" style="background:#0A55A8"><svg viewBox="0 0 28 28" fill="none"><path d="M5 14 Q9 6 14 14 Q19 22 23 14" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="2.8" fill="white"/></svg></div>
+    <div><div class="wlc-title">Wound Care Advisor</div><div class="wlc-sub">Hospital in the Home · Community Nursing</div></div>
+  </div>
+  <p class="wlc-intro">Guided STRIDE + TIMER wound assessment with evidence-based dressing recommendations. Patient records stored on this device with export/import for team sharing.</p>
+  <div class="fw-pills">
+    <div class="fw-pill fw-stride"><div class="fw-code">STRIDE</div><div class="fw-name">Assessment</div></div>
+    <div class="fw-pill fw-timer"><div class="fw-code">TIMER</div><div class="fw-name">Barriers</div></div>
+    <div class="fw-pill fw-rec"><div class="fw-code">DoH</div><div class="fw-name">Dressings</div></div>
+  </div>
+  <div id="recent-patient-pill" style="display:none"></div>
+  <div class="notice notice-warn"><span class="notice-icon">⚠</span><span><strong>Advisory use only.</strong> Always apply clinical judgement. This tool supports — it does not replace — professional wound assessment.</span></div>
+  <button class="btn-start" onclick="showScreen('patient-entry')">Begin new assessment →</button>
+  <button class="btn-secondary-full" onclick="showScreen('patients')">👥 View patient records</button>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn-secondary-full" style="flex:1" onclick="showImportModal()">📥 Import patient data</button>
+  </div>
+  <p class="doh-credit">Australian Government Department of Health &amp; Aged Care · Wound Consumable Choice Guide</p>
+</div>
+
+<!-- ══ PATIENT ENTRY ══ -->
+<div class="screen" id="patient-entry">
+  <div class="phase-badge phase-patient">👤 Patient details</div>
+  <div class="step-header">
+    <div class="step-disc disc-patient">P</div>
+    <div class="step-meta"><div class="step-name">Patient identification</div><div class="step-of">Before assessment</div></div>
+  </div>
+  <p class="screen-body">Enter patient details for this assessment. UR number is used to link visits over time. No data leaves this device unless you export it.</p>
+
+  <div class="input-group">
+    <label class="input-label" for="inp-ur">UR / Patient ID number <span style="color:var(--red)">*</span></label>
+    <input class="text-input" id="inp-ur" type="text" placeholder="e.g. 123456" autocomplete="off" oninput="checkPatientReady()">
+  </div>
+  <div class="input-group">
+    <label class="input-label" for="inp-name">Patient name (optional)</label>
+    <input class="text-input" id="inp-name" type="text" placeholder="e.g. J. Smith" autocomplete="off">
+  </div>
+  <div class="input-group">
+    <label class="input-label" for="inp-dob">Date of birth (optional)</label>
+    <input class="text-input" id="inp-dob" type="date">
+  </div>
+  <div class="input-group">
+    <label class="input-label" for="inp-clinician">Assessing clinician (optional)</label>
+    <input class="text-input" id="inp-clinician" type="text" placeholder="e.g. RN A. Jones" autocomplete="off">
+  </div>
+  <div id="existing-patient-notice" style="display:none" class="notice notice-green">
+    <span class="notice-icon">✓</span>
+    <span id="existing-patient-text"></span>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+    <button class="btn-next" id="next-patient-entry" disabled onclick="commitPatient(); go('s1')">Start assessment →</button>
+  </div>
+</div>
+
+<!-- ══ STRIDE S ══ -->
+<div class="screen" id="s1">
+  <div class="phase-badge phase-stride">⬤ STRIDE</div>
+  <div class="step-header"><div class="step-disc disc-stride">S</div><div class="step-meta"><div class="step-name">Site &amp; location</div><div class="step-of">Step 1 of 6</div></div></div>
+  <p class="screen-body">Select the body region where the wound is located.</p>
+  <div class="options">
+    <button class="opt-btn" onclick="pick('site','lower-limb',this)"><span class="oi">🦵</span><span class="ob"><span class="ol">Lower limb</span><span class="od">Leg, ankle, foot, toe — including venous and diabetic foot wounds</span></span></button>
+    <button class="opt-btn" onclick="pick('site','upper-limb',this)"><span class="oi">💪</span><span class="ob"><span class="ol">Upper limb</span><span class="od">Arm, forearm, hand, finger</span></span></button>
+    <button class="opt-btn" onclick="pick('site','trunk-pressure',this)"><span class="oi">🫁</span><span class="ob"><span class="ol">Trunk / pressure area</span><span class="od">Sacrum, coccyx, ischium, abdomen, back, chest</span></span></button>
+    <button class="opt-btn" onclick="pick('site','head-neck',this)"><span class="oi">👤</span><span class="ob"><span class="ol">Head / neck</span><span class="od">Face, scalp, ear, neck</span></span></button>
+    <button class="opt-btn" onclick="pick('site','other',this)"><span class="oi">📍</span><span class="ob"><span class="ol">Other / not listed</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-s1" disabled onclick="go('s2')">Continue</button></div>
+</div>
+
+<!-- ══ STRIDE T ══ -->
+<div class="screen" id="s2">
+  <div class="phase-badge phase-stride">⬤ STRIDE</div>
+  <div class="step-header"><div class="step-disc disc-stride">T</div><div class="step-meta"><div class="step-name">Tissue type</div><div class="step-of">Step 2 of 6</div></div></div>
+  <p class="screen-body">Identify the predominant tissue. If mixed, select the tissue most needing to be addressed.</p>
+  <div class="options">
+    <button class="opt-btn" onclick="pick('tissue','necrotic-ischemic',this)"><span class="oi">🖤</span><span class="ob"><span class="ol">Necrotic — ischemic</span><span class="od">Black/dark eschar; desiccated devitalised tissue due to ischemia</span></span></button>
+    <button class="opt-btn" onclick="pick('tissue','necrotic-non-ischemic',this)"><span class="oi">⬛</span><span class="ob"><span class="ol">Necrotic — non-ischemic</span><span class="od">Desiccated devitalised tissue not caused by ischemia</span></span></button>
+    <button class="opt-btn" onclick="pick('tissue','slough',this)"><span class="oi">🟡</span><span class="ob"><span class="ol">Slough</span><span class="od">Yellow/tan/grey stringy or moist devitalised tissue</span></span></button>
+    <button class="opt-btn" onclick="pick('tissue','granulating',this)"><span class="oi">🔴</span><span class="ob"><span class="ol">Granulating</span><span class="od">Beefy red, cobblestone-textured healthy granulation tissue</span></span></button>
+    <button class="opt-btn" onclick="pick('tissue','epithelialising',this)"><span class="oi">🟣</span><span class="ob"><span class="ol">Epithelialising</span><span class="od">Pink, translucent new skin forming at edges or across surface</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-s2" disabled onclick="go('s3')">Continue</button></div>
+</div>
+
+<!-- ══ STRIDE R ══ -->
+<div class="screen" id="s3">
+  <div class="phase-badge phase-stride">⬤ STRIDE</div>
+  <div class="step-header"><div class="step-disc disc-stride">R</div><div class="step-meta"><div class="step-name">Surrounding skin</div><div class="step-of">Step 3 of 6</div></div></div>
+  <p class="screen-body">Select all features present in the peri-wound skin.</p>
+  <div class="check-options" id="skin-checks">
+    <div class="ck-row"><input type="checkbox" id="ck-ery" value="erythema"><label for="ck-ery">Erythema / redness</label></div>
+    <div class="ck-row"><input type="checkbox" id="ck-mac" value="maceration"><label for="ck-mac">Maceration / soggy, waterlogged skin</label></div>
+    <div class="ck-row"><input type="checkbox" id="ck-ecz" value="eczema"><label for="ck-ecz">Venous eczema</label></div>
+    <div class="ck-row"><input type="checkbox" id="ck-ind" value="induration"><label for="ck-ind">Induration / palpable firmness</label></div>
+    <div class="ck-row"><input type="checkbox" id="ck-fra" value="fragile"><label for="ck-fra">Fragile / thin / atrophic skin</label></div>
+    <div class="ck-row"><input type="checkbox" id="ck-dry" value="dry-skin"><label for="ck-dry">Dry / scaly skin</label></div>
+    <div class="ck-row"><input type="checkbox" id="ck-non" value="none"><label for="ck-non">No abnormalities noted</label></div>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" onclick="collectSkin(); go('s4')">Continue</button></div>
+</div>
+
+<!-- ══ STRIDE I ══ -->
+<div class="screen" id="s4">
+  <div class="phase-badge phase-stride">⬤ STRIDE</div>
+  <div class="step-header"><div class="step-disc disc-stride">I</div><div class="step-meta"><div class="step-name">Infection</div><div class="step-of">Step 4 of 6</div></div></div>
+  <p class="screen-body">Are local signs of wound infection present? Consider: increased pain, warmth, erythema, purulent or malodorous exudate, or failure to progress.</p>
+  <div class="yn-row">
+    <button class="yn-btn yn-yes" onclick="pickYN('infected','yes',this)">Yes</button>
+    <button class="yn-btn yn-no"  onclick="pickYN('infected','no',this)">No / Suspected only</button>
+  </div>
+  <div id="odour-block">
+    <div class="sub-question">
+      <div class="sub-q-label">Is odour present within the wound bed?</div>
+      <div class="yn-row" style="margin-bottom:0">
+        <button class="yn-btn yn-yes" onclick="pickYN('odour','yes',this)">Yes</button>
+        <button class="yn-btn yn-no"  onclick="pickYN('odour','no',this)">No</button>
+      </div>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-s4" disabled onclick="go('s5')">Continue</button></div>
+</div>
+
+<!-- ══ STRIDE D ══ -->
+<div class="screen" id="s5">
+  <div class="phase-badge phase-stride">⬤ STRIDE</div>
+  <div class="step-header"><div class="step-disc disc-stride">D</div><div class="step-meta"><div class="step-name">Discharge (exudate)</div><div class="step-of">Step 5 of 6</div></div></div>
+  <p class="screen-body">Estimate the level of wound exudate.</p>
+  <div class="level-options">
+    <button class="lvl-btn" onclick="pickLevel('exudate','low',this)"><span class="lvl-icon">💧</span><span class="lvl-body"><span class="lvl-label">Low</span><span class="lvl-desc">Wound bed moist; dressing minimally soiled at change</span></span></button>
+    <button class="lvl-btn" onclick="pickLevel('exudate','moderate',this)"><span class="lvl-icon">💧💧</span><span class="lvl-body"><span class="lvl-label">Moderate</span><span class="lvl-desc">Dressing saturated but contained; no strike-through</span></span></button>
+    <button class="lvl-btn" onclick="pickLevel('exudate','high',this)"><span class="lvl-icon">💧💧💧</span><span class="lvl-body"><span class="lvl-label">High</span><span class="lvl-desc">Strike-through; frequent changes required; leaking</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-s5" disabled onclick="go('s6')">Continue</button></div>
+</div>
+
+<!-- ══ STRIDE E ══ -->
+<div class="screen" id="s6">
+  <div class="phase-badge phase-stride">⬤ STRIDE</div>
+  <div class="step-header"><div class="step-disc disc-stride">E</div><div class="step-meta"><div class="step-name">Edge</div><div class="step-of">Step 6 of 6</div></div></div>
+  <p class="screen-body">Describe the predominant wound edge appearance.</p>
+  <div class="options">
+    <button class="opt-btn" onclick="pick('edge','attached',this)"><span class="ob"><span class="ol">Attached / flat</span><span class="od">Edges flush with wound bed; epithelium advancing; healing evident</span></span></button>
+    <button class="opt-btn" onclick="pick('edge','undermined',this)"><span class="ob"><span class="ol">Undermined / tunnelling</span><span class="od">Wound edges extend beneath surrounding skin</span></span></button>
+    <button class="opt-btn" onclick="pick('edge','rolled',this)"><span class="ob"><span class="ol">Rolled / epibole</span><span class="od">Edges curled inward; not advancing</span></span></button>
+    <button class="opt-btn" onclick="pick('edge','macerated',this)"><span class="ob"><span class="ol">Macerated</span><span class="od">Pale, soft, waterlogged edges from excessive moisture</span></span></button>
+    <button class="opt-btn" onclick="pick('edge','callous',this)"><span class="ob"><span class="ol">Callous / indurated</span><span class="od">Firm, thickened, hyperkeratotic edges</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-s6" disabled onclick="go('wounds')">Record dimensions →</button></div>
+</div>
+
+<!-- ══ WOUND DIMENSIONS ══ -->
+<div class="screen" id="wounds">
+  <div class="phase-badge phase-stride">⬤ STRIDE</div>
+  <div class="step-header"><div class="step-disc disc-stride">📏</div><div class="step-meta"><div class="step-name">Wound dimensions</div><div class="step-of">Measurements</div></div></div>
+  <p class="screen-body">Record wound measurements. These are tracked across visits to monitor progression. Leave blank if not measured today.</p>
+  <div class="dim-row">
+    <div class="dim-cell"><div class="dim-label">Length</div><input class="dim-input" id="dim-l" type="number" min="0" step="0.1" placeholder="—"><div class="dim-unit">mm</div></div>
+    <div class="dim-cell"><div class="dim-label">Width</div><input class="dim-input" id="dim-w" type="number" min="0" step="0.1" placeholder="—"><div class="dim-unit">mm</div></div>
+    <div class="dim-cell"><div class="dim-label">Depth</div><input class="dim-input" id="dim-d" type="number" min="0" step="0.1" placeholder="—"><div class="dim-unit">mm</div></div>
+  </div>
+  <div id="dim-area-display" style="display:none;margin-bottom:14px" class="notice notice-info">
+    <span class="notice-icon">📐</span><span id="dim-area-text"></span>
+  </div>
+  <div class="input-group">
+    <label class="input-label" for="inp-notes">Clinical notes for this visit (optional)</label>
+    <textarea class="text-input" id="inp-notes" rows="3" placeholder="e.g. Wound appears to be progressing well; no signs of infection; patient reports reduced pain..." style="resize:vertical"></textarea>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" onclick="collectDimensions(); go('t1')">Begin TIMER →</button></div>
+</div>
+
+<!-- ══ TIMER T ══ -->
+<div class="screen" id="t1">
+  <div class="phase-badge phase-timer">◆ TIMER</div>
+  <div class="step-header"><div class="step-disc disc-timer">T</div><div class="step-meta"><div class="step-name">Tissue (non-viable)</div><div class="step-of">Step 1 of 5</div></div></div>
+  <p class="screen-body">Is non-viable tissue present that may impede healing?</p>
+  <div class="yn-row"><button class="yn-btn yn-yes" onclick="pickYN('timer_tissue','yes',this)">Yes</button><button class="yn-btn yn-no" onclick="pickYN('timer_tissue','no',this)">No</button></div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-t1" disabled onclick="go('t2')">Continue</button></div>
+</div>
+
+<!-- ══ TIMER I ══ -->
+<div class="screen" id="t2">
+  <div class="phase-badge phase-timer">◆ TIMER</div>
+  <div class="step-header"><div class="step-disc disc-timer">I</div><div class="step-meta"><div class="step-name">Infection / inflammation</div><div class="step-of">Step 2 of 5</div></div></div>
+  <p class="screen-body">What is the extent of infection or ongoing inflammation?</p>
+  <div class="options">
+    <button class="opt-btn" onclick="pick('timer_infection','none',this)"><span class="ob"><span class="ol">No infection / inflammation</span><span class="od">Wound progressing normally; no clinical signs</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_infection','local',this)"><span class="ob"><span class="ol">Local infection</span><span class="od">Signs confined to wound bed: increased pain, exudate, malodour</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_infection','spreading',this)"><span class="ob"><span class="ol">Spreading infection</span><span class="od">Cellulitis or erythema extending beyond wound margins</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_infection','systemic',this)"><span class="ob"><span class="ol">Systemic infection</span><span class="od">Fever, rigors, sepsis signs — consider urgent escalation</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-t2" disabled onclick="go('t3')">Continue</button></div>
+</div>
+
+<!-- ══ TIMER M ══ -->
+<div class="screen" id="t3">
+  <div class="phase-badge phase-timer">◆ TIMER</div>
+  <div class="step-header"><div class="step-disc disc-timer">M</div><div class="step-meta"><div class="step-name">Moisture balance</div><div class="step-of">Step 3 of 5</div></div></div>
+  <p class="screen-body">How would you describe the overall wound moisture environment?</p>
+  <div class="options">
+    <button class="opt-btn" onclick="pick('timer_moisture','dry',this)"><span class="ob"><span class="ol">Too dry</span><span class="od">Desiccated wound bed; minimal exudate; dressings adhering</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_moisture','balanced',this)"><span class="ob"><span class="ol">Balanced</span><span class="od">Moist environment appropriate for healing; no maceration</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_moisture','excess',this)"><span class="ob"><span class="ol">Excess moisture</span><span class="od">Maceration, strike-through, leaking; peri-wound breakdown</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-t3" disabled onclick="go('t4')">Continue</button></div>
+</div>
+
+<!-- ══ TIMER E ══ -->
+<div class="screen" id="t4">
+  <div class="phase-badge phase-timer">◆ TIMER</div>
+  <div class="step-header"><div class="step-disc disc-timer">E</div><div class="step-meta"><div class="step-name">Edge advancement</div><div class="step-of">Step 4 of 5</div></div></div>
+  <p class="screen-body">Are wound edges advancing and wound dimensions reducing?</p>
+  <div class="options">
+    <button class="opt-btn" onclick="pick('timer_edge','advancing',this)"><span class="ob"><span class="ol">Advancing</span><span class="od">Wound reducing in size; epithelium migrating inward</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_edge','stalled',this)"><span class="ob"><span class="ol">Stalled</span><span class="od">No measurable reduction over 2–4 weeks</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_edge','increasing',this)"><span class="ob"><span class="ol">Increasing in size</span><span class="od">Wound enlarging — review management and escalate</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-t4" disabled onclick="go('t5')">Continue</button></div>
+</div>
+
+<!-- ══ TIMER R ══ -->
+<div class="screen" id="t5">
+  <div class="phase-badge phase-timer">◆ TIMER</div>
+  <div class="step-header"><div class="step-disc disc-timer">R</div><div class="step-meta"><div class="step-name">Repair &amp; regeneration</div><div class="step-of">Step 5 of 5</div></div></div>
+  <p class="screen-body">Considering wound type and patient factors, how would you describe overall healing progress?</p>
+  <div class="options">
+    <button class="opt-btn" onclick="pick('timer_repair','progressing',this)"><span class="ob"><span class="ol">Progressing as expected</span><span class="od">Healing on expected trajectory for wound type and patient</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_repair','slow',this)"><span class="ob"><span class="ol">Slower than expected</span><span class="od">Some healing activity but behind anticipated timeline</span></span></button>
+    <button class="opt-btn" onclick="pick('timer_repair','stalled',this)"><span class="ob"><span class="ol">Stalled / not healing</span><span class="od">No meaningful progress — consider specialist referral</span></span></button>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goBack()">←</button><button class="btn-next" id="next-t5" disabled onclick="buildResults()">View recommendations →</button></div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div class="screen" id="results">
+  <div class="phase-badge phase-result">✓ Recommendation</div>
+  <div id="results-content"></div>
+  <button class="btn-restart" onclick="restart()">↺ Start new assessment</button>
+</div>
+
+<!-- ══ PATIENT LIST ══ -->
+<div class="screen" id="patients">
+  <div class="phase-badge phase-patient">👥 Patient records</div>
+  <h2 style="font-size:19px;font-weight:600;margin-bottom:4px;color:var(--text-primary)">Patients</h2>
+  <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px">All records stored on this device. Tap a patient to view their wound history.</p>
+  <div class="action-row">
+    <button class="action-btn primary-action" onclick="showScreen('patient-entry')">+ New assessment</button>
+    <button class="action-btn" onclick="exportAllData()">📤 Export all</button>
+    <button class="action-btn" onclick="showImportModal()">📥 Import</button>
+  </div>
+  <div id="patient-list-container"></div>
+</div>
+
+<!-- ══ PATIENT HISTORY ══ -->
+<div class="screen" id="patient-history">
+  <div class="phase-badge phase-history">📋 Wound history</div>
+  <div id="history-header"></div>
+  <div class="action-row" id="history-actions"></div>
+  <div id="history-charts"></div>
+  <div id="history-visits"></div>
+</div>
+
+<!-- ══ IMPORT MODAL ══ -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📥 Import patient data</div>
+    <div class="modal-body">Paste exported JSON data below. Existing records for matching UR numbers will be merged — new visits will be added without overwriting existing ones.</div>
+    <textarea class="import-area" id="import-textarea" placeholder='Paste exported JSON here...'></textarea>
+    <div style="margin-top:10px" class="modal-actions">
+      <button class="modal-btn modal-cancel" onclick="closeModal('import-modal')">Cancel</button>
+      <button class="modal-btn modal-confirm" style="background:var(--teal)" onclick="doImport()">Import data</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DELETE MODAL ══ -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Delete patient record?</div>
+    <div class="modal-body" id="delete-modal-body"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-cancel" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="modal-btn modal-confirm" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const S = {
+  site:null,tissue:null,skin:[],infected:null,odour:null,
+  exudate:null,edge:null,dimL:null,dimW:null,dimD:null,notes:'',
+  timer_tissue:null,timer_infection:null,timer_moisture:null,
+  timer_edge:null,timer_repair:null
+};
+let currentPatientUR = null;
+let pendingDeleteUR  = null;
+
+/* ═══════════════════════════════════════════
+   LOCAL STORAGE
+═══════════════════════════════════════════ */
+const LS_KEY = 'wca_patients_v2';
+function loadDB(){ try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}')}catch(e){return{}} }
+function saveDB(db){ localStorage.setItem(LS_KEY,JSON.stringify(db)) }
+
+function getPatient(ur){ return loadDB()[ur]||null }
+function upsertVisit(ur,visit){
+  const db=loadDB();
+  if(!db[ur]) db[ur]={ur,name:'',dob:'',visits:[]};
+  db[ur].name    = visit.patientName||db[ur].name||'';
+  db[ur].dob     = visit.dob||db[ur].dob||'';
+  db[ur].visits  = db[ur].visits||[];
+  db[ur].visits.push(visit);
+  saveDB(db);
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+const SCREENS=['welcome','patient-entry','s1','s2','s3','s4','s5','s6','wounds','t1','t2','t3','t4','t5','results','patients','patient-history'];
+let current='welcome';
+
+const PROG={
+  'welcome':          {pct:0,  phase:'',               step:''},
+  'patient-entry':    {pct:5,  phase:'Patient details', step:'Step 1 of 13'},
+  's1':               {pct:13, phase:'STRIDE',          step:'Step 2 of 13'},
+  's2':               {pct:21, phase:'STRIDE',          step:'Step 3 of 13'},
+  's3':               {pct:29, phase:'STRIDE',          step:'Step 4 of 13'},
+  's4':               {pct:37, phase:'STRIDE',          step:'Step 5 of 13'},
+  's5':               {pct:44, phase:'STRIDE',          step:'Step 6 of 13'},
+  's6':               {pct:52, phase:'STRIDE',          step:'Step 7 of 13'},
+  'wounds':           {pct:58, phase:'Dimensions',      step:'Step 8 of 13'},
+  't1':               {pct:65, phase:'TIMER',           step:'Step 9 of 13'},
+  't2':               {pct:72, phase:'TIMER',           step:'Step 10 of 13'},
+  't3':               {pct:79, phase:'TIMER',           step:'Step 11 of 13'},
+  't4':               {pct:86, phase:'TIMER',           step:'Step 12 of 13'},
+  't5':               {pct:93, phase:'TIMER',           step:'Step 13 of 13'},
+  'results':          {pct:100,phase:'Recommendation',  step:'Complete'},
+  'patients':         {pct:0,  phase:'',               step:''},
+  'patient-history':  {pct:0,  phase:'',               step:''}
+};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  current=id;
+  const inAssess=['patient-entry','s1','s2','s3','s4','s5','s6','wounds','t1','t2','t3','t4','t5','results'].includes(id);
+  const pw=document.getElementById('progress-wrap');
+  const tr=document.getElementById('tb-restart');
+  const tp=document.getElementById('tb-patients');
+  pw.style.display=inAssess?'block':'none';
+  tr.style.display=inAssess?'flex':'none';
+  tp.style.display=(id!=='welcome')?'flex':'none';
+  if(inAssess&&PROG[id]){
+    document.getElementById('progress-fill').style.width=PROG[id].pct+'%';
+    document.getElementById('progress-phase').textContent=PROG[id].phase;
+    document.getElementById('progress-step').textContent=PROG[id].step;
+  }
+  if(id==='patients') renderPatientList();
+  if(id==='welcome') renderRecentPatientPill();
+  window.scrollTo(0,0);
+}
+function go(id){showScreen(id)}
+function goBack(){const i=SCREENS.indexOf(current);if(i>0)showScreen(SCREENS[i-1])}
+
+/* ═══════════════════════════════════════════
+   INPUT HELPERS
+═══════════════════════════════════════════ */
+function pick(key,val,el){
+  S[key]=val;
+  el.closest('.options').querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  const nb=document.getElementById('next-'+current);if(nb)nb.disabled=false;
+}
+function pickYN(key,val,el){
+  S[key]=val;
+  el.closest('.yn-row').querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  if(key==='infected'){
+    document.getElementById('odour-block').style.display=val==='yes'?'block':'none';
+    if(val==='no'){S.odour='no';document.getElementById('next-s4').disabled=false;}
+    else document.getElementById('next-s4').disabled=S.odour===null;
+    return;
+  }
+  if(key==='odour'){document.getElementById('next-s4').disabled=false;return;}
+  const nb=document.getElementById('next-'+current);if(nb)nb.disabled=false;
+}
+function pickLevel(key,val,el){
+  S[key]=val;
+  el.parentElement.querySelectorAll('.lvl-btn').forEach(b=>b.classList.remove('sel-low','sel-moderate','sel-high'));
+  el.classList.add('sel-'+val);
+  const nb=document.getElementById('next-'+current);if(nb)nb.disabled=false;
+}
+function collectSkin(){S.skin=Array.from(document.querySelectorAll('#skin-checks input:checked')).map(c=>c.value);}
+function collectDimensions(){
+  S.dimL=parseFloat(document.getElementById('dim-l').value)||null;
+  S.dimW=parseFloat(document.getElementById('dim-w').value)||null;
+  S.dimD=parseFloat(document.getElementById('dim-d').value)||null;
+  S.notes=document.getElementById('inp-notes').value.trim();
+}
+
+/* Live area calc */
+document.addEventListener('input',function(e){
+  if(['dim-l','dim-w'].includes(e.target.id)){
+    const l=parseFloat(document.getElementById('dim-l').value);
+    const w=parseFloat(document.getElementById('dim-w').value);
+    const d=document.getElementById('dim-area-display');
+    const t=document.getElementById('dim-area-text');
+    if(l&&w){d.style.display='flex';t.textContent='Calculated surface area: '+(l*w).toFixed(1)+' mm² ('+(l*w/100).toFixed(2)+' cm²)';}
+    else d.style.display='none';
+  }
+});
+
+/* ═══════════════════════════════════════════
+   PATIENT FLOW
+═══════════════════════════════════════════ */
+function checkPatientReady(){
+  const ur=document.getElementById('inp-ur').value.trim();
+  document.getElementById('next-patient-entry').disabled=ur.length<2;
+  const existing=getPatient(ur);
+  const notice=document.getElementById('existing-patient-notice');
+  const txt=document.getElementById('existing-patient-text');
+  if(existing&&existing.visits&&existing.visits.length>0){
+    const n=existing.visits.length;
+    const last=existing.visits[existing.visits.length-1];
+    const dateStr=last.date?new Date(last.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'unknown date';
+    notice.style.display='flex';
+    txt.textContent=`Existing record found — ${n} previous visit${n>1?'s':''}. Last assessment: ${dateStr}. This assessment will be added to their record.`;
+    if(existing.name&&!document.getElementById('inp-name').value) document.getElementById('inp-name').value=existing.name;
+    if(existing.dob&&!document.getElementById('inp-dob').value) document.getElementById('inp-dob').value=existing.dob;
+  } else {
+    notice.style.display='none';
+  }
+}
+function commitPatient(){
+  currentPatientUR=document.getElementById('inp-ur').value.trim();
+}
+
+/* ═══════════════════════════════════════════
+   DOH MATRIX
+═══════════════════════════════════════════ */
+const MATRIX={
+  'necrotic-ischemic_low_yes':          {id:1, primary:['Povidone iodine solution','Chlorhexidine topical application','Antimicrobial (Iodophors — Inadine only)'],secondary:['Low absorbent dressing']},
+  'necrotic-ischemic_low_no':           {id:2, primary:['Povidone iodine solution','Chlorhexidine topical application','Antimicrobial (Iodophors — Inadine only)'],secondary:['Low absorbent dressing']},
+  'necrotic-ischemic_moderate_yes':     {id:3, primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver gelling fibres)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)'],secondary:['Foam or absorbent dressing']},
+  'necrotic-ischemic_moderate_no':      {id:4, primary:['Antimicrobial (Iodophors — Inadine only)','Gelling fibres'],secondary:['Foam or absorbent dressing']},
+  'necrotic-ischemic_high_yes':         {id:5, primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (DACC-coated)'],secondary:['Super-absorbent dressing']},
+  'necrotic-ischemic_high_no':          {id:6, primary:['Antimicrobial (Iodophors — Inadine only)','Gelling fibres'],secondary:['Super-absorbent dressing']},
+  'necrotic-non-ischemic_low_yes':      {id:7, primary:['Antimicrobial (Alginogels)','Antimicrobial (Medical Grade Honey)','Antimicrobial (Wound Gels)'],secondary:['Low absorbent, foam or absorbent dressing']},
+  'necrotic-non-ischemic_low_no':       {id:8, primary:['Hydroactive dressing','Antimicrobial (Wound Gel)','Antimicrobial (Alginogels)','Antimicrobial (DACC-coated)','Antimicrobial (Sucrose-octasulfate Clean)','Low absorbent (consider contact layer)'],secondary:['Low absorbent, foam or absorbent dressing']},
+  'necrotic-non-ischemic_moderate_yes': {id:9, primary:['Antimicrobial (Alginogels)','Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Hydroactive (+ systemic antimicrobial)','Gelling fibres (+ systemic antimicrobial)','Hypertonic Saline (+ systemic antimicrobial)'],secondary:['Foam or absorbent dressing']},
+  'necrotic-non-ischemic_moderate_no':  {id:10,primary:['Foam or absorbent dressing','Alginates','Hydroactive','Gelling fibres','Hypertonic Saline'],secondary:['Foam or absorbent dressing']},
+  'necrotic-non-ischemic_high_yes':     {id:11,primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver gelling fibres)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (DACC-coated)','Hydroactive (+ systemic antimicrobial)','Gelling fibres (+ systemic antimicrobial)','Hypertonic Saline (+ systemic antimicrobial)'],secondary:['Super-absorbent dressing']},
+  'necrotic-non-ischemic_high_no':      {id:12,primary:['Absorbent or super-absorbent dressing','Alginates','Hydroactive','Gelling fibres','Hypertonic Saline'],secondary:['Super-absorbent dressing']},
+  'slough_low_yes':                     {id:13,primary:['Antimicrobial (Alginogels)','Antimicrobial (Medical Grade Honey)','Antimicrobial (Silver Foam)','Antimicrobial (Wound Gels)'],secondary:['Foam or absorbent dressing']},
+  'slough_low_no':                      {id:14,primary:['Antimicrobial (Wound gel)','Antimicrobial (Alginogel)','Hydroactive dressing'],secondary:['Foam or absorbent dressing']},
+  'slough_moderate_yes':                {id:15,primary:['Antimicrobial (Alginogels)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Antimicrobial (Collagen-based)','Hydroactive (+ systemic antimicrobial)','Gelling fibres (+ systemic antimicrobial)','Hypertonic Saline (+ systemic antimicrobial)'],secondary:['Foam or absorbent dressing']},
+  'slough_moderate_no':                 {id:16,primary:['Alginates','Hydroactive','Gelling fibres','Hypertonic Saline','Antimicrobial (Sucrose-octasulfate)'],secondary:['Foam or absorbent dressing']},
+  'slough_high_yes':                    {id:17,primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver gelling fibres)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Antimicrobial (Collagen-based)','Hydroactive (+ systemic antimicrobial)','Gelling fibres (+ systemic antimicrobial)','Hypertonic Saline (+ systemic antimicrobial)'],secondary:['Super-absorbent dressing']},
+  'slough_high_no':                     {id:18,primary:['Alginates','Gelling fibres','Hypertonic Saline'],secondary:['Super-absorbent dressing']},
+  'granulating_low_yes':                {id:19,primary:['Antimicrobial (Alginogels)','Antimicrobial (Medical Grade Honey)','Antimicrobial (Wound Gels)','Antimicrobial (Sucrose-octasulfate)'],secondary:['Foam or absorbent dressing']},
+  'granulating_low_no':                 {id:20,primary:['Low absorbent, foam or absorbent dressing (consider contact layer)'],secondary:['Low absorbent, foam or absorbent dressing (consider contact layer)']},
+  'granulating_moderate_yes':           {id:21,primary:['Antimicrobial (Alginogels)','Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Antimicrobial (Collagen-based)','Hydroactive (+ systemic antimicrobial)','Gelling fibres (+ systemic antimicrobial)'],secondary:['Foam or absorbent dressing']},
+  'granulating_moderate_no':            {id:22,primary:['Foam dressing or absorbent dressing','Alginates','Hydroactive','Gelling fibres'],secondary:['Foam or absorbent dressing']},
+  'granulating_high_yes':               {id:23,primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (Silver gelling fibres)','Antimicrobial (DACC-coated)','Hydroactive (+ systemic antimicrobial)','Gelling fibres (+ systemic antimicrobial)'],secondary:['Super-absorbent dressing']},
+  'granulating_high_no':                {id:24,primary:['Super-absorbent dressing','Alginates','Hydroactive','Gelling fibres'],secondary:['Super-absorbent dressing']},
+  'epithelialising_low_no':             {id:25,primary:['Low absorbent or foam'],secondary:['Low absorbent or foam']},
+  'epithelialising_low_yes':            {id:26,primary:['Low absorbent or foam'],secondary:['Consider escalation of care / review for possible soft tissue infection']}
+};
+
+const TISSUE_LABELS={'necrotic-ischemic':'Necrotic (ischemic)','necrotic-non-ischemic':'Necrotic (non-ischemic)','slough':'Slough','granulating':'Granulating','epithelialising':'Epithelialising'};
+const SITE_LABELS={'lower-limb':'Lower limb','upper-limb':'Upper limb','trunk-pressure':'Trunk / pressure area','head-neck':'Head / neck','other':'Other'};
+
+function getKey(){
+  const t=S.tissue||'granulating';
+  const e=(t==='epithelialising')?'low':(S.exudate||'low');
+  const i=S.infected==='yes'?'yes':'no';
+  return t+'_'+e+'_'+i;
+}
+
+/* ═══════════════════════════════════════════
+   BUILD RESULTS + SAVE VISIT
+═══════════════════════════════════════════ */
+function buildResults(){
+  const key=getKey();
+  const rec=MATRIX[key]||MATRIX['granulating_low_no'];
+
+  // Save visit
+  const now=new Date();
+  const visit={
+    date:now.toISOString(),
+    patientName:document.getElementById('inp-name').value.trim(),
+    dob:document.getElementById('inp-dob').value,
+    clinician:document.getElementById('inp-clinician').value.trim(),
+    site:S.site, tissue:S.tissue, skin:S.skin,
+    infected:S.infected, odour:S.odour, exudate:S.exudate, edge:S.edge,
+    dimL:S.dimL, dimW:S.dimW, dimD:S.dimD,
+    area:(S.dimL&&S.dimW)?parseFloat((S.dimL*S.dimW).toFixed(1)):null,
+    notes:S.notes,
+    timer_tissue:S.timer_tissue, timer_infection:S.timer_infection,
+    timer_moisture:S.timer_moisture, timer_edge:S.timer_edge, timer_repair:S.timer_repair,
+    pathway:rec.id, primaryDressings:rec.primary, secondaryDressings:rec.secondary
+  };
+  if(currentPatientUR) upsertVisit(currentPatientUR,visit);
+
+  // Flags
+  const flags=[];
+  if(S.timer_infection==='systemic') flags.push({type:'alert',text:'Systemic infection signs — urgent escalation to treating clinician; systemic antimicrobial therapy likely required.'});
+  else if(S.timer_infection==='spreading') flags.push({type:'alert',text:'Spreading infection (cellulitis/lymphangitis) — escalate to treating clinician; review systemic antimicrobial therapy.'});
+  if(S.timer_tissue==='yes') flags.push({type:'alert',text:'Non-viable tissue present — debridement should be considered as part of the wound management plan.'});
+  if(S.timer_edge==='increasing') flags.push({type:'alert',text:'Wound is enlarging — review current management plan and escalate for clinical review.'});
+  if(S.timer_repair==='stalled') flags.push({type:'info',text:'Wound repair stalled — consider referral to wound specialist or advanced wound therapy.'});
+  if(S.timer_edge==='stalled') flags.push({type:'info',text:'Wound edges not advancing — consider edge preparation, debridement, or specialist input.'});
+  if(S.timer_moisture==='excess') flags.push({type:'info',text:'Excess moisture — prioritise absorbent dressing; consider moisture barrier for peri-wound skin.'});
+  if(S.edge==='rolled') flags.push({type:'info',text:'Rolled / epibole edges noted — consider edge preparation or specialist input.'});
+  if(S.edge==='undermined') flags.push({type:'info',text:'Undermining / tunnelling noted — ensure dressing fills dead space; document depth and direction.'});
+
+  const mods=[];
+  if(S.odour==='yes') mods.push('Odour present — consider adding a charcoal / carbon dressing (with or without silver).');
+  if(S.skin.includes('eczema')) mods.push('Venous eczema noted — zinc paste bandages may be appropriate; consider inclusion in management plan.');
+  if(S.skin.includes('maceration')) mods.push('Peri-wound maceration — consider moisture barrier skin protectant; choose higher absorbency dressing.');
+
+  const exuLabel=S.exudate?(S.exudate.charAt(0).toUpperCase()+S.exudate.slice(1)):'—';
+  const infLabel=S.infected==='yes'?'Yes':'No';
+  const dimStr=(S.dimL&&S.dimW)?`${S.dimL}mm × ${S.dimW}mm${S.dimD?' × '+S.dimD+'mm (depth)':''} = ${(S.dimL*S.dimW).toFixed(1)} mm² surface area`:'Not recorded';
+
+  // Progression comparison
+  let progressHtml='';
+  if(currentPatientUR){
+    const pt=getPatient(currentPatientUR);
+    if(pt&&pt.visits&&pt.visits.length>1){
+      const prev=pt.visits[pt.visits.length-2];
+      progressHtml=buildProgressCompare(prev,visit);
+    }
+  }
+
+  const flagsHtml=flags.map(f=>`<div class="notice ${f.type==='alert'?'notice-alert':'notice-info'}"><span class="notice-icon">${f.type==='alert'?'🔴':'ℹ'}</span><span>${f.text}</span></div>`).join('');
+  const modsHtml=mods.map(m=>`<div class="notice notice-mod"><span class="notice-icon">💡</span><span>${m}</span></div>`).join('');
+  const primaryHtml=rec.primary.map(d=>`<div class="dressing-item di-primary"><div class="di-dot"></div><span>${d}</span></div>`).join('');
+  const secondaryHtml=rec.secondary.map(d=>`<div class="dressing-item di-secondary"><div class="di-dot"></div><span>${d}</span></div>`).join('');
+
+  const patientRow=currentPatientUR?`<div class="summary-row"><span class="sr-lbl">Patient</span><span class="sr-val">${document.getElementById('inp-name').value.trim()||'—'} · UR ${currentPatientUR}</span></div>`:'';
+  const clinRow=document.getElementById('inp-clinician').value.trim()?`<div class="summary-row"><span class="sr-lbl">Clinician</span><span class="sr-val">${document.getElementById('inp-clinician').value.trim()}</span></div>`:'';
+
+  const html=`
+    <div class="results-section">
+      <div class="rs-label">Wound profile — ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}</div>
+      <div class="summary-card">
+        ${patientRow}${clinRow}
+        <div class="summary-row"><span class="sr-lbl">Tissue type</span><span class="sr-val">${TISSUE_LABELS[S.tissue]||'—'}</span></div>
+        <div class="summary-row"><span class="sr-lbl">Exudate</span><span class="sr-val"><span class="badge badge-${S.exudate||'low'}">${exuLabel}</span></span></div>
+        <div class="summary-row"><span class="sr-lbl">Infection</span><span class="sr-val"><span class="badge badge-${S.infected}">${infLabel}</span></span></div>
+        <div class="summary-row"><span class="sr-lbl">Site</span><span class="sr-val">${SITE_LABELS[S.site]||'—'}</span></div>
+        <div class="summary-row"><span class="sr-lbl">Dimensions</span><span class="sr-val" style="font-size:12px">${dimStr}</span></div>
+      </div>
+    </div>
+    ${progressHtml}
+    ${flags.length?`<div class="results-section"><div class="rs-label">Clinical flags</div>${flagsHtml}</div>`:''}
+    ${mods.length?`<div class="results-section"><div class="rs-label">Additional considerations</div>${modsHtml}</div>`:''}
+    <div class="results-section">
+      <div class="pathway-row"><div class="pathway-num">${rec.id}</div><div class="pathway-text"><div class="pathway-title">DoH Pathway ${rec.id}</div><div class="pathway-sub">${TISSUE_LABELS[S.tissue]} · ${exuLabel} exudate · ${infLabel==='Yes'?'Infected':'No infection'}</div></div></div>
+      <div class="rs-label">Primary dressing options</div>
+      <div class="dressing-list" style="margin-bottom:13px">${primaryHtml}</div>
+      <div class="rs-label">Secondary dressing</div>
+      <div class="dressing-list">${secondaryHtml}</div>
+    </div>
+    ${S.notes?`<div class="results-section"><div class="rs-label">Clinical notes</div><div class="summary-card"><div style="padding:12px 14px;font-size:14px;color:var(--text-secondary);line-height:1.6">${S.notes}</div></div></div>`:''}
+    ${currentPatientUR?`<div class="results-section"><button class="action-btn primary-action" style="width:100%;justify-content:center" onclick="viewPatientHistory('${currentPatientUR}')">📋 View full wound history for this patient</button></div>`:''}
+    <div class="notice notice-warn"><span class="notice-icon">⚠</span><span><strong>Advisory only.</strong> Apply clinical judgement. Based on the Australian Government DoH Aged Care consumable choice guide. Generic names used.</span></div>`;
+
+  document.getElementById('results-content').innerHTML=html;
+  showScreen('results');
+}
+
+/* ═══════════════════════════════════════════
+   PROGRESS COMPARE (visit-to-visit)
+═══════════════════════════════════════════ */
+function buildProgressCompare(prev,curr){
+  const rows=[];
+
+  // Area
+  if(prev.area&&curr.area){
+    const diff=curr.area-prev.area;
+    const pct=Math.abs(diff/prev.area*100).toFixed(0);
+    const better=diff<0;
+    const same=Math.abs(diff)<1;
+    rows.push(`<div class="summary-row"><span class="sr-lbl">Surface area</span><span class="sr-val" style="display:flex;align-items:center;gap:8px"><span>${curr.area} mm²</span>${same?'<span class="trend trend-same">→ Unchanged</span>':better?'<span class="trend trend-better">↓ '+pct+'% smaller</span>':'<span class="trend trend-worse">↑ '+pct+'% larger</span>'}</span></div>`);
+  }
+
+  // Tissue
+  const tissueOrder={'necrotic-ischemic':0,'necrotic-non-ischemic':1,'slough':2,'granulating':3,'epithelialising':4};
+  if(prev.tissue&&curr.tissue&&prev.tissue!==curr.tissue){
+    const better=(tissueOrder[curr.tissue]||0)>(tissueOrder[prev.tissue]||0);
+    rows.push(`<div class="summary-row"><span class="sr-lbl">Tissue type</span><span class="sr-val" style="display:flex;align-items:center;gap:8px"><span>${TISSUE_LABELS[curr.tissue]}</span>${better?'<span class="trend trend-better">↑ Progressing</span>':'<span class="trend trend-worse">↓ Deteriorating</span>'}</span></div>`);
+  }
+
+  // Exudate
+  const exuOrder={low:0,moderate:1,high:2};
+  if(prev.exudate&&curr.exudate&&prev.exudate!==curr.exudate){
+    const better=(exuOrder[curr.exudate]||0)<(exuOrder[prev.exudate]||0);
+    rows.push(`<div class="summary-row"><span class="sr-lbl">Exudate</span><span class="sr-val" style="display:flex;align-items:center;gap:8px"><span class="badge badge-${curr.exudate}">${curr.exudate.charAt(0).toUpperCase()+curr.exudate.slice(1)}</span>${better?'<span class="trend trend-better">↓ Reduced</span>':'<span class="trend trend-worse">↑ Increased</span>'}</span></div>`);
+  }
+
+  // Infection
+  if(prev.infected&&curr.infected&&prev.infected!==curr.infected){
+    const better=curr.infected==='no';
+    rows.push(`<div class="summary-row"><span class="sr-lbl">Infection</span><span class="sr-val" style="display:flex;align-items:center;gap:8px"><span class="badge badge-${curr.infected}">${curr.infected==='yes'?'Yes':'No'}</span>${better?'<span class="trend trend-better">↑ Resolved</span>':'<span class="trend trend-worse">↓ Developed</span>'}</span></div>`);
+  }
+
+  if(!rows.length) return '';
+  const prevDate=new Date(prev.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  return `<div class="results-section"><div class="rs-label">Comparison vs previous visit (${prevDate})</div><div class="summary-card">${rows.join('')}</div></div>`;
+}
+
+/* ═══════════════════════════════════════════
+   PATIENT LIST
+═══════════════════════════════════════════ */
+function renderPatientList(){
+  const db=loadDB();
+  const keys=Object.keys(db);
+  const container=document.getElementById('patient-list-container');
+  if(!keys.length){
+    container.innerHTML=`<div class="empty-state"><div class="es-icon">🩺</div><div class="es-text">No patient records yet.<br>Complete an assessment to create a record.</div></div>`;
+    return;
+  }
+  const sorted=keys.sort((a,b)=>{
+    const la=db[a].visits&&db[a].visits.length?db[a].visits[db[a].visits.length-1].date:'';
+    const lb=db[b].visits&&db[b].visits.length?db[b].visits[db[b].visits.length-1].date:'';
+    return lb.localeCompare(la);
+  });
+  container.innerHTML=`<div class="patient-list">${sorted.map(ur=>{
+    const pt=db[ur];
+    const n=pt.visits?pt.visits.length:0;
+    const last=n?pt.visits[n-1]:null;
+    const dateStr=last?new Date(last.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'No visits';
+    const tissue=last?TISSUE_LABELS[last.tissue]||'—':'—';
+    return `<div class="patient-row" onclick="viewPatientHistory('${ur}')">
+      <span class="pr-icon">🧑‍⚕️</span>
+      <span class="pr-body">
+        <span class="pr-name">${pt.name||'Patient'} · UR ${ur}</span>
+        <span class="pr-meta">${n} visit${n!==1?'s':''} · Last: ${dateStr} · ${tissue}</span>
+      </span>
+      <span class="pr-arrow">›</span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ═══════════════════════════════════════════
+   PATIENT HISTORY VIEW
+═══════════════════════════════════════════ */
+function viewPatientHistory(ur){
+  currentPatientUR=ur;
+  const pt=getPatient(ur);
+  if(!pt){return;}
+  const visits=pt.visits||[];
+
+  // Header
+  document.getElementById('history-header').innerHTML=`
+    <div style="margin-bottom:12px">
+      <div style="font-size:20px;font-weight:700;color:var(--text-primary)">${pt.name||'Patient'}</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:2px">UR ${ur}${pt.dob?' · DOB '+new Date(pt.dob).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):''} · ${visits.length} visit${visits.length!==1?'s':''}</div>
+    </div>`;
+
+  // Actions
+  document.getElementById('history-actions').innerHTML=`
+    <button class="action-btn primary-action" onclick="startNewVisitForPatient('${ur}')">+ New visit</button>
+    <button class="action-btn" onclick="exportPatient('${ur}')">📤 Export</button>
+    <button class="action-btn danger" onclick="promptDelete('${ur}')">🗑 Delete</button>`;
+
+  // Charts
+  document.getElementById('history-charts').innerHTML=buildCharts(visits);
+
+  // Visit accordion
+  const visitsHtml=visits.slice().reverse().map((v,i)=>{
+    const vn=visits.length-i;
+    const dateStr=new Date(v.date).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    const dimStr=(v.dimL&&v.dimW)?`${v.dimL}×${v.dimW}mm${v.dimD?' ×'+v.dimD:''}`:null;
+    const areaStr=v.area?`${v.area} mm²`:null;
+    return `<div class="visit-card">
+      <div class="visit-header" onclick="toggleVisit(this)">
+        <div class="vh-left">
+          <div class="vh-num">${vn}</div>
+          <div><div class="vh-date">${dateStr}</div><div class="vh-meta">${TISSUE_LABELS[v.tissue]||'—'} · ${v.exudate?v.exudate.charAt(0).toUpperCase()+v.exudate.slice(1):''} exudate · Pathway ${v.pathway||'—'}${v.clinician?' · '+v.clinician:''}</div></div>
+        </div>
+        <span class="vh-arrow">›</span>
+      </div>
+      <div class="visit-body">
+        <div class="vb-grid">
+          <div class="vb-cell"><div class="vb-cell-label">Site</div><div class="vb-cell-val">${SITE_LABELS[v.site]||'—'}</div></div>
+          <div class="vb-cell"><div class="vb-cell-label">Tissue</div><div class="vb-cell-val">${TISSUE_LABELS[v.tissue]||'—'}</div></div>
+          <div class="vb-cell"><div class="vb-cell-label">Exudate</div><div class="vb-cell-val">${v.exudate?v.exudate.charAt(0).toUpperCase()+v.exudate.slice(1):'—'}</div></div>
+          <div class="vb-cell"><div class="vb-cell-label">Infection</div><div class="vb-cell-val">${v.infected==='yes'?'Yes':'No'}</div></div>
+          ${dimStr?`<div class="vb-cell"><div class="vb-cell-label">Dimensions</div><div class="vb-cell-val">${dimStr}</div></div>`:''}
+          ${areaStr?`<div class="vb-cell"><div class="vb-cell-label">Surface area</div><div class="vb-cell-val">${areaStr}</div></div>`:''}
+          <div class="vb-cell"><div class="vb-cell-label">TIMER — tissue</div><div class="vb-cell-val">${v.timer_tissue==='yes'?'Non-viable present':'Clear'}</div></div>
+          <div class="vb-cell"><div class="vb-cell-label">Wound edge</div><div class="vb-cell-val">${v.timer_edge||'—'}</div></div>
+        </div>
+        ${v.notes?`<div style="margin-top:10px;padding:10px;background:var(--bg-secondary);border-radius:var(--radius-sm);font-size:13px;color:var(--text-secondary);line-height:1.5"><strong style="display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px">Notes</strong>${v.notes}</div>`:''}
+        <div class="vb-dressings" style="margin-top:10px">
+          <div class="vb-dress-label">Dressing recommendation (Pathway ${v.pathway||'—'})</div>
+          ${(v.primaryDressings||[]).map(d=>`<div class="vb-dress-item">● ${d}</div>`).join('')}
+          ${(v.secondaryDressings||[]).map(d=>`<div class="vb-dress-item">○ ${d}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('history-visits').innerHTML=`
+    <div class="rs-label" style="margin-bottom:8px">Visit history (${visits.length} total)</div>
+    ${visits.length?visitsHtml:'<div class="empty-state"><div class="es-text">No visits recorded yet.</div></div>'}`;
+
+  showScreen('patient-history');
+}
+
+function toggleVisit(header){
+  const body=header.nextElementSibling;
+  const arrow=header.querySelector('.vh-arrow');
+  const open=body.classList.toggle('open');
+  arrow.style.transform=open?'rotate(90deg)':'';
+}
+
+function startNewVisitForPatient(ur){
+  const pt=getPatient(ur);
+  if(pt){
+    document.getElementById('inp-ur').value=ur;
+    document.getElementById('inp-name').value=pt.name||'';
+    document.getElementById('inp-dob').value=pt.dob||'';
+    currentPatientUR=ur;
+  }
+  showScreen('s1');
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('tb-restart').style.display='flex';
+}
+
+/* ═══════════════════════════════════════════
+   SVG CHARTS
+═══════════════════════════════════════════ */
+function buildCharts(visits){
+  if(visits.length<2) return `<div class="chart-wrap"><div class="chart-empty">📈 Charts available after 2+ visits</div></div>`;
+
+  const labels=visits.map((_,i)=>'V'+(i+1));
+  let html='';
+
+  // Area chart
+  const areaData=visits.map(v=>v.area);
+  if(areaData.some(v=>v!==null)){
+    html+=buildLineChart('Surface area over time (mm²)',labels,areaData,'#0A55A8',v=>v!==null);
+  }
+
+  // Exudate chart
+  const exuMap={low:1,moderate:2,high:3};
+  const exuData=visits.map(v=>exuMap[v.exudate]||null);
+  html+=buildBarChart('Exudate level',labels,exuData,v=>v===1?'#639922':v===2?'#BA7517':'#E24B4A',['Low','Moderate','High']);
+
+  // Tissue chart
+  const tissueOrder={'necrotic-ischemic':1,'necrotic-non-ischemic':2,'slough':3,'granulating':4,'epithelialising':5};
+  const tissueData=visits.map(v=>tissueOrder[v.tissue]||null);
+  html+=buildTissueChart('Tissue type progression',labels,visits.map(v=>v.tissue));
+
+  return html;
+}
+
+function buildLineChart(title,labels,data,color,filter){
+  const valid=data.map((v,i)=>({v,i})).filter(x=>x.v!==null);
+  if(valid.length<2) return '';
+  const W=340,H=120,PL=42,PR=16,PT=10,PB=28;
+  const iW=W-PL-PR,iH=H-PT-PB;
+  const vals=valid.map(x=>x.v);
+  const mn=Math.min(...vals),mx=Math.max(...vals);
+  const range=mx-mn||1;
+  const xStep=iW/(labels.length-1);
+  const pts=valid.map(x=>{
+    const cx=PL+x.i*xStep;
+    const cy=PT+iH-(((x.v-mn)/range)*iH);
+    return {cx,cy,v:x.v,i:x.i};
+  });
+  const pathD=pts.map((p,j)=>(j===0?'M':'L')+p.cx.toFixed(1)+','+p.cy.toFixed(1)).join(' ');
+  const areaD=pathD+' L'+pts[pts.length-1].cx.toFixed(1)+','+(PT+iH)+' L'+pts[0].cx.toFixed(1)+','+(PT+iH)+' Z';
+
+  // Y axis ticks
+  const yticks=[mn,mn+range/2,mx].map(v=>({v,y:PT+iH-(((v-mn)/range)*iH)}));
+
+  return `<div class="chart-wrap">
+    <div class="chart-title">${title}</div>
+    <svg class="chart-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".18"/><stop offset="100%" stop-color="${color}" stop-opacity=".01"/></linearGradient></defs>
+      ${yticks.map(t=>`<line x1="${PL}" y1="${t.y.toFixed(1)}" x2="${W-PR}" y2="${t.y.toFixed(1)}" stroke="#e0ddd6" stroke-width="1"/>
+      <text x="${PL-4}" y="${(t.y+4).toFixed(1)}" text-anchor="end" font-size="9" fill="#888780">${t.v.toFixed(0)}</text>`).join('')}
+      <path d="${areaD}" fill="url(#ag)"/>
+      <path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${pts.map(p=>`<circle cx="${p.cx.toFixed(1)}" cy="${p.cy.toFixed(1)}" r="3.5" fill="${color}" stroke="white" stroke-width="1.5"/>`).join('')}
+      ${labels.map((_,i)=>{
+        const cx=PL+i*xStep;
+        return `<text x="${cx.toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="#888780">${labels[i]}</text>`;
+      }).join('')}
+    </svg>
+  </div>`;
+}
+
+function buildBarChart(title,labels,data,colorFn,legend){
+  const valid=data.every(v=>v===null);
+  if(valid) return '';
+  const W=340,H=100,PL=42,PR=16,PT=10,PB=28;
+  const iW=W-PL-PR,iH=H-PT-PB;
+  const bw=Math.min(28,(iW/labels.length)*0.6);
+  const gap=iW/labels.length;
+  const bars=labels.map((_,i)=>{
+    const v=data[i];
+    if(!v) return '';
+    const bh=(v/3)*iH;
+    const x=PL+i*gap+(gap-bw)/2;
+    const y=PT+iH-bh;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${colorFn(v)}" opacity="0.85"/>
+    <text x="${(x+bw/2).toFixed(1)}" y="${(y-3).toFixed(1)}" text-anchor="middle" font-size="8" fill="${colorFn(v)}">${legend[v-1]||''}</text>`;
+  }).join('');
+  return `<div class="chart-wrap">
+    <div class="chart-title">${title}</div>
+    <svg class="chart-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+iH}" stroke="#e0ddd6" stroke-width="1"/>
+      <line x1="${PL}" y1="${PT+iH}" x2="${W-PR}" y2="${PT+iH}" stroke="#e0ddd6" stroke-width="1"/>
+      ${bars}
+      ${labels.map((_,i)=>`<text x="${(PL+i*gap+gap/2).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="#888780">${labels[i]}</text>`).join('')}
+    </svg>
+  </div>`;
+}
+
+function buildTissueChart(title,labels,tissues){
+  const tissueColors={'necrotic-ischemic':'#2C2C2A','necrotic-non-ischemic':'#5F5E5A','slough':'#BA7517','granulating':'#E24B4A','epithelialising':'#0A55A8'};
+  const W=340,H=60,PL=10,PR=10,PT=6,PB=18;
+  const iW=W-PL-PR;
+  const bw=Math.max(8,iW/labels.length-3);
+  const gap=iW/labels.length;
+  const blocks=tissues.map((t,i)=>{
+    if(!t) return '';
+    const x=PL+i*gap;
+    const c=tissueColors[t]||'#888780';
+    return `<rect x="${x.toFixed(1)}" y="${PT}" width="${(gap-2).toFixed(1)}" height="${H-PT-PB}" rx="3" fill="${c}" opacity="0.85"/>`;
+  }).join('');
+  const legend=Object.entries(tissueColors).map(([k,c])=>`<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--text-secondary);margin-right:8px"><span style="width:10px;height:10px;border-radius:2px;background:${c};display:inline-block"></span>${TISSUE_LABELS[k]}</span>`).join('');
+  return `<div class="chart-wrap">
+    <div class="chart-title">${title}</div>
+    <svg class="chart-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      ${blocks}
+      ${labels.map((_,i)=>`<text x="${(PL+i*gap+gap/2).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="9" fill="#888780">${labels[i]}</text>`).join('')}
+    </svg>
+    <div style="margin-top:8px;line-height:1.8">${legend}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   EXPORT / IMPORT
+═══════════════════════════════════════════ */
+function exportAllData(){
+  const db=loadDB();
+  const json=JSON.stringify({exportedBy:'WoundCareAdvisor',exportDate:new Date().toISOString(),version:2,patients:db},null,2);
+  downloadJSON(json,'wound-care-all-patients.json');
+}
+function exportPatient(ur){
+  const pt=getPatient(ur);
+  if(!pt) return;
+  const json=JSON.stringify({exportedBy:'WoundCareAdvisor',exportDate:new Date().toISOString(),version:2,patients:{[ur]:pt}},null,2);
+  downloadJSON(json,'wound-care-patient-'+ur+'.json');
+}
+function downloadJSON(json,filename){
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(json);
+  a.download=filename;a.click();
+}
+function showImportModal(){document.getElementById('import-modal').classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function doImport(){
+  const raw=document.getElementById('import-textarea').value.trim();
+  try{
+    const parsed=JSON.parse(raw);
+    const pts=parsed.patients||{};
+    const db=loadDB();
+    let count=0;
+    Object.entries(pts).forEach(([ur,pt])=>{
+      if(!db[ur]){db[ur]=pt;count+=(pt.visits||[]).length;}
+      else{
+        const existing=new Set((db[ur].visits||[]).map(v=>v.date));
+        const newVis=(pt.visits||[]).filter(v=>!existing.has(v.date));
+        db[ur].visits=[...(db[ur].visits||[]),...newVis];
+        if(pt.name&&!db[ur].name) db[ur].name=pt.name;
+        if(pt.dob&&!db[ur].dob) db[ur].dob=pt.dob;
+        count+=newVis.length;
+      }
+    });
+    saveDB(db);
+    closeModal('import-modal');
+    document.getElementById('import-textarea').value='';
+    alert(`Import successful — ${count} visit${count!==1?'s':''} added across ${Object.keys(pts).length} patient${Object.keys(pts).length!==1?'s':''}.`);
+    if(current==='patients') renderPatientList();
+  }catch(e){alert('Import failed — please check the JSON is valid and was exported from this tool.');}
+}
+
+/* ═══════════════════════════════════════════
+   DELETE
+═══════════════════════════════════════════ */
+function promptDelete(ur){
+  pendingDeleteUR=ur;
+  const pt=getPatient(ur);
+  document.getElementById('delete-modal-body').textContent=`This will permanently delete all ${(pt.visits||[]).length} visit record${(pt.visits||[]).length!==1?'s':''} for ${pt.name||'this patient'} (UR ${ur}). This cannot be undone.`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function confirmDelete(){
+  if(!pendingDeleteUR) return;
+  const db=loadDB();
+  delete db[pendingDeleteUR];
+  saveDB(db);
+  pendingDeleteUR=null;
+  closeModal('delete-modal');
+  showScreen('patients');
+}
+
+/* ═══════════════════════════════════════════
+   RECENT PATIENT PILL ON WELCOME
+═══════════════════════════════════════════ */
+function renderRecentPatientPill(){
+  const db=loadDB();
+  const keys=Object.keys(db);
+  if(!keys.length){document.getElementById('recent-patient-pill').style.display='none';return;}
+  const sorted=keys.sort((a,b)=>{
+    const la=db[a].visits&&db[a].visits.length?db[a].visits[db[a].visits.length-1].date:'';
+    const lb=db[b].visits&&db[b].visits.length?db[b].visits[db[b].visits.length-1].date:'';
+    return lb.localeCompare(la);
+  });
+  const ur=sorted[0];const pt=db[ur];
+  const n=pt.visits?pt.visits.length:0;
+  const last=n?pt.visits[n-1]:null;
+  const dateStr=last?new Date(last.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'}):'';
+  const pill=document.getElementById('recent-patient-pill');
+  pill.style.display='flex';
+  pill.innerHTML=`<div class="patient-pill" onclick="viewPatientHistory('${ur}')"><span class="pp-icon">🧑‍⚕️</span><span class="pp-body"><span class="pp-name">Recent: ${pt.name||'Patient'} · UR ${ur}</span><span class="pp-meta">Last visit ${dateStr} · ${n} visit${n!==1?'s':''}</span></span><span class="pp-arrow">›</span></div>`;
+}
+
+/* ═══════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════ */
+function restart(){
+  Object.keys(S).forEach(k=>{S[k]=Array.isArray(S[k])?[]:null;});
+  currentPatientUR=null;
+  document.querySelectorAll('.opt-btn,.yn-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.lvl-btn').forEach(b=>b.classList.remove('sel-low','sel-moderate','sel-high'));
+  document.querySelectorAll('#skin-checks input').forEach(c=>c.checked=false);
+  document.querySelectorAll('[id^=next-]').forEach(b=>b.disabled=true);
+  document.getElementById('odour-block').style.display='none';
+  ['inp-ur','inp-name','inp-clinician','inp-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const dob=document.getElementById('inp-dob');if(dob)dob.value='';
+  ['dim-l','dim-w','dim-d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('dim-area-display').style.display='none';
+  document.getElementById('existing-patient-notice').style.display='none';
+  showScreen('welcome');
+}
+
+// Init
+renderRecentPatientPill();
+</script>
+</body>
+</html>
