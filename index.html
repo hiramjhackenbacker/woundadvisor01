@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Wound Care Advisor — HITH</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:           #1D9E75;
+    --teal-light:     #E1F5EE;
+    --teal-mid:       #9FE1CB;
+    --teal-dark:      #085041;
+    --amber:          #BA7517;
+    --amber-light:    #FAEEDA;
+    --amber-dark:     #633806;
+    --red:            #E24B4A;
+    --red-light:      #FCEBEB;
+    --red-dark:       #501313;
+    --green:          #639922;
+    --green-light:    #EAF3DE;
+    --green-dark:     #27500A;
+    --blue:           #185FA5;
+    --blue-light:     #E6F1FB;
+    --blue-dark:      #042C53;
+    --gray-50:        #F1EFE8;
+    --gray-200:       #B4B2A9;
+    --gray-400:       #888780;
+    --gray-600:       #5F5E5A;
+    --gray-900:       #2C2C2A;
+    --text-primary:   #1a1a18;
+    --text-secondary: #5F5E5A;
+    --text-muted:     #888780;
+    --bg-page:        #f7f6f2;
+    --bg-card:        #ffffff;
+    --bg-secondary:   #f1efe8;
+    --border:         rgba(0,0,0,0.10);
+    --border-med:     rgba(0,0,0,0.18);
+    --radius-sm:      6px;
+    --radius-md:      10px;
+    --radius-lg:      14px;
+    --radius-xl:      18px;
+    --shadow-sm:      0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md:      0 3px 12px rgba(0,0,0,0.10);
+  }
+
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── Shell ── */
+  #shell {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--bg-page);
+    position: relative;
+  }
+
+  /* ── Top bar ── */
+  #topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+  #topbar-logo svg { flex-shrink: 0; }
+  #topbar-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  #topbar-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 0.03em; }
+  #topbar-restart {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #topbar-restart:hover { background: var(--gray-200); }
+
+  /* ── Progress ── */
+  #progress-wrap {
+    display: none;
+    padding: 0 16px 0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+  #progress-track {
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  #progress-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 2px;
+    transition: width 0.35s ease;
+    width: 0%;
+  }
+  #progress-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; padding: 20px 16px 32px; }
+  .screen.active { display: block; }
+
+  /* ── Phase badge ── */
+  .phase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .phase-stride { background: var(--blue-light); color: var(--blue-dark); }
+  .phase-timer  { background: var(--amber-light); color: var(--amber-dark); }
+  .phase-result { background: var(--teal-light); color: var(--teal-dark); }
+
+  /* ── Step header ── */
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .step-disc {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: white;
+  }
+  .disc-stride { background: var(--blue); }
+  .disc-timer  { background: var(--amber); }
+  .step-meta { flex: 1; }
+  .step-name { font-size: 19px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+  .step-of   { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+  /* ── Screen body text ── */
+  .screen-body {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  /* ── Option buttons ── */
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .opt-btn {
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    transition: border-color 0.15s, background 0.15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .opt-btn:hover { border-color: var(--teal); background: #fafffe; }
+  .opt-btn.selected {
+    border: 2px solid var(--teal);
+    background: var(--teal-light);
+  }
+  .opt-btn .oi {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    line-height: 1;
+  }
+  .opt-btn .ob { flex: 1; }
+  .opt-btn .ol { font-size: 15px; font-weight: 500; color: var(--text-primary); display: block; }
+  .opt-btn .od { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+  .opt-btn.selected .ol { color: var(--teal-dark); }
+  .opt-btn.selected .od { color: var(--teal-dark); opacity: 0.75; }
+
+  /* ── Level buttons (exudate) ── */
+  .level-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .lvl-btn {
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .lvl-btn:hover { border-color: var(--teal); }
+  .lvl-icon { font-size: 22px; flex-shrink: 0; }
+  .lvl-body { flex: 1; }
+  .lvl-label { font-size: 15px; font-weight: 500; color: var(--text-primary); display: block; }
+  .lvl-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .lvl-btn.sel-low      { border: 2px solid var(--green);  background: var(--green-light); }
+  .lvl-btn.sel-moderate { border: 2px solid var(--amber);  background: var(--amber-light); }
+  .lvl-btn.sel-high     { border: 2px solid var(--red);    background: var(--red-light); }
+  .lvl-btn.sel-low .lvl-label      { color: var(--green-dark); }
+  .lvl-btn.sel-moderate .lvl-label { color: var(--amber-dark); }
+  .lvl-btn.sel-high .lvl-label     { color: var(--red-dark); }
+
+  /* ── Yes / No ── */
+  .yn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .yn-btn {
+    padding: 18px 12px;
+    text-align: center;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .yn-btn:hover { border-color: var(--teal); }
+  .yn-yes.selected { border: 2px solid var(--red);   background: var(--red-light);   color: var(--red-dark); }
+  .yn-no.selected  { border: 2px solid var(--green); background: var(--green-light); color: var(--green-dark); }
+
+  /* ── Checkbox options ── */
+  .check-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .ck-row {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px 15px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s;
+  }
+  .ck-row:hover { border-color: var(--teal); }
+  .ck-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--teal);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .ck-row label { font-size: 14px; color: var(--text-primary); cursor: pointer; flex: 1; }
+
+  /* ── Nav row ── */
+  .nav-row { display: flex; gap: 10px; margin-top: 4px; }
+  .btn-back {
+    flex: 0 0 auto;
+    padding: 14px 18px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text-secondary);
+    line-height: 1;
+  }
+  .btn-back:hover { background: var(--gray-200); }
+  .btn-next {
+    flex: 1;
+    padding: 15px 20px;
+    background: var(--teal);
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.01em;
+    transition: opacity 0.15s, background 0.15s;
+    box-shadow: 0 2px 8px rgba(29,158,117,0.25);
+  }
+  .btn-next:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
+  .btn-next:not(:disabled):hover { background: #18855f; }
+  .btn-next:not(:disabled):active { transform: scale(0.98); }
+
+  /* ── Notices ── */
+  .notice {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .notice-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+  .notice-warn  { background: var(--amber-light); border: 1px solid rgba(186,117,23,0.25); color: var(--amber-dark); }
+  .notice-alert { background: var(--red-light);   border: 1px solid rgba(226,75,74,0.25);  color: var(--red-dark); }
+  .notice-info  { background: var(--blue-light);  border: 1px solid rgba(24,95,165,0.25);  color: var(--blue-dark); }
+  .notice-mod   { background: var(--gray-50);     border: 1px solid var(--border);         color: var(--text-secondary); }
+
+  /* ── Sub-question block ── */
+  .sub-question {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .sub-q-label { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+
+  /* ── Welcome screen ── */
+  #welcome { padding: 24px 20px 32px; }
+  .wlc-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .wlc-logo-disc {
+    width: 52px; height: 52px;
+    background: var(--teal);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wlc-logo-disc svg { width: 30px; height: 30px; }
+  .wlc-logo-text {}
+  .wlc-title { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+  .wlc-sub   { font-size: 13px; color: var(--text-muted); margin-top: 1px; }
+  .wlc-intro { font-size: 15px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 20px; }
+  .framework-pills {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .fw-pill {
+    padding: 12px 8px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    border: 1px solid transparent;
+  }
+  .fw-stride { background: var(--blue-light);   color: var(--blue-dark);   border-color: rgba(24,95,165,0.2); }
+  .fw-timer  { background: var(--amber-light);  color: var(--amber-dark);  border-color: rgba(186,117,23,0.2); }
+  .fw-rec    { background: var(--teal-light);   color: var(--teal-dark);   border-color: rgba(29,158,117,0.2); }
+  .fw-pill-code { font-size: 14px; font-weight: 700; letter-spacing: 0.05em; }
+  .fw-pill-name { font-size: 10px; margin-top: 3px; opacity: 0.8; }
+  .btn-start {
+    width: 100%;
+    padding: 17px;
+    background: var(--teal);
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.01em;
+    box-shadow: 0 3px 12px rgba(29,158,117,0.3);
+    transition: background 0.15s;
+  }
+  .btn-start:hover { background: #18855f; }
+  .doh-credit {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Results ── */
+  .results-section { margin-bottom: 20px; }
+  .rs-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 14px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .sr-lbl { color: var(--text-secondary); }
+  .sr-val { font-weight: 500; color: var(--text-primary); text-align: right; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-low      { background: var(--green-light); color: var(--green-dark); }
+  .badge-moderate { background: var(--amber-light);  color: var(--amber-dark); }
+  .badge-high     { background: var(--red-light);    color: var(--red-dark); }
+  .badge-yes      { background: var(--red-light);    color: var(--red-dark); }
+  .badge-no       { background: var(--green-light);  color: var(--green-dark); }
+  .badge-teal     { background: var(--teal-light);   color: var(--teal-dark); }
+
+  .pathway-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--teal-light);
+    border: 1px solid rgba(29,158,117,0.25);
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+  }
+  .pathway-num {
+    width: 36px; height: 36px;
+    background: var(--teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .pathway-text { flex: 1; }
+  .pathway-title { font-size: 13px; font-weight: 600; color: var(--teal-dark); }
+  .pathway-sub   { font-size: 11px; color: var(--teal-dark); opacity: 0.75; margin-top: 1px; }
+
+  .dressing-list { display: flex; flex-direction: column; gap: 7px; }
+  .dressing-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 13px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .dressing-item .di-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .di-primary   .di-dot { background: var(--teal); }
+  .di-secondary .di-dot { background: var(--gray-400); }
+
+  .btn-restart {
+    width: 100%;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-med);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    transition: background 0.15s;
+  }
+  .btn-restart:hover { background: var(--gray-200); }
+
+  /* ── Print styles ── */
+  @media print {
+    body { background: white; }
+    #topbar-restart, .btn-restart, .btn-print { display: none !important; }
+    #topbar { position: static; box-shadow: none; border-bottom: 1px solid #ccc; }
+    .screen { padding: 16px; }
+    .dressing-item { box-shadow: none; border: 1px solid #ccc; }
+  }
+
+  /* ── Odour sub-section ── */
+  #odour-block { display: none; margin-top: 14px; }
+
+  /* ── Utility ── */
+  .mt8  { margin-top: 8px; }
+  .mt16 { margin-top: 16px; }
+  .mb8  { margin-bottom: 8px; }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<div id="shell">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div id="topbar-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="#1D9E75"/>
+        <path d="M8 14 Q11 8 14 14 Q17 20 20 14" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="14" cy="14" r="2.5" fill="white"/>
+      </svg>
+      <div>
+        <div id="topbar-title">Wound Care Advisor</div>
+        <div id="topbar-sub">HITH Community Nursing</div>
+      </div>
+    </div>
+    <button id="topbar-restart" onclick="restart()" aria-label="Start new assessment">
+      ↺ New
+    </button>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="progress-wrap">
+    <div id="progress-track"><div id="progress-fill"></div></div>
+    <div id="progress-label"><span id="progress-phase">STRIDE assessment</span><span id="progress-step"></span></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       WELCOME
+  ══════════════════════════════════════ -->
+  <div class="screen active" id="welcome">
+    <div class="wlc-logo">
+      <div class="wlc-logo-disc">
+        <svg viewBox="0 0 30 30" fill="none">
+          <path d="M6 15 Q9.5 7 15 15 Q20.5 23 24 15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="15" cy="15" r="3" fill="white"/>
+        </svg>
+      </div>
+      <div class="wlc-logo-text">
+        <div class="wlc-title">Wound Care Advisor</div>
+        <div class="wlc-sub">Hospital in the Home · Community Nursing</div>
+      </div>
+    </div>
+
+    <p class="wlc-intro">A clinical decision support tool to guide dressing selection at the bedside. Step through a structured wound assessment and receive evidence-based recommendations aligned with the Department of Health &amp; Aged Care consumable choice guide.</p>
+
+    <div class="framework-pills">
+      <div class="fw-pill fw-stride">
+        <div class="fw-pill-code">STRIDE</div>
+        <div class="fw-pill-name">Wound assessment</div>
+      </div>
+      <div class="fw-pill fw-timer">
+        <div class="fw-pill-code">TIMER</div>
+        <div class="fw-pill-name">Barrier check</div>
+      </div>
+      <div class="fw-pill fw-rec">
+        <div class="fw-pill-code">DoH</div>
+        <div class="fw-pill-name">Dressing guide</div>
+      </div>
+    </div>
+
+    <div class="notice notice-warn">
+      <span class="notice-icon">⚠</span>
+      <span><strong>Advisory use only.</strong> Always apply clinical judgement. This tool supports — it does not replace — professional wound assessment and clinical reasoning.</span>
+    </div>
+
+    <button class="btn-start" onclick="startAssessment()">Begin wound assessment →</button>
+
+    <p class="doh-credit">Based on the Australian Government Department of Health &amp; Aged Care<br>Wound Consumable Choice Guide · Generic names used throughout</p>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STRIDE · S — Site
+  ══════════════════════════════════════ -->
+  <div class="screen" id="s1">
+    <div class="phase-badge phase-stride">⬤ STRIDE assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-stride">S</div>
+      <div class="step-meta">
+        <div class="step-name">Site &amp; location</div>
+        <div class="step-of">Step 1 of 6</div>
+      </div>
+    </div>
+    <p class="screen-body">Select the body region where the wound is located. This is recorded for clinical reference.</p>
+
+    <div class="options">
+      <button class="opt-btn" onclick="pick('site','lower-limb',this)">
+        <span class="oi">🦵</span>
+        <span class="ob"><span class="ol">Lower limb</span><span class="od">Leg, ankle, foot, toe — including venous and diabetic foot wounds</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('site','upper-limb',this)">
+        <span class="oi">💪</span>
+        <span class="ob"><span class="ol">Upper limb</span><span class="od">Arm, forearm, hand, finger</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('site','trunk-pressure',this)">
+        <span class="oi">🫁</span>
+        <span class="ob"><span class="ol">Trunk / pressure area</span><span class="od">Sacrum, coccyx, ischium, abdomen, back, chest</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('site','head-neck',this)">
+        <span class="oi">👤</span>
+        <span class="ob"><span class="ol">Head / neck</span><span class="od">Face, scalp, ear, neck</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('site','other',this)">
+        <span class="oi">📍</span>
+        <span class="ob"><span class="ol">Other / not listed</span></span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-s1" disabled onclick="go('s2')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STRIDE · T — Tissue type
+  ══════════════════════════════════════ -->
+  <div class="screen" id="s2">
+    <div class="phase-badge phase-stride">⬤ STRIDE assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-stride">T</div>
+      <div class="step-meta">
+        <div class="step-name">Tissue type</div>
+        <div class="step-of">Step 2 of 6</div>
+      </div>
+    </div>
+    <p class="screen-body">Identify the predominant tissue in the wound bed. If the wound has mixed tissue types, select the tissue type that most needs to be addressed (e.g. if both slough and granulation tissue are present, select slough).</p>
+
+    <div class="options">
+      <button class="opt-btn" onclick="pick('tissue','necrotic-ischemic',this)">
+        <span class="oi">🖤</span>
+        <span class="ob">
+          <span class="ol">Necrotic — ischemic</span>
+          <span class="od">Black or dark eschar; desiccated devitalised tissue due to ischemia; hard, dry</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick('tissue','necrotic-non-ischemic',this)">
+        <span class="oi">⬛</span>
+        <span class="ob">
+          <span class="ol">Necrotic — non-ischemic</span>
+          <span class="od">Desiccated devitalised tissue not caused by ischemia; may be soft or hard</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick('tissue','slough',this)">
+        <span class="oi">🟡</span>
+        <span class="ob">
+          <span class="ol">Slough</span>
+          <span class="od">Yellow, tan, or grey stringy/moist devitalised tissue; may be adherent or loose</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick('tissue','granulating',this)">
+        <span class="oi">🔴</span>
+        <span class="ob">
+          <span class="ol">Granulating</span>
+          <span class="od">Beefy red, cobblestone-textured, moist granulation tissue; healthy healing tissue</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick('tissue','epithelialising',this)">
+        <span class="oi">🟣</span>
+        <span class="ob">
+          <span class="ol">Epithelialising</span>
+          <span class="od">Pink, translucent new skin forming at wound edges or migrating across wound surface</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-s2" disabled onclick="go('s3')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STRIDE · R — Surrounding skin
+  ══════════════════════════════════════ -->
+  <div class="screen" id="s3">
+    <div class="phase-badge phase-stride">⬤ STRIDE assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-stride">R</div>
+      <div class="step-meta">
+        <div class="step-name">Surrounding skin</div>
+        <div class="step-of">Step 3 of 6</div>
+      </div>
+    </div>
+    <p class="screen-body">Select all features observed in the peri-wound skin. You may select multiple.</p>
+
+    <div class="check-options" id="skin-checks">
+      <div class="ck-row"><input type="checkbox" id="ck-ery" value="erythema"><label for="ck-ery">Erythema / redness</label></div>
+      <div class="ck-row"><input type="checkbox" id="ck-mac" value="maceration"><label for="ck-mac">Maceration / soggy, waterlogged skin</label></div>
+      <div class="ck-row"><input type="checkbox" id="ck-ecz" value="eczema"><label for="ck-ecz">Venous eczema</label></div>
+      <div class="ck-row"><input type="checkbox" id="ck-ind" value="induration"><label for="ck-ind">Induration / palpable firmness</label></div>
+      <div class="ck-row"><input type="checkbox" id="ck-fra" value="fragile"><label for="ck-fra">Fragile / thin / atrophic skin</label></div>
+      <div class="ck-row"><input type="checkbox" id="ck-dry" value="dry-skin"><label for="ck-dry">Dry / scaly skin</label></div>
+      <div class="ck-row"><input type="checkbox" id="ck-non" value="none"><label for="ck-non">No abnormalities noted</label></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" onclick="collectSkin(); go('s4')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STRIDE · I — Infection
+  ══════════════════════════════════════ -->
+  <div class="screen" id="s4">
+    <div class="phase-badge phase-stride">⬤ STRIDE assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-stride">I</div>
+      <div class="step-meta">
+        <div class="step-name">Infection</div>
+        <div class="step-of">Step 4 of 6</div>
+      </div>
+    </div>
+    <p class="screen-body">Are local signs of wound infection present? Consider: increased pain, warmth, erythema, swelling, purulent or malodorous exudate, or failure to progress.</p>
+
+    <div class="yn-row">
+      <button class="yn-btn yn-yes" onclick="pickYN('infected','yes',this)">Yes</button>
+      <button class="yn-btn yn-no"  onclick="pickYN('infected','no',this)">No / Suspected only</button>
+    </div>
+
+    <div id="odour-block">
+      <div class="sub-question">
+        <div class="sub-q-label">Is odour present within the wound bed?</div>
+        <div class="yn-row" style="margin-bottom:0">
+          <button class="yn-btn yn-yes" onclick="pickYN('odour','yes',this)">Yes</button>
+          <button class="yn-btn yn-no"  onclick="pickYN('odour','no',this)">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-s4" disabled onclick="go('s5')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STRIDE · D — Discharge / Exudate
+  ══════════════════════════════════════ -->
+  <div class="screen" id="s5">
+    <div class="phase-badge phase-stride">⬤ STRIDE assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-stride">D</div>
+      <div class="step-meta">
+        <div class="step-name">Discharge (exudate)</div>
+        <div class="step-of">Step 5 of 6</div>
+      </div>
+    </div>
+    <p class="screen-body">Estimate the level of wound exudate — the fluid produced by the wound.</p>
+
+    <div class="level-options">
+      <button class="lvl-btn" onclick="pickLevel('exudate','low',this)">
+        <span class="lvl-icon">💧</span>
+        <span class="lvl-body">
+          <span class="lvl-label">Low</span>
+          <span class="lvl-desc">Wound bed moist but not wet; dressing minimally soiled at change</span>
+        </span>
+      </button>
+      <button class="lvl-btn" onclick="pickLevel('exudate','moderate',this)">
+        <span class="lvl-icon">💧💧</span>
+        <span class="lvl-body">
+          <span class="lvl-label">Moderate</span>
+          <span class="lvl-desc">Dressing well-saturated but contained; no strike-through to outer layer</span>
+        </span>
+      </button>
+      <button class="lvl-btn" onclick="pickLevel('exudate','high',this)">
+        <span class="lvl-icon">💧💧💧</span>
+        <span class="lvl-body">
+          <span class="lvl-label">High</span>
+          <span class="lvl-desc">Strike-through evident; frequent dressing changes required; leaking or pooling</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-s5" disabled onclick="go('s6')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STRIDE · E — Edge
+  ══════════════════════════════════════ -->
+  <div class="screen" id="s6">
+    <div class="phase-badge phase-stride">⬤ STRIDE assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-stride">E</div>
+      <div class="step-meta">
+        <div class="step-name">Edge</div>
+        <div class="step-of">Step 6 of 6</div>
+      </div>
+    </div>
+    <p class="screen-body">Describe the predominant wound edge appearance.</p>
+
+    <div class="options">
+      <button class="opt-btn" onclick="pick('edge','attached',this)">
+        <span class="ob"><span class="ol">Attached / flat</span><span class="od">Edges flush with wound bed; epithelium advancing inward; healing progress evident</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('edge','undermined',this)">
+        <span class="ob"><span class="ol">Undermined / tunnelling</span><span class="od">Wound edges extend beneath surrounding skin; probing reveals undermining</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('edge','rolled',this)">
+        <span class="ob"><span class="ol">Rolled / epibole</span><span class="od">Edges curled inward and downward; epithelium migrating but not bridging wound bed</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('edge','macerated',this)">
+        <span class="ob"><span class="ol">Macerated</span><span class="od">Pale, soft, waterlogged edges from excessive moisture</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('edge','callous',this)">
+        <span class="ob"><span class="ol">Callous / indurated</span><span class="od">Firm, thickened, hyperkeratotic edges; common in chronic wounds</span></span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-s6" disabled onclick="go('t1')">Begin TIMER assessment →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TIMER · T — Tissue (non-viable)
+  ══════════════════════════════════════ -->
+  <div class="screen" id="t1">
+    <div class="phase-badge phase-timer">◆ TIMER assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-timer">T</div>
+      <div class="step-meta">
+        <div class="step-name">Tissue (non-viable)</div>
+        <div class="step-of">Step 1 of 5</div>
+      </div>
+    </div>
+    <p class="screen-body">Is non-viable or devitalised tissue present in a quantity likely to impede wound healing?</p>
+
+    <div class="yn-row">
+      <button class="yn-btn yn-yes" onclick="pickYN('timer_tissue','yes',this)">Yes</button>
+      <button class="yn-btn yn-no"  onclick="pickYN('timer_tissue','no',this)">No</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-t1" disabled onclick="go('t2')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TIMER · I — Infection / Inflammation
+  ══════════════════════════════════════ -->
+  <div class="screen" id="t2">
+    <div class="phase-badge phase-timer">◆ TIMER assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-timer">I</div>
+      <div class="step-meta">
+        <div class="step-name">Infection / inflammation</div>
+        <div class="step-of">Step 2 of 5</div>
+      </div>
+    </div>
+    <p class="screen-body">What is the extent of infection or ongoing inflammation in this wound?</p>
+
+    <div class="options">
+      <button class="opt-btn" onclick="pick('timer_infection','none',this)">
+        <span class="ob"><span class="ol">No infection or inflammation</span><span class="od">Wound progressing normally; no clinical signs of infection</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_infection','local',this)">
+        <span class="ob"><span class="ol">Local infection</span><span class="od">Signs confined to the wound bed: increased pain, exudate, malodour, delayed healing</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_infection','spreading',this)">
+        <span class="ob"><span class="ol">Spreading infection</span><span class="od">Cellulitis, lymphangitis, or erythema extending beyond wound margins</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_infection','systemic',this)">
+        <span class="ob"><span class="ol">Systemic infection</span><span class="od">Fever, rigors, altered consciousness, sepsis signs — consider urgent escalation</span></span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-t2" disabled onclick="go('t3')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TIMER · M — Moisture balance
+  ══════════════════════════════════════ -->
+  <div class="screen" id="t3">
+    <div class="phase-badge phase-timer">◆ TIMER assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-timer">M</div>
+      <div class="step-meta">
+        <div class="step-name">Moisture balance</div>
+        <div class="step-of">Step 3 of 5</div>
+      </div>
+    </div>
+    <p class="screen-body">How would you describe the overall wound moisture environment?</p>
+
+    <div class="options">
+      <button class="opt-btn" onclick="pick('timer_moisture','dry',this)">
+        <span class="ob"><span class="ol">Too dry</span><span class="od">Desiccated wound bed; hard eschar; minimal or no exudate; dressings adhering</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_moisture','balanced',this)">
+        <span class="ob"><span class="ol">Balanced</span><span class="od">Moist wound environment appropriate for healing; no maceration of peri-wound skin</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_moisture','excess',this)">
+        <span class="ob"><span class="ol">Excess moisture</span><span class="od">Maceration, strike-through, leaking; peri-wound skin breakdown; frequent changes needed</span></span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-t3" disabled onclick="go('t4')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TIMER · E — Edge advancement
+  ══════════════════════════════════════ -->
+  <div class="screen" id="t4">
+    <div class="phase-badge phase-timer">◆ TIMER assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-timer">E</div>
+      <div class="step-meta">
+        <div class="step-name">Edge advancement</div>
+        <div class="step-of">Step 4 of 5</div>
+      </div>
+    </div>
+    <p class="screen-body">Are the wound edges advancing inward and wound dimensions reducing?</p>
+
+    <div class="options">
+      <button class="opt-btn" onclick="pick('timer_edge','advancing',this)">
+        <span class="ob"><span class="ol">Advancing</span><span class="od">Wound reducing in size; epithelium migrating; healing progressing as expected</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_edge','stalled',this)">
+        <span class="ob"><span class="ol">Stalled</span><span class="od">No measurable reduction in wound dimensions over 2–4 weeks despite appropriate treatment</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_edge','increasing',this)">
+        <span class="ob"><span class="ol">Increasing in size</span><span class="od">Wound enlarging — review management plan and consider escalation</span></span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-t4" disabled onclick="go('t5')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TIMER · R — Repair / Regeneration
+  ══════════════════════════════════════ -->
+  <div class="screen" id="t5">
+    <div class="phase-badge phase-timer">◆ TIMER assessment</div>
+    <div class="step-header">
+      <div class="step-disc disc-timer">R</div>
+      <div class="step-meta">
+        <div class="step-name">Repair &amp; regeneration</div>
+        <div class="step-of">Step 5 of 5</div>
+      </div>
+    </div>
+    <p class="screen-body">Considering the wound type and patient factors, how would you describe overall healing progress?</p>
+
+    <div class="options">
+      <button class="opt-btn" onclick="pick('timer_repair','progressing',this)">
+        <span class="ob"><span class="ol">Progressing as expected</span><span class="od">Healing on expected trajectory for wound type, aetiology, and patient co-morbidities</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_repair','slow',this)">
+        <span class="ob"><span class="ol">Slower than expected</span><span class="od">Some healing activity but behind anticipated timeline; review contributing factors</span></span>
+      </button>
+      <button class="opt-btn" onclick="pick('timer_repair','stalled',this)">
+        <span class="ob"><span class="ol">Stalled / not healing</span><span class="od">No meaningful progress; chronic wound pattern — consider specialist referral</span></span>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()" aria-label="Back">←</button>
+      <button class="btn-next" id="next-t5" disabled onclick="buildResults()">View recommendations →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       RESULTS
+  ══════════════════════════════════════ -->
+  <div class="screen" id="results">
+    <div class="phase-badge phase-result">✓ Dressing recommendation</div>
+    <div id="results-content"></div>
+    <button class="btn-restart" onclick="restart()">↺ &nbsp;Start new assessment</button>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+/* ─── State ─── */
+const S = {
+  site: null, tissue: null, skin: [],
+  infected: null, odour: null, exudate: null, edge: null,
+  timer_tissue: null, timer_infection: null,
+  timer_moisture: null, timer_edge: null, timer_repair: null
+};
+
+/* ─── Navigation ─── */
+const SCREENS = ['welcome','s1','s2','s3','s4','s5','s6','t1','t2','t3','t4','t5','results'];
+let current = 'welcome';
+
+const PROGRESS = {
+  welcome:{pct:0,  phase:'',                  step:''},
+  s1:     {pct:8,  phase:'STRIDE assessment',  step:'Step 1 of 11'},
+  s2:     {pct:16, phase:'STRIDE assessment',  step:'Step 2 of 11'},
+  s3:     {pct:25, phase:'STRIDE assessment',  step:'Step 3 of 11'},
+  s4:     {pct:33, phase:'STRIDE assessment',  step:'Step 4 of 11'},
+  s5:     {pct:42, phase:'STRIDE assessment',  step:'Step 5 of 11'},
+  s6:     {pct:50, phase:'STRIDE assessment',  step:'Step 6 of 11'},
+  t1:     {pct:58, phase:'TIMER assessment',   step:'Step 7 of 11'},
+  t2:     {pct:67, phase:'TIMER assessment',   step:'Step 8 of 11'},
+  t3:     {pct:75, phase:'TIMER assessment',   step:'Step 9 of 11'},
+  t4:     {pct:83, phase:'TIMER assessment',   step:'Step 10 of 11'},
+  t5:     {pct:92, phase:'TIMER assessment',   step:'Step 11 of 11'},
+  results:{pct:100,phase:'Recommendation',     step:'Complete'}
+};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  current = id;
+  const pw = document.getElementById('progress-wrap');
+  const tr = document.getElementById('topbar-restart');
+  if (id === 'welcome') {
+    pw.style.display = 'none';
+    tr.style.display = 'none';
+  } else {
+    pw.style.display = 'block';
+    tr.style.display = 'flex';
+    const p = PROGRESS[id];
+    document.getElementById('progress-fill').style.width = p.pct + '%';
+    document.getElementById('progress-phase').textContent = p.phase;
+    document.getElementById('progress-step').textContent = p.step;
+  }
+  window.scrollTo(0, 0);
+}
+
+function startAssessment() { showScreen('s1'); }
+function go(id) { showScreen(id); }
+function goBack() {
+  const i = SCREENS.indexOf(current);
+  if (i > 0) showScreen(SCREENS[i - 1]);
+}
+
+/* ─── Input helpers ─── */
+function pick(key, val, el) {
+  S[key] = val;
+  const parent = el.closest('.options');
+  parent.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  const nb = document.getElementById('next-' + current);
+  if (nb) nb.disabled = false;
+}
+
+function pickYN(key, val, el) {
+  S[key] = val;
+  const parent = el.closest('.yn-row');
+  parent.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+
+  if (key === 'infected') {
+    const ob = document.getElementById('odour-block');
+    ob.style.display = val === 'yes' ? 'block' : 'none';
+    if (val === 'no') {
+      S.odour = 'no';
+      document.getElementById('next-s4').disabled = false;
+    } else {
+      document.getElementById('next-s4').disabled = S.odour === null;
+    }
+    return;
+  }
+  if (key === 'odour') {
+    document.getElementById('next-s4').disabled = false;
+    return;
+  }
+  const nb = document.getElementById('next-' + current);
+  if (nb) nb.disabled = false;
+}
+
+function pickLevel(key, val, el) {
+  S[key] = val;
+  const cls = 'sel-' + val;
+  el.parentElement.querySelectorAll('.lvl-btn').forEach(b => {
+    b.classList.remove('sel-low','sel-moderate','sel-high');
+  });
+  el.classList.add(cls);
+  const nb = document.getElementById('next-' + current);
+  if (nb) nb.disabled = false;
+}
+
+function collectSkin() {
+  S.skin = Array.from(document.querySelectorAll('#skin-checks input:checked')).map(c => c.value);
+}
+
+/* ─── DoH Dressing Matrix — all 26 pathways ─── */
+const MATRIX = {
+  'necrotic-ischemic_low_yes':          { id:1,  primary:['Povidone iodine solution','Chlorhexidine topical application','Antimicrobial (Iodophors — Inadine only)'], secondary:['Low absorbent dressing'] },
+  'necrotic-ischemic_low_no':           { id:2,  primary:['Povidone iodine solution','Chlorhexidine topical application','Antimicrobial (Iodophors — Inadine only)'], secondary:['Low absorbent dressing'] },
+  'necrotic-ischemic_moderate_yes':     { id:3,  primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver gelling fibres)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)'], secondary:['Foam or absorbent dressing'] },
+  'necrotic-ischemic_moderate_no':      { id:4,  primary:['Antimicrobial (Iodophors — Inadine only)','Gelling fibres'], secondary:['Foam or absorbent dressing'] },
+  'necrotic-ischemic_high_yes':         { id:5,  primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (DACC-coated)'], secondary:['Super-absorbent dressing'] },
+  'necrotic-ischemic_high_no':          { id:6,  primary:['Antimicrobial (Iodophors — Inadine only)','Gelling fibres'], secondary:['Super-absorbent dressing'] },
+  'necrotic-non-ischemic_low_yes':      { id:7,  primary:['Antimicrobial (Alginogels)','Antimicrobial (Medical Grade Honey)','Antimicrobial (Wound Gels)'], secondary:['Low absorbent, foam or absorbent dressing'] },
+  'necrotic-non-ischemic_low_no':       { id:8,  primary:['Hydroactive dressing','Antimicrobial (Wound Gel)','Antimicrobial (Alginogels)','Antimicrobial (DACC-coated)','Antimicrobial (Sucrose-octasulfate Clean)','Low absorbent (consider contact layer)'], secondary:['Low absorbent, foam or absorbent dressing'] },
+  'necrotic-non-ischemic_moderate_yes': { id:9,  primary:['Antimicrobial (Alginogels)','Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Hydroactive (in conjunction with systemic antimicrobial therapy)','Gelling fibres (in conjunction with systemic antimicrobial therapy)','Hypertonic Saline (in conjunction with systemic antimicrobial therapy)'], secondary:['Foam or absorbent dressing'] },
+  'necrotic-non-ischemic_moderate_no':  { id:10, primary:['Foam or absorbent dressing','Alginates','Hydroactive','Gelling fibres','Hypertonic Saline'], secondary:['Foam or absorbent dressing'] },
+  'necrotic-non-ischemic_high_yes':     { id:11, primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver gelling fibres)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (DACC-coated)','Hydroactive (in conjunction with systemic antimicrobial therapy)','Gelling fibres (in conjunction with systemic antimicrobial therapy)','Hypertonic Saline (in conjunction with systemic antimicrobial therapy)'], secondary:['Super-absorbent dressing'] },
+  'necrotic-non-ischemic_high_no':      { id:12, primary:['Absorbent or super-absorbent dressing','Alginates','Hydroactive','Gelling fibres','Hypertonic Saline'], secondary:['Super-absorbent dressing'] },
+  'slough_low_yes':                     { id:13, primary:['Antimicrobial (Alginogels)','Antimicrobial (Medical Grade Honey)','Antimicrobial (Silver Foam)','Antimicrobial (Wound Gels)'], secondary:['Foam or absorbent dressing'] },
+  'slough_low_no':                      { id:14, primary:['Antimicrobial (Wound gel)','Antimicrobial (Alginogel)','Hydroactive dressing'], secondary:['Foam or absorbent dressing'] },
+  'slough_moderate_yes':                { id:15, primary:['Antimicrobial (Alginogels)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Antimicrobial (Collagen-based)','Hydroactive (in conjunction with systemic antimicrobial therapy)','Gelling fibres (in conjunction with systemic antimicrobial therapy)','Hypertonic Saline (in conjunction with systemic antimicrobial therapy)'], secondary:['Foam or absorbent dressing'] },
+  'slough_moderate_no':                 { id:16, primary:['Alginates','Hydroactive','Gelling fibres','Hypertonic Saline','Antimicrobial (Sucrose-octasulfate)'], secondary:['Foam or absorbent dressing'] },
+  'slough_high_yes':                    { id:17, primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver gelling fibres)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Antimicrobial (Collagen-based)','Hydroactive (in conjunction with systemic antimicrobial therapy)','Gelling fibres (in conjunction with systemic antimicrobial therapy)','Hypertonic Saline (in conjunction with systemic antimicrobial therapy)'], secondary:['Super-absorbent dressing'] },
+  'slough_high_no':                     { id:18, primary:['Alginates','Gelling fibres','Hypertonic Saline'], secondary:['Super-absorbent dressing'] },
+  'granulating_low_yes':                { id:19, primary:['Antimicrobial (Alginogels)','Antimicrobial (Medical Grade Honey)','Antimicrobial (Wound Gels)','Antimicrobial (Sucrose-octasulfate)'], secondary:['Foam or absorbent dressing'] },
+  'granulating_low_no':                 { id:20, primary:['Low absorbent, foam or absorbent dressing (consider contact layer)'], secondary:['Low absorbent, foam or absorbent dressing (consider contact layer)'] },
+  'granulating_moderate_yes':           { id:21, primary:['Antimicrobial (Alginogels)','Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver Foam)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Silicone)','Antimicrobial (Silver Charcoal)','Antimicrobial (Sucrose-octasulfate)','Antimicrobial (DACC-coated)','Antimicrobial (Collagen-based)','Hydroactive (in conjunction with systemic antimicrobial therapy)','Gelling fibres (in conjunction with systemic antimicrobial therapy)'], secondary:['Foam or absorbent dressing'] },
+  'granulating_moderate_no':            { id:22, primary:['Foam dressing or absorbent dressing','Alginates','Hydroactive','Gelling fibres'], secondary:['Foam or absorbent dressing'] },
+  'granulating_high_yes':               { id:23, primary:['Antimicrobial (Iodophors)','Antimicrobial (Silver Alginates)','Antimicrobial (Silver wound contact layer)','Antimicrobial (Silver Charcoal)','Antimicrobial (Silver gelling fibres)','Antimicrobial (DACC-coated)','Hydroactive (in conjunction with systemic antimicrobial therapy)','Gelling fibres (in conjunction with systemic antimicrobial therapy)'], secondary:['Super-absorbent dressing'] },
+  'granulating_high_no':                { id:24, primary:['Super-absorbent dressing','Alginates','Hydroactive','Gelling fibres'], secondary:['Super-absorbent dressing'] },
+  'epithelialising_low_no':             { id:25, primary:['Low absorbent or foam'], secondary:['Low absorbent or foam'] },
+  'epithelialising_low_yes':            { id:26, primary:['Low absorbent or foam'], secondary:['Consider escalation of care / review for possible soft tissue infection'] }
+};
+
+function getKey() {
+  const tissue  = S.tissue || 'granulating';
+  const exudate = (tissue === 'epithelialising') ? 'low' : (S.exudate || 'low');
+  const inf     = S.infected === 'yes' ? 'yes' : 'no';
+  return tissue + '_' + exudate + '_' + inf;
+}
+
+/* ─── Build results ─── */
+const TISSUE_LABELS = {
+  'necrotic-ischemic':     'Necrotic (ischemic)',
+  'necrotic-non-ischemic': 'Necrotic (non-ischemic)',
+  'slough':                'Slough',
+  'granulating':           'Granulating',
+  'epithelialising':       'Epithelialising'
+};
+const SITE_LABELS = {
+  'lower-limb':    'Lower limb',
+  'upper-limb':    'Upper limb',
+  'trunk-pressure':'Trunk / pressure area',
+  'head-neck':     'Head / neck',
+  'other':         'Other'
+};
+
+function buildResults() {
+  const key = getKey();
+  const rec = MATRIX[key] || MATRIX['granulating_low_no'];
+
+  /* Clinical flags from TIMER */
+  const flags = [];
+  if (S.timer_infection === 'systemic') {
+    flags.push({type:'alert', text:'Systemic infection signs detected — consider urgent escalation to treating clinician; systemic antimicrobial therapy likely required.'});
+  } else if (S.timer_infection === 'spreading') {
+    flags.push({type:'alert', text:'Spreading infection (cellulitis/lymphangitis) noted — escalate to treating clinician; review systemic antimicrobial therapy.'});
+  }
+  if (S.timer_tissue === 'yes') {
+    flags.push({type:'alert', text:'Non-viable tissue present — debridement should be considered as part of the wound management plan.'});
+  }
+  if (S.timer_edge === 'increasing') {
+    flags.push({type:'alert', text:'Wound is enlarging — review current management plan and escalate for clinical review.'});
+  }
+  if (S.timer_repair === 'stalled') {
+    flags.push({type:'info', text:'Wound repair is stalled — consider referral to wound specialist or advanced wound therapy.'});
+  }
+  if (S.timer_edge === 'stalled') {
+    flags.push({type:'info', text:'Wound edges not advancing — consider edge preparation, debridement, or specialist input.'});
+  }
+  if (S.timer_moisture === 'excess') {
+    flags.push({type:'info', text:'Excess moisture noted — prioritise absorbent dressing selection; consider moisture barrier for peri-wound skin.'});
+  }
+  if (S.edge === 'rolled') {
+    flags.push({type:'info', text:'Rolled/epibole edges noted — consider edge preparation or podiatry/specialist input.'});
+  }
+  if (S.edge === 'undermined') {
+    flags.push({type:'info', text:'Undermining or tunnelling noted — ensure dressing fills dead space; document depth and direction.'});
+  }
+
+  /* Modifiers */
+  const mods = [];
+  if (S.odour === 'yes') {
+    mods.push('Odour present — consider adding a charcoal / carbon dressing (with or without silver) to address wound odour.');
+  }
+  if (S.skin.includes('eczema')) {
+    mods.push('Venous eczema noted — zinc paste bandages are available and may be appropriate; consider inclusion in management plan.');
+  }
+  if (S.skin.includes('maceration')) {
+    mods.push('Peri-wound maceration — consider moisture barrier skin protectant; choose a dressing with higher absorbency to reduce exudate contact.');
+  }
+
+  /* Render */
+  const exuLabel = S.exudate ? (S.exudate.charAt(0).toUpperCase() + S.exudate.slice(1)) : '—';
+  const infLabel = S.infected === 'yes' ? 'Yes' : 'No';
+
+  const flagsHtml = flags.map(f =>
+    `<div class="notice ${f.type === 'alert' ? 'notice-alert' : 'notice-info'}">
+      <span class="notice-icon">${f.type === 'alert' ? '🔴' : 'ℹ'}</span>
+      <span>${f.text}</span>
+    </div>`
+  ).join('');
+
+  const modsHtml = mods.map(m =>
+    `<div class="notice notice-mod"><span class="notice-icon">💡</span><span>${m}</span></div>`
+  ).join('');
+
+  const primaryHtml = rec.primary.map(d =>
+    `<div class="dressing-item di-primary"><div class="di-dot"></div><span>${d}</span></div>`
+  ).join('');
+  const secondaryHtml = rec.secondary.map(d =>
+    `<div class="dressing-item di-secondary"><div class="di-dot"></div><span>${d}</span></div>`
+  ).join('');
+
+  const html = `
+    <div class="results-section">
+      <div class="rs-label">Wound profile</div>
+      <div class="summary-card">
+        <div class="summary-row"><span class="sr-lbl">Tissue type</span><span class="sr-val">${TISSUE_LABELS[S.tissue] || '—'}</span></div>
+        <div class="summary-row"><span class="sr-lbl">Exudate level</span><span class="sr-val"><span class="badge badge-${S.exudate || 'low'}">${exuLabel}</span></span></div>
+        <div class="summary-row"><span class="sr-lbl">Infection</span><span class="sr-val"><span class="badge badge-${S.infected}">${infLabel}</span></span></div>
+        <div class="summary-row"><span class="sr-lbl">Site</span><span class="sr-val">${SITE_LABELS[S.site] || '—'}</span></div>
+      </div>
+    </div>
+
+    ${flags.length > 0 ? `<div class="results-section"><div class="rs-label">Clinical flags</div>${flagsHtml}</div>` : ''}
+    ${mods.length > 0 ? `<div class="results-section"><div class="rs-label">Additional considerations</div>${modsHtml}</div>` : ''}
+
+    <div class="results-section">
+      <div class="pathway-row">
+        <div class="pathway-num">${rec.id}</div>
+        <div class="pathway-text">
+          <div class="pathway-title">DoH Consumable Choice Guide — Pathway ${rec.id}</div>
+          <div class="pathway-sub">${TISSUE_LABELS[S.tissue]} · ${exuLabel} exudate · ${infLabel === 'Yes' ? 'Infected' : 'No infection'}</div>
+        </div>
+      </div>
+
+      <div class="rs-label">Primary dressing options</div>
+      <div class="dressing-list" style="margin-bottom:14px">${primaryHtml}</div>
+
+      <div class="rs-label">Secondary dressing</div>
+      <div class="dressing-list">${secondaryHtml}</div>
+    </div>
+
+    <div class="notice notice-warn" style="margin-bottom:8px">
+      <span class="notice-icon">⚠</span>
+      <span><strong>Advisory only.</strong> Apply clinical judgement. Recommendations are based on the Australian Government Department of Health &amp; Aged Care consumable choice guide. Generic names are used — refer to local formulary for available brand names.</span>
+    </div>
+  `;
+
+  document.getElementById('results-content').innerHTML = html;
+  showScreen('results');
+}
+
+/* ─── Reset ─── */
+function restart() {
+  Object.keys(S).forEach(k => { S[k] = Array.isArray(S[k]) ? [] : null; });
+  document.querySelectorAll('.opt-btn, .yn-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('sel-low','sel-moderate','sel-high'));
+  document.querySelectorAll('#skin-checks input').forEach(c => c.checked = false);
+  document.querySelectorAll('[id^=next-]').forEach(b => b.disabled = true);
+  document.getElementById('odour-block').style.display = 'none';
+  showScreen('welcome');
+}
+</script>
+</body>
+</html>
