@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lower Limb Compression Algorithm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F8F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F2EFE9;
+    --border: #E2DDD4;
+    --border2: #C8C2B6;
+    --text: #1A1714;
+    --text2: #5A5450;
+    --text3: #9A958F;
+    --teal: #0F7B62;
+    --teal-lt: #E1F5EE;
+    --teal-dk: #085041;
+    --amber: #B8700F;
+    --amber-lt: #FEF3E2;
+    --amber-dk: #7A4A08;
+    --red: #B83232;
+    --red-lt: #FDEAEA;
+    --red-dk: #7A1F1F;
+    --blue: #1A5FA0;
+    --blue-lt: #E8F2FB;
+    --blue-dk: #0D3F70;
+    --purple: #5B48C0;
+    --purple-lt: #EEEDFE;
+    --purple-dk: #3A2E88;
+    --coral: #C04030;
+    --coral-lt: #FAECE7;
+    --coral-dk: #882818;
+    --accent: #0F7B62;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Header */
+  .header {
+    background: var(--text);
+    color: #fff;
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: 40px; bottom: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .header-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 0.5rem;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .header p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    max-width: 480px;
+    line-height: 1.6;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 1rem 1.2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--text2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    font-weight: 400;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Content */
+  .content {
+    padding: 1.5rem;
+    max-width: 900px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Section label */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+  .card-sub {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* Algorithm Steps */
+  .algo-step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--text);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; margin-bottom: 0.25rem; }
+  .step-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* Grade cards */
+  .grade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .grade-card {
+    border-radius: var(--radius);
+    padding: 1rem;
+    border: 1px solid;
+  }
+  .grade-card.mild { background: var(--teal-lt); border-color: #9FE1CB; }
+  .grade-card.moderate { background: var(--amber-lt); border-color: #FAC775; }
+  .grade-card.strong { background: var(--coral-lt); border-color: #F0997B; }
+  .grade-card.verystrong { background: var(--red-lt); border-color: #F09595; }
+
+  .grade-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 0.4rem;
+  }
+  .mild .grade-badge { background: #9FE1CB; color: var(--teal-dk); }
+  .moderate .grade-badge { background: #FAC775; color: var(--amber-dk); }
+  .strong .grade-badge { background: #F0997B; color: var(--coral-dk); }
+  .verystrong .grade-badge { background: #F09595; color: var(--red-dk); }
+
+  .grade-mmhg {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .mild .grade-mmhg { color: var(--teal-dk); }
+  .moderate .grade-mmhg { color: var(--amber-dk); }
+  .strong .grade-mmhg { color: var(--coral-dk); }
+  .verystrong .grade-mmhg { color: var(--red-dk); }
+
+  .grade-indications {
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .mild .grade-indications { color: var(--teal-dk); }
+  .moderate .grade-indications { color: var(--amber-dk); }
+  .strong .grade-indications { color: var(--coral-dk); }
+  .verystrong .grade-indications { color: var(--red-dk); }
+
+  /* ABPI Decision Tool */
+  .abpi-tool {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .abpi-header {
+    background: var(--surface2);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .abpi-header h3 {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .abpi-header p {
+    font-size: 12.5px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+  .abpi-body { padding: 1.25rem; }
+
+  .abpi-scale {
+    display: flex;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+  }
+  .abpi-zone {
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    position: relative;
+  }
+  .abpi-zone:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.3); }
+  .abpi-zone.z-red { background: #FDEAEA; }
+  .abpi-zone.z-amber { background: var(--amber-lt); }
+  .abpi-zone.z-yellow { background: #FFFDE8; }
+  .abpi-zone.z-green { background: var(--teal-lt); }
+  .abpi-zone.selected { box-shadow: inset 0 0 0 2px var(--text); }
+  .abpi-zone-val {
+    font-size: 12px;
+    font-weight: 500;
+    display: block;
+  }
+  .abpi-zone.z-red .abpi-zone-val { color: var(--red-dk); }
+  .abpi-zone.z-amber .abpi-zone-val { color: var(--amber-dk); }
+  .abpi-zone.z-yellow .abpi-zone-val { color: #7A6E00; }
+  .abpi-zone.z-green .abpi-zone-val { color: var(--teal-dk); }
+  .abpi-zone-lbl {
+    font-size: 11px;
+    margin-top: 2px;
+    display: block;
+  }
+  .abpi-zone.z-red .abpi-zone-lbl { color: var(--red); }
+  .abpi-zone.z-amber .abpi-zone-lbl { color: var(--amber); }
+  .abpi-zone.z-yellow .abpi-zone-lbl { color: #9A8800; }
+  .abpi-zone.z-green .abpi-zone-lbl { color: var(--teal); }
+
+  .abpi-result {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text);
+    min-height: 60px;
+  }
+  .abpi-result strong { font-weight: 500; }
+  .abpi-result.warn { background: var(--amber-lt); border-color: #FAC775; color: var(--amber-dk); }
+  .abpi-result.danger { background: var(--red-lt); border-color: #F09595; color: var(--red-dk); }
+  .abpi-result.caution { background: #FFFDE8; border-color: #E8DC60; color: #5A4E00; }
+  .abpi-result.safe { background: var(--teal-lt); border-color: #9FE1CB; color: var(--teal-dk); }
+
+  /* Product table */
+  .prod-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .prod-table th {
+    background: var(--surface2);
+    text-align: left;
+    padding: 0.7rem 1rem;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+  }
+  .prod-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .prod-table tr:last-child td { border-bottom: none; }
+  .prod-table tr:hover td { background: var(--surface2); }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-right: 3px;
+    margin-bottom: 2px;
+  }
+  .tag-light { background: var(--teal-lt); color: var(--teal-dk); }
+  .tag-mod { background: var(--amber-lt); color: var(--amber-dk); }
+  .tag-strong { background: var(--coral-lt); color: var(--coral-dk); }
+  .tag-vs { background: var(--red-lt); color: var(--red-dk); }
+
+  /* Tubigrip sizing */
+  .sizing-tool {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .sizing-header {
+    background: var(--surface2);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .sizing-header h3 { font-size: 14px; font-weight: 500; }
+  .sizing-body { padding: 1.25rem; }
+  .sizing-input-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .input-group { flex: 1; min-width: 160px; }
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+  }
+  .input-group input, .input-group select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+  }
+  .input-group input:focus, .input-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .calc-btn {
+    padding: 0.55rem 1.25rem;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .calc-btn:hover { opacity: 0.85; }
+
+  .sizing-result {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    min-height: 52px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text2);
+  }
+  .sizing-result.found {
+    background: var(--teal-lt);
+    border: 1px solid #9FE1CB;
+    color: var(--teal-dk);
+  }
+  .sizing-result .size-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--teal-dk);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Red Flags */
+  .flag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .flag-card {
+    background: var(--red-lt);
+    border: 1px solid #F09595;
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .flag-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: #F7C1C1;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--red-dk);
+    font-weight: 700;
+  }
+  .flag-text .flag-title {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--red-dk);
+  }
+  .flag-text .flag-desc {
+    font-size: 12.5px;
+    color: #B83232;
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  /* Do/Don't */
+  .dos-donts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 600px) { .dos-donts { grid-template-columns: 1fr; } }
+  .do-col, .dont-col {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .do-col-header, .dont-col-header {
+    padding: 0.6rem 1rem;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .do-col-header { background: var(--teal-lt); color: var(--teal-dk); }
+  .dont-col-header { background: var(--red-lt); color: var(--red-dk); }
+  .do-col-body, .dont-col-body {
+    background: var(--surface);
+    padding: 0.75rem 1rem;
+  }
+  .do-item, .dont-item {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 13px;
+    padding: 0.35rem 0;
+    line-height: 1.5;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .do-item:last-child, .dont-item:last-child { border-bottom: none; }
+  .do-item::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+  .dont-item::before { content: '✗'; color: var(--red); font-weight: 700; flex-shrink: 0; }
+
+  /* Standards comparison */
+  .std-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .std-table th {
+    background: var(--surface2);
+    padding: 0.65rem 0.9rem;
+    text-align: center;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+  }
+  .std-table th:first-child { text-align: left; }
+  .std-table td {
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    color: var(--text2);
+  }
+  .std-table td:first-child { text-align: left; font-weight: 500; color: var(--text); }
+  .std-table tr:last-child td { border-bottom: none; }
+  .std-table .ral { background: var(--teal-lt); color: var(--teal-dk); font-weight: 500; }
+  .au-note {
+    background: var(--teal-lt);
+    border: 1px solid #9FE1CB;
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-size: 13px;
+    color: var(--teal-dk);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* Capillary refill */
+  .crt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .crt-steps {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .crt-step {
+    flex: 1;
+    min-width: 140px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem;
+    text-align: center;
+  }
+  .crt-step-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .crt-step-text { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
+  .crt-pass { background: var(--teal-lt); border-color: #9FE1CB; }
+  .crt-pass .crt-step-text { color: var(--teal-dk); }
+  .crt-fail { background: var(--red-lt); border-color: #F09595; }
+  .crt-fail .crt-step-text { color: var(--red-dk); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* Clinical decision tool */
+  .clinical-q {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .clinical-q-body { padding: 1.25rem; }
+  .clinical-q-label {
+    font-size: 12px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+  .clinical-q-text {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  .q-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .q-opt {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text);
+  }
+  .q-opt:hover { background: var(--surface2); border-color: var(--text2); }
+  .q-opt.selected {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+  .clinical-recommendation {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-top: 1rem;
+  }
+  .rec-header {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+  .rec-grade {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+  .rec-body { font-size: 13.5px; color: var(--text2); line-height: 1.7; }
+  .rec-products {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+  .rec-products-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+  }
+  .rec-products-list { font-size: 13px; color: var(--text2); line-height: 1.8; }
+
+  footer {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    font-size: 12px;
+    color: var(--text3);
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+    line-height: 1.7;
+  }
+
+  @media print {
+    .tabs, .tab-btn { display: none; }
+    .panel { display: block !important; }
+    footer { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Clinical Reference Tool</div>
+  <h1>Lower Limb Compression<br>Algorithm</h1>
+  <p>Australian clinical guide for compression selection, product matching, Tubigrip sizing, and patient safety monitoring.</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('grades')">Compression grades</button>
+  <button class="tab-btn" onclick="switchTab('abpi')">ABPI decision</button>
+  <button class="tab-btn" onclick="switchTab('products')">Product guide</button>
+  <button class="tab-btn" onclick="switchTab('tubigrip')">Tubigrip sizing</button>
+  <button class="tab-btn" onclick="switchTab('standards')">Standards</button>
+  <button class="tab-btn" onclick="switchTab('safety')">Patient safety</button>
+</div>
+
+<!-- PANEL: Grades -->
+<div id="panel-grades" class="panel active">
+<div class="content">
+  <p class="section-label">Compression dosage hierarchy — Australia</p>
+
+  <div class="grade-grid">
+    <div class="grade-card mild">
+      <span class="grade-badge">Class 1 · Mild</span>
+      <div class="grade-mmhg">18–21 mmHg</div>
+      <div class="grade-indications">Tired/aching legs, mild oedema, DVT prophylaxis for travel, early varicose veins. Double-layer Tubigrip (~15–20 mmHg).</div>
+    </div>
+    <div class="grade-card moderate">
+      <span class="grade-badge">Class 2 · Moderate</span>
+      <div class="grade-mmhg">23–32 mmHg</div>
+      <div class="grade-indications">Moderate oedema, post-sclerotherapy, healed venous ulcers (maintenance), active venous leg ulcers (clinical target).</div>
+    </div>
+    <div class="grade-card strong">
+      <span class="grade-badge">Class 3 · Strong</span>
+      <div class="grade-mmhg">34–46 mmHg</div>
+      <div class="grade-indications">Active venous leg ulcers, severe chronic venous insufficiency, lymphoedema. Standard 4-layer targets 40 mmHg.</div>
+    </div>
+    <div class="grade-card verystrong">
+      <span class="grade-badge">Class 4 · Very Strong</span>
+      <div class="grade-mmhg">&gt;49 mmHg</div>
+      <div class="grade-indications">Severe lymphoedema, elephantiasis, "de-bulking" of large limbs. Often requires custom fitting (short-stretch/flat-knit).</div>
+    </div>
+  </div>
+
+  <p class="section-label">Full dosage ladder</p>
+  <table class="prod-table">
+    <thead>
+      <tr>
+        <th>Level</th>
+        <th>Product type</th>
+        <th>Approx. pressure</th>
+        <th>Primary use</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1 · Support</td>
+        <td>Tubigrip (single layer)</td>
+        <td>5–10 mmHg</td>
+        <td>Minimal support; securing dressings; not graduated</td>
+      </tr>
+      <tr>
+        <td>2 · Support</td>
+        <td>Anti-embolism (TEDs)</td>
+        <td>~18 mmHg</td>
+        <td>Non-ambulatory patients only; DVT prophylaxis</td>
+      </tr>
+      <tr>
+        <td>3 · Mild</td>
+        <td>Class 1 hosiery / Tubigrip (double)</td>
+        <td>18–21 mmHg</td>
+        <td>Tired legs, mild oedema, travel DVT prophylaxis</td>
+      </tr>
+      <tr>
+        <td>4 · Moderate</td>
+        <td>Class 2 hosiery / 2-layer kits</td>
+        <td>23–32 mmHg</td>
+        <td>VLU; moderate oedema; CVI management</td>
+      </tr>
+      <tr>
+        <td>5 · High</td>
+        <td>Class 3 hosiery / 4-layer bandaging</td>
+        <td>34–46 mmHg</td>
+        <td>Severe VLU; chronic lymphoedema</td>
+      </tr>
+      <tr>
+        <td>6 · Very High</td>
+        <td>Class 4 short-stretch (e.g. Comprilan)</td>
+        <td>&gt;49 mmHg (active)</td>
+        <td>Severe lymphoedema; de-bulking large limbs</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="algo-step">
+    <div class="step-num">!</div>
+    <div class="step-body">
+      <div class="step-title">Graduation rule</div>
+      <div class="step-desc">Compression must always be graduated — highest at the ankle, decreasing up the limb — to effectively counteract venous hypertension. Never apply equal or reverse-graduated compression.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PANEL: ABPI Decision -->
+<div id="panel-abpi" class="panel">
+<div class="content">
+  <p class="section-label">ABPI-guided compression selection</p>
+
+  <div class="abpi-tool">
+    <div class="abpi-header">
+      <h3>ABPI value selector</h3>
+      <p>Select the patient's ankle-brachial pressure index to see the recommended compression pathway.</p>
+    </div>
+    <div class="abpi-body">
+      <div class="abpi-scale">
+        <div class="abpi-zone z-red" onclick="selectABPI(this,'<0.5')">
+          <span class="abpi-zone-val">&lt; 0.5</span>
+          <span class="abpi-zone-lbl">Critical</span>
+        </div>
+        <div class="abpi-zone z-amber" onclick="selectABPI(this,'0.5–0.6')">
+          <span class="abpi-zone-val">0.5–0.6</span>
+          <span class="abpi-zone-lbl">Severe PAD</span>
+        </div>
+        <div class="abpi-zone z-amber" onclick="selectABPI(this,'0.6–0.8')">
+          <span class="abpi-zone-val">0.6–0.8</span>
+          <span class="abpi-zone-lbl">Moderate PAD</span>
+        </div>
+        <div class="abpi-zone z-yellow" onclick="selectABPI(this,'0.8–0.9')">
+          <span class="abpi-zone-val">0.8–0.9</span>
+          <span class="abpi-zone-lbl">Borderline</span>
+        </div>
+        <div class="abpi-zone z-green" onclick="selectABPI(this,'0.9–1.3')">
+          <span class="abpi-zone-val">0.9–1.3</span>
+          <span class="abpi-zone-lbl">Normal</span>
+        </div>
+        <div class="abpi-zone z-amber" onclick="selectABPI(this,'>1.3')">
+          <span class="abpi-zone-val">&gt; 1.3</span>
+          <span class="abpi-zone-lbl">Non-compressible</span>
+        </div>
+      </div>
+      <div class="abpi-result" id="abpi-result">Select an ABPI value above to see the clinical recommendation.</div>
+    </div>
+  </div>
+
+  <p class="section-label">Clinical decision pathway</p>
+  <div class="algo-step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">Measure ABPI</div>
+      <div class="step-desc">Obtain a validated Doppler ABPI before initiating any compression. Do not rely on palpation alone for high-compression (Class 2+) therapy.</div>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Assess wound and oedema</div>
+      <div class="step-desc">Classify wound type (venous, arterial, mixed, lymphoedema). Document oedema grade, wound dimensions, and exudate level to determine required compression level.</div>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Select compression class</div>
+      <div class="step-desc">Match the clinical picture to the appropriate compression class (see Compression Grades tab). ABPI ≥ 0.8 with no contraindications → standard compression. ABPI 0.8–0.9 → consider reduced compression (Class 1). ABPI &lt; 0.8 → medical review before compression.</div>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-title">Choose product</div>
+      <div class="step-desc">Select bandage system or hosiery matching the required pressure class. Use inelastic (short-stretch) for ambulatory patients with lymphoedema; elastic (long-stretch) or multi-layer for venous ulcers.</div>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <div class="step-title">Review &amp; reassess</div>
+      <div class="step-desc">Reassess ABPI and wound status at minimum every 12 weeks, or sooner if clinical deterioration is noted. Adjust compression class accordingly.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PANEL: Products -->
+<div id="panel-products" class="panel">
+<div class="content">
+  <p class="section-label">Bandage system reference — by manufacturer</p>
+
+  <table class="prod-table">
+    <thead>
+      <tr>
+        <th>Manufacturer</th>
+        <th>Light (&lt;20 mmHg)</th>
+        <th>Moderate (20–30 mmHg)</th>
+        <th>Strong (30–40 mmHg)</th>
+        <th>Very strong (34–46 mmHg)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mölnlycke</strong></td>
+        <td><span class="tag tag-light">Tubifast</span><span class="tag tag-light">Tubigrip</span></td>
+        <td><span class="tag tag-mod">Setopress</span></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Smith &amp; Nephew</strong></td>
+        <td><span class="tag tag-light">Profore #1, #2</span></td>
+        <td><span class="tag tag-mod">Profore Lite</span><span class="tag tag-mod">Setopress</span></td>
+        <td>—</td>
+        <td><span class="tag tag-vs">Profore 4-Layer</span></td>
+      </tr>
+      <tr>
+        <td><strong>3M</strong></td>
+        <td><span class="tag tag-light">Coban 2 Lite</span></td>
+        <td><span class="tag tag-mod">Coban 2 Lite</span></td>
+        <td><span class="tag tag-strong">Coban 2 Layer</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>JOBST (Essity)</strong></td>
+        <td>—</td>
+        <td><span class="tag tag-mod">Compri2 Lite</span></td>
+        <td><span class="tag tag-strong">Comprilan</span> <span style="font-size:11px;color:var(--text3)">(inelastic)</span></td>
+        <td><span class="tag tag-vs">Compri2 Full</span></td>
+      </tr>
+      <tr>
+        <td><strong>Hartmanns</strong></td>
+        <td><span class="tag tag-light">Lastodur Light</span></td>
+        <td><span class="tag tag-mod">Putter Pro Lite</span></td>
+        <td><span class="tag tag-strong">Putterbinde</span> <span style="font-size:11px;color:var(--text3)">(short stretch)</span></td>
+        <td><span class="tag tag-vs">Putter Pro 2</span></td>
+      </tr>
+      <tr>
+        <td><strong>Urgo Medical</strong></td>
+        <td>—</td>
+        <td><span class="tag tag-mod">K-Two Reduced</span></td>
+        <td><span class="tag tag-strong">K-Two Full</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Lohmann &amp; Rauscher</strong></td>
+        <td>—</td>
+        <td><span class="tag tag-mod">Rosidal K / CC</span></td>
+        <td><span class="tag tag-strong">Rosidal Haft 2-Layer</span></td>
+        <td><span class="tag tag-vs">Rosidal Sys 4-Layer</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sutherland Medical</strong></td>
+        <td><span class="tag tag-light">Tubular bandage</span></td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="section-label">Elastic vs inelastic — when to choose</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;">
+    <div class="card">
+      <div class="card-title">Elastic (long-stretch)</div>
+      <div class="card-sub">High resting pressure. Suited for ambulatory and non-ambulatory patients. Most venous leg ulcer systems. Examples: Profore, Coban 2, K-Two.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Inelastic (short-stretch)</div>
+      <div class="card-sub">High working pressure, low resting pressure. Ideal for ambulatory lymphoedema patients. Massaging effect with calf pump. Examples: Comprilan, Putterbinde, Rosidal K.</div>
+    </div>
+  </div>
+
+  <div class="au-note">
+    <strong>Australian clinical standard:</strong> For active venous leg ulcers, the primary target is RAL Class 2 or 3 (23–46 mmHg). Multi-layer compression systems that achieve sustained pressure are preferred over single-layer hosiery.
+  </div>
+</div>
+</div>
+
+<!-- PANEL: Tubigrip Sizing -->
+<div id="panel-tubigrip" class="panel">
+<div class="content">
+  <p class="section-label">Tubigrip lower limb sizing calculator</p>
+
+  <div class="sizing-tool">
+    <div class="sizing-header">
+      <h3>Size finder</h3>
+    </div>
+    <div class="sizing-body">
+      <div class="sizing-input-row">
+        <div class="input-group">
+          <label>Widest circumference (cm)</label>
+          <input type="number" id="circInput" min="8" max="120" placeholder="e.g. 26">
+        </div>
+        <div class="input-group">
+          <label>Application area</label>
+          <select id="areaSelect">
+            <option value="">— select —</option>
+            <option value="ankle">Ankle</option>
+            <option value="knee">Knee</option>
+            <option value="calf">Calf</option>
+            <option value="thigh">Thigh</option>
+          </select>
+        </div>
+        <button class="calc-btn" onclick="calcTubigrip()">Find size</button>
+      </div>
+      <div class="sizing-result" id="sizing-result">Enter measurements above and click "Find size".</div>
+    </div>
+  </div>
+
+  <p class="section-label">Full sizing reference</p>
+  <table class="prod-table">
+    <thead>
+      <tr>
+        <th>Size</th>
+        <th>Circumference</th>
+        <th>Typical lower limb area</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>B</strong></td><td>13–16 cm</td><td>Very small ankles / Pediatric limbs</td></tr>
+      <tr><td><strong>C</strong></td><td>16–20 cm</td><td>Small ankles / Adult wrists</td></tr>
+      <tr><td><strong>D</strong></td><td>20–24 cm</td><td>Medium ankles / Large arms</td></tr>
+      <tr><td><strong>E</strong></td><td>24–28 cm</td><td>Large ankles / Small-medium knees</td></tr>
+      <tr><td><strong>F</strong></td><td>28–36 cm</td><td>Large knees / Medium thighs</td></tr>
+      <tr><td><strong>G</strong></td><td>36–46 cm</td><td>Large thighs</td></tr>
+      <tr><td><strong>J</strong></td><td>46–110 cm</td><td>Extra-large thighs / Small trunks</td></tr>
+    </tbody>
+  </table>
+
+  <p class="section-label">Double-layer application guide</p>
+  <div class="algo-step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">Measure and cut</div>
+      <div class="step-desc">Measure from the base of the toes to just below the knee. Cut a length of Tubigrip that is <strong>double</strong> this distance plus 2–3 cm for overlap.</div>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Apply first layer</div>
+      <div class="step-desc">Slide the first half of the bandage onto the limb, starting at the toes and working up to just below the knee.</div>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Fold back for second layer</div>
+      <div class="step-desc">Fold the remaining length back over the first layer. Ensure the outer layer ends 2–3 cm <em>higher</em> than the inner layer to prevent a pressure "ring".</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <p class="section-label">Clinical caveats</p>
+  <div class="card">
+    <div class="card-title">The "in-between" rule</div>
+    <div class="card-sub">If a measurement falls exactly on the border (e.g. exactly 24 cm), choose the <strong>larger</strong> size (Size E) to avoid excessive pressure — especially if ABPI is borderline (0.8–0.9).</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Joint flexion</div>
+    <div class="card-sub">When applying over the knee, ensure the patient has their leg slightly bent during measurement and application to prevent bunching in the popliteal fossa.</div>
+  </div>
+  <div class="card" style="background:var(--amber-lt);border-color:#FAC775;">
+    <div class="card-title" style="color:var(--amber-dk);">⚠ Latex warning</div>
+    <div class="card-sub" style="color:var(--amber-dk);">Standard Tubigrip contains natural rubber latex. Patients with a latex allergy must use a latex-free alternative (Tubigrip LF or Medigrip LF).</div>
+  </div>
+</div>
+</div>
+
+<!-- PANEL: Standards -->
+<div id="panel-standards" class="panel">
+<div class="content">
+  <p class="section-label">Compression classification standards comparison</p>
+
+  <div class="au-note">
+    In Australia, the <strong>RAL GZ 387 (German)</strong> standard is most frequently used for medical-grade therapy. The British (BS 6612) standard is common in retail and for patients requiring gentler fabric. The French (AFNOR) standard appears in some oncology settings.
+  </div>
+
+  <table class="std-table">
+    <thead>
+      <tr>
+        <th>Class</th>
+        <th class="ral">RAL GZ 387 (German)</th>
+        <th>BS 6612 (British)</th>
+        <th>AFNOR (French)</th>
+        <th>USA (Generic)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Class 1 · Mild</td>
+        <td class="ral">18–21 mmHg</td>
+        <td>14–17 mmHg</td>
+        <td>10–15 mmHg</td>
+        <td>15–20 mmHg</td>
+      </tr>
+      <tr>
+        <td>Class 2 · Moderate</td>
+        <td class="ral">23–32 mmHg</td>
+        <td>18–24 mmHg</td>
+        <td>15–20 mmHg</td>
+        <td>20–30 mmHg</td>
+      </tr>
+      <tr>
+        <td>Class 3 · Strong</td>
+        <td class="ral">34–46 mmHg</td>
+        <td>25–35 mmHg</td>
+        <td>20–36 mmHg</td>
+        <td>30–40 mmHg</td>
+      </tr>
+      <tr>
+        <td>Class 4 · Very Strong</td>
+        <td class="ral">&gt;49 mmHg</td>
+        <td>N/A</td>
+        <td>&gt;36 mmHg</td>
+        <td>40–50 mmHg</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="section-label">When to choose each standard</p>
+  <table class="prod-table">
+    <thead>
+      <tr>
+        <th>Patient situation</th>
+        <th>Recommended standard</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Active venous leg ulcer</td>
+        <td><span class="tag tag-light">RAL Class 2 or 3</span></td>
+        <td>High stiffness and guaranteed high pressure required to heal the wound</td>
+      </tr>
+      <tr>
+        <td>Mild varicose veins / pregnancy</td>
+        <td><span class="tag tag-mod">BS Class 1</span></td>
+        <td>Higher compliance; easier to don; sufficient for simple prophylaxis</td>
+      </tr>
+      <tr>
+        <td>Fragile skin / elderly</td>
+        <td><span class="tag tag-mod">British Standard</span></td>
+        <td>More "give" in fabric makes it easier to don without skin tears</td>
+      </tr>
+      <tr>
+        <td>Severe lymphoedema</td>
+        <td><span class="tag tag-vs">RAL (flat-knit)</span></td>
+        <td>Stiffness of the German standard prevents fluid crossover into tissue</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- PANEL: Patient Safety -->
+<div id="panel-safety" class="panel">
+<div class="content">
+  <p class="section-label">Stop &amp; check — red flag signs</p>
+  <p style="font-size:13.5px;color:var(--text2);margin-bottom:1rem;line-height:1.6;">If any of the following occur, the patient must remove compression immediately and contact their clinician or present to Urgent Care.</p>
+
+  <div class="flag-grid">
+    <div class="flag-card">
+      <div class="flag-icon">👁</div>
+      <div class="flag-text">
+        <div class="flag-title">Changes in colour</div>
+        <div class="flag-desc">Toes or fingers look pale, white, blue, or purple.</div>
+      </div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-icon">🌡</div>
+      <div class="flag-text">
+        <div class="flag-title">Temperature change</div>
+        <div class="flag-desc">Foot or toes feel unusually cold compared to the other leg.</div>
+      </div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-icon">⚡</div>
+      <div class="flag-text">
+        <div class="flag-title">Pins &amp; needles</div>
+        <div class="flag-desc">Tingling, numbness, or a crawling sensation in the feet or toes.</div>
+      </div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-icon">!</div>
+      <div class="flag-text">
+        <div class="flag-title">Intense pain</div>
+        <div class="flag-desc">Sharp, throbbing, or burning pain not present before compression was applied.</div>
+      </div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-icon">💧</div>
+      <div class="flag-text">
+        <div class="flag-title">New swelling</div>
+        <div class="flag-desc">Toes look swollen or puffy above or below the edge of the bandage.</div>
+      </div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-icon">✋</div>
+      <div class="flag-text">
+        <div class="flag-title">Loss of movement</div>
+        <div class="flag-desc">Difficulty or inability to wiggle the toes.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">Capillary refill test (patient self-check)</p>
+  <div class="crt-card">
+    <p style="font-size:13.5px;color:var(--text2);line-height:1.6;">Patients can perform this simple check to verify adequate circulation while compression is in place.</p>
+    <div class="crt-steps">
+      <div class="crt-step">
+        <span class="crt-step-num">1</span>
+        <div class="crt-step-text">Press firmly on the big toenail for 5 seconds until it turns white.</div>
+      </div>
+      <div class="crt-step">
+        <span class="crt-step-num">2</span>
+        <div class="crt-step-text">Release the pressure completely.</div>
+      </div>
+      <div class="crt-step crt-pass">
+        <span class="crt-step-num">✓</span>
+        <div class="crt-step-text"><strong>Pass:</strong> Pink colour returns in under 3 seconds — circulation is adequate.</div>
+      </div>
+      <div class="crt-step crt-fail">
+        <span class="crt-step-num">✗</span>
+        <div class="crt-step-text"><strong>Fail:</strong> Stays white or takes &gt;3 seconds — compression may be too tight. Remove and contact clinician.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">Daily care do's and don'ts</p>
+  <div class="dos-donts">
+    <div class="do-col">
+      <div class="do-col-header">Do</div>
+      <div class="do-col-body">
+        <div class="do-item">Check your skin at bandage edges for redness or "cutting in".</div>
+        <div class="do-item">Elevate legs above your heart when sitting to help compression work.</div>
+        <div class="do-item">Keep the bandage dry — use a waterproof cover when showering.</div>
+        <div class="do-item">Stay active. Gentle walking helps the calf pump move blood.</div>
+      </div>
+    </div>
+    <div class="dont-col">
+      <div class="dont-col-header">Don't</div>
+      <div class="dont-col-body">
+        <div class="dont-item">Fold or roll down the top of the bandage — this creates a double-pressure ring.</div>
+        <div class="dont-item">Wear compression while sleeping unless your clinician specifically advised it.</div>
+        <div class="dont-item">Patch a hole or cut the bandage yourself if it feels tight.</div>
+        <div class="dont-item">Ignore a heavy or throbbing feeling that gets worse over time.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer>
+  For clinical use by trained healthcare professionals only. Always obtain a validated ABPI before initiating Class 2+ compression.<br>
+  Refer to current product instructions for use and local clinical guidelines. This tool does not constitute medical advice.
+</footer>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function selectABPI(el, val) {
+  document.querySelectorAll('.abpi-zone').forEach(z => z.classList.remove('selected'));
+  el.classList.add('selected');
+  const res = document.getElementById('abpi-result');
+  const msgs = {
+    '<0.5': { cls:'danger', text:'<strong>ABPI &lt; 0.5 — Critical ischaemia.</strong> Compression is contraindicated. Urgent vascular surgical referral required. Do not apply any form of compression bandaging.' },
+    '0.5–0.6': { cls:'danger', text:'<strong>ABPI 0.5–0.6 — Severe peripheral arterial disease.</strong> Compression is contraindicated until vascular assessment is completed. Refer to vascular specialist before any compression.' },
+    '0.6–0.8': { cls:'warn', text:'<strong>ABPI 0.6–0.8 — Moderate PAD.</strong> Compression is generally contraindicated. A specialist vascular opinion is required. Reduced compression (10–17 mmHg maximum) may be considered only under close specialist supervision.' },
+    '0.8–0.9': { cls:'caution', text:'<strong>ABPI 0.8–0.9 — Borderline / mild PAD.</strong> Reduced compression only. Use Class 1 (18–21 mmHg) or consider double-layer Tubigrip. Choose the larger Tubigrip size if on the border. Monitor closely; reassess within 4–6 weeks.' },
+    '0.9–1.3': { cls:'safe', text:'<strong>ABPI 0.9–1.3 — Normal range.</strong> Full compression therapy is appropriate. Select compression class based on clinical indication: Class 1 for mild oedema/varicose veins, Class 2 for active VLU and moderate CVI, Class 3 for severe VLU and lymphoedema.' },
+    '>1.3': { cls:'warn', text:'<strong>ABPI &gt; 1.3 — Likely non-compressible vessels (calcification).</strong> Result is unreliable. Do not base compression decisions on this reading. Consider toe brachial index (TBI) or specialist duplex assessment before initiating compression.' }
+  };
+  const m = msgs[val];
+  res.className = 'abpi-result ' + m.cls;
+  res.innerHTML = m.text;
+}
+
+function calcTubigrip() {
+  const circ = parseFloat(document.getElementById('circInput').value);
+  const area = document.getElementById('areaSelect').value;
+  const res = document.getElementById('sizing-result');
+
+  if (isNaN(circ) || circ <= 0) {
+    res.className = 'sizing-result';
+    res.innerHTML = 'Please enter a valid circumference measurement.';
+    return;
+  }
+
+  const sizes = [
+    { size: 'B', min: 13, max: 16, areas: 'Very small ankles, paediatric limbs' },
+    { size: 'C', min: 16, max: 20, areas: 'Small ankles, adult wrists' },
+    { size: 'D', min: 20, max: 24, areas: 'Medium ankles, large arms' },
+    { size: 'E', min: 24, max: 28, areas: 'Large ankles, small-medium knees' },
+    { size: 'F', min: 28, max: 36, areas: 'Large knees, medium thighs' },
+    { size: 'G', min: 36, max: 46, areas: 'Large thighs' },
+    { size: 'J', min: 46, max: 110, areas: 'Extra-large thighs, small trunks' }
+  ];
+
+  let match = null;
+  for (const s of sizes) {
+    if (circ >= s.min && circ <= s.max) {
+      match = s;
+      break;
+    }
+  }
+
+  if (!match) {
+    res.className = 'sizing-result';
+    res.innerHTML = circ < 13
+      ? 'Measurement below standard sizing range (&lt;13 cm). Consult a specialist for paediatric or very small limb options.'
+      : 'Measurement exceeds standard sizing range (&gt;110 cm). Custom or specialist fitting required.';
+    return;
+  }
+
+  const borderNote = (circ === match.min && match.min > 13)
+    ? '<br><em style="font-size:12.5px">Measurement is on the lower border — this size is appropriate unless there is borderline ABPI (0.8–0.9), in which case choose the larger size.</em>'
+    : (circ === match.max)
+      ? '<br><em style="font-size:12.5px">Measurement is on the upper border — size up to the next size to avoid excessive pressure.</em>'
+      : '';
+
+  const areaNote = area ? `<br>Typical use for <strong>${area}</strong>: ${match.areas}.` : '';
+
+  res.className = 'sizing-result found';
+  res.innerHTML = `<span class="size-big">Size ${match.size}</span>Range: ${match.min}–${match.max} cm${areaNote}${borderNote}<br><span style="font-size:12.5px;opacity:0.8">Apply in double layer to achieve therapeutic pressure (15–20 mmHg).</span>`;
+}
+</script>
+</body>
+</html>
