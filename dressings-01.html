@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wound Dressing Selector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B2E4A;
+    --navy-mid: #164469;
+    --teal: #1A7F6E;
+    --teal-light: #E6F5F2;
+    --teal-mid: #2CA896;
+    --teal-border: #A8DDD7;
+    --blue-accent: #1B6CA8;
+    --blue-light: #EBF4FB;
+    --amber: #B8620A;
+    --amber-light: #FEF3E8;
+    --red: #C0392B;
+    --red-light: #FDECEA;
+    --green: #1E7C4A;
+    --green-light: #EAF5EE;
+    --purple: #5B3F9A;
+    --purple-light: #F0EBF9;
+    --bg: #F4F7F9;
+    --surface: #FFFFFF;
+    --border: #DDE3E9;
+    --border-soft: #EDF0F3;
+    --text: #12293D;
+    --text-mid: #3D5A72;
+    --text-muted: #7A95AA;
+    --shadow-sm: 0 1px 3px rgba(11,46,74,.06), 0 1px 2px rgba(11,46,74,.04);
+    --shadow-md: 0 4px 16px rgba(11,46,74,.08), 0 1px 4px rgba(11,46,74,.05);
+    --shadow-lg: 0 8px 32px rgba(11,46,74,.12), 0 2px 8px rgba(11,46,74,.06);
+    --radius: 10px;
+    --radius-lg: 14px;
+    --radius-pill: 100px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--navy);
+    color: #fff;
+    padding: 0;
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 32px 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+  }
+  .header-logo {
+    width: 42px;
+    height: 42px;
+    background: var(--teal-mid);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+  }
+  .header-logo svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .header-text { flex: 1; }
+  .header-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -.01em;
+    line-height: 1.15;
+    color: #fff;
+  }
+  .header-text p {
+    font-size: 13px;
+    color: rgba(255,255,255,.55);
+    margin-top: 2px;
+    font-weight: 300;
+  }
+  .header-badge {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.7);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+    margin-bottom: 8px;
+    font-weight: 400;
+    letter-spacing: .02em;
+  }
+
+  /* ── Tab nav ── */
+  .tab-nav {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 32px 0;
+    display: flex;
+    gap: 4px;
+  }
+  .tab-btn {
+    padding: 11px 24px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    color: rgba(255,255,255,.6);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .tab-btn:hover { background: rgba(255,255,255,.13); color: rgba(255,255,255,.85); }
+  .tab-btn.active {
+    background: var(--bg);
+    color: var(--navy);
+    border-color: var(--border);
+  }
+  .tab-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── Main layout ── */
+  .main-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 32px 60px;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* ── Left panel ── */
+  .left-panel {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 14px 18px;
+    background: var(--navy);
+    color: #fff;
+  }
+  .panel-head h2 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.7);
+  }
+  .panel-section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 14px 18px 6px;
+    background: var(--border-soft);
+    border-bottom: 1px solid var(--border);
+  }
+  .select-btn {
+    width: 100%;
+    padding: 11px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-soft);
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all .12s;
+    font-weight: 400;
+  }
+  .select-btn:last-child { border-bottom: none; }
+  .select-btn:hover { background: var(--bg); color: var(--text); }
+  .select-btn.active { background: var(--teal-light); color: var(--teal); font-weight: 500; border-left: 3px solid var(--teal); padding-left: 15px; }
+  .select-btn .swatch {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .select-btn .chevron { margin-left: auto; opacity: .3; transition: opacity .12s; }
+  .select-btn.active .chevron { opacity: .7; color: var(--teal); }
+  .select-btn .badge-exudate {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+  }
+
+  /* ── Right panel ── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .placeholder-card {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 60px 40px;
+    text-align: center;
+  }
+  .placeholder-card svg { width: 48px; height: 48px; stroke: var(--border); margin-bottom: 16px; fill: none; stroke-width: 1.5; }
+  .placeholder-card h3 { font-size: 16px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+  .placeholder-card p { font-size: 13px; color: var(--text-muted); }
+
+  /* ── Result card ── */
+  .result-header {
+    background: var(--navy);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 22px 28px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .result-icon {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,.12);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .result-icon svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .result-title-block h2 { font-size: 20px; font-weight: 500; font-family: 'DM Serif Display', serif; letter-spacing: -.01em; }
+  .result-title-block .aim { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 2px; }
+  .result-note-pill {
+    margin-left: auto;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    font-size: 11px; padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    color: rgba(255,255,255,.7);
+    white-space: nowrap;
+  }
+
+  /* Exudate table */
+  .exudate-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    overflow: hidden;
+  }
+  .exudate-card:last-of-type { border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+  .exudate-row-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 28px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .exudate-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text-muted);
+  }
+  .exudate-pip {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .exudate-body { padding: 14px 28px 16px; }
+  .dress-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .dress-chip {
+    padding: 6px 13px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .12s;
+  }
+  .dress-chip.primary { background: var(--teal-light); color: var(--teal); border-color: var(--teal-border); }
+  .dress-chip.primary:hover { background: #CBF0EA; }
+  .dress-chip.alt { background: var(--purple-light); color: var(--purple); border-color: #C9B8EF; font-style: italic; }
+  .dress-chip.note { background: var(--amber-light); color: var(--amber); border-color: #F0C88A; font-size: 12px; }
+  .dress-chip.warn { background: #FFF8E1; color: #7A5C00; border-color: #F0D780; font-size: 12px; font-style: italic; }
+  .alt-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-top: 10px; margin-bottom: 6px; }
+
+  /* Dressing detail card */
+  .detail-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .detail-section {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .detail-section:last-child { border-bottom: none; }
+  .detail-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .detail-material { font-size: 13.5px; color: var(--text-mid); line-height: 1.55; }
+  .adv-list, .dis-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .adv-list li, .dis-list li { font-size: 13px; color: var(--text-mid); padding-left: 18px; position: relative; line-height: 1.45; }
+  .adv-list li::before { content: ''; position: absolute; left: 4px; top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .dis-list li::before { content: ''; position: absolute; left: 4px; top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+  .wound-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .wound-tag { padding: 5px 12px; border-radius: var(--radius-pill); font-size: 12.5px; font-weight: 500; background: var(--blue-light); color: var(--blue-accent); border: 1px solid #BDD8EF; }
+  .example-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .example-tag { padding: 5px 12px; border-radius: var(--radius-pill); font-size: 12.5px; font-weight: 400; background: var(--bg); color: var(--text-mid); border: 1px solid var(--border); font-family: 'DM Sans', monospace; }
+  .exudate-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 12.5px; font-weight: 500; }
+  .exudate-badge.low { background: var(--green-light); color: var(--green); }
+  .exudate-badge.medium { background: var(--amber-light); color: var(--amber); }
+  .exudate-badge.high { background: var(--red-light); color: var(--red); }
+  .exudate-badge.any { background: var(--purple-light); color: var(--purple); }
+
+  /* Tip note at bottom */
+  .tip-note {
+    background: var(--navy);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    color: rgba(255,255,255,.7);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tip-note svg { width: 16px; height: 16px; fill: none; stroke: rgba(255,255,255,.5); stroke-width: 2; flex-shrink: 0; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,.45);
+    font-size: 12px;
+    text-align: center;
+    padding: 16px 32px;
+  }
+  footer strong { color: rgba(255,255,255,.7); font-weight: 500; }
+
+  /* ── Responsive ── */
+  @media (max-width: 780px) {
+    .header-inner { padding: 20px 20px 0; }
+    .tab-nav { padding: 16px 20px 0; }
+    .main-wrap { grid-template-columns: 1fr; padding: 20px 16px 48px; }
+    .result-header { flex-wrap: wrap; }
+    .result-note-pill { margin-left: 0; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .exudate-body { padding: 12px 18px 14px; }
+    .exudate-row-head { padding: 11px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2L12 8M12 16 12 22M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M16 12h6M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/></svg>
+    </div>
+    <div class="header-text">
+      <h1>Wound Dressing Selector</h1>
+      <p>Evidence-based dressing selection by wound presentation and product type</p>
+    </div>
+    <div class="header-badge">Clinical Reference Tool</div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab-btn active" id="tab-wound" onclick="switchTab('wound')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+      Select by wound type
+    </button>
+    <button class="tab-btn" id="tab-dressing" onclick="switchTab('dressing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Select by dressing type
+    </button>
+  </div>
+</header>
+
+<div class="main-wrap" id="main-wrap">
+
+  <!-- Left: selector panel -->
+  <div class="left-panel" id="left-panel"></div>
+
+  <!-- Right: result panel -->
+  <div class="right-panel" id="right-panel">
+    <div class="placeholder-card" id="placeholder">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <h3>No selection yet</h3>
+      <p>Choose a wound type or dressing from the left panel to view recommendations.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Based on <strong>St Vincent's Hospital Melbourne</strong> Dressing Selections Chart &amp; <strong>Geeky Medics</strong> Wound Dressings Summary. For clinical guidance only — always defer to local protocols and wound care specialist advice.
+</footer>
+
+<script>
+const WOUNDS = [
+  {
+    id:'necrotic', name:'Necrotic', color:'#444441', aim:'Debride / rehydrate', note:'Black wound bed',
+    icon:'<path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M8 12h8"/>',
+    high:  { opts:['Hydrofibre','Skin protectant'], alt:null, note:null },
+    medium:{ opts:['Hydrogel','Alginate','Hydrocolloid','Skin protectant'], alt:null, note:null },
+    low:   { opts:['Sheet hydrogel','Hydrocolloid'], alt:'Maggot therapy', note:null }
+  },
+  {
+    id:'sloughy', name:'Sloughy', color:'#B8620A', aim:'Deslough / hydration', note:'Yellow wound bed',
+    icon:'<path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M8 12h8M12 8v8"/>',
+    high:  { opts:['Hydrofibre','Skin protectant'], alt:null, note:null },
+    medium:{ opts:['Hydrogel','Alginate','Hydrocolloid','Skin protectant'], alt:null, note:null },
+    low:   { opts:['Sheet hydrogel','Hydrocolloid'], alt:'Maggot therapy', note:null }
+  },
+  {
+    id:'granulating', name:'Granulating', color:'#1E7C4A', aim:'Encourage moist environment', note:'Red wound bed',
+    icon:'<circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/>',
+    high:  { opts:['Hydrofibre','Alginate','Skin protectant'], alt:'Negative pressure therapy', note:'Cavity wounds' },
+    medium:{ opts:['Alginate','Hydrocolloid','Foam','Skin protectant'], alt:'Negative pressure therapy', note:null },
+    low:   { opts:['Vapour permeable film','Hydrocolloid','Lite foam'], alt:null, note:'Consider low adherent dressing' }
+  },
+  {
+    id:'epithelialising', name:'Epithelialising', color:'#993556', aim:'Protect / promote wound maturation', note:'Pink wound bed',
+    icon:'<path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M8 8l8 8M8 16l8-8"/>',
+    high:  { opts:[], alt:null, note:'High exudate should not occur with clean granulating wounds' },
+    medium:{ opts:['Alginate','Hydrocolloid','Skin protectant'], alt:null, note:null },
+    low:   { opts:['Vapour permeable film','Hydrocolloid','Lite foam'], alt:null, note:'Consider low adherent dressing' }
+  },
+  {
+    id:'infected', name:'Infected', color:'#C0392B', aim:'Resolve infection', note:'Signs of local infection or bacterial colonisation',
+    icon:'<path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>',
+    high:  { opts:['Antimicrobial hydrofibre','Antimicrobial alginate','Skin protectant'], alt:null, note:null },
+    medium:{ opts:['Antimicrobial alginate','Antimicrobial tulle','Antimicrobial ointment','Skin protectant'], alt:null, note:null },
+    low:   { opts:['Antimicrobial low adherent'], alt:null, note:null }
+  },
+  {
+    id:'fungating', name:'Fungating', color:'#5B3F9A', aim:'Manage symptoms', note:'Bleeding, odour, exudate management',
+    icon:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/>',
+    high:  { opts:['Alginate','Activated charcoal','Skin protectant'], alt:null, note:null },
+    medium:{ opts:['Alginate','Activated charcoal','Skin protectant'], alt:null, note:null },
+    low:   { opts:['Low adherent'], alt:null, note:null }
+  }
+];
+
+const DRESSINGS = [
+  {
+    category:'Basic', id:'simple-island', name:'Simple island dressings', exudate:'Low',
+    material:'Absorbent wound pad with adhesive backing',
+    advantages:['Useful for wounds where edges are closely re-approximated, such as post-operative incisions','Can absorb small amounts of wound exudate'],
+    disadvantages:['Not appropriate for open wounds or those with excessive exudate'],
+    wounds:['Closed wounds (e.g. surgical incisions) healing via primary intention'],
+    examples:['Alldress®','Primapore®']
+  },
+  {
+    category:'Basic', id:'non-adherent', name:'Non-adherent wound contact layer', exudate:'Low–medium',
+    material:'Moist dressings impregnated with paraffin or other compounds to reduce adherence to the wound bed',
+    advantages:['Protect the wound bed from direct contact with secondary dressings'],
+    disadvantages:['Limited ability to absorb exudate — require a secondary dressing'],
+    wounds:['Superficial wounds healing by secondary intention','Burns'],
+    examples:['Mepitel®','Atraumann®']
+  },
+  {
+    category:'Basic', id:'films', name:'Films & membranes', exudate:'Low',
+    material:'Transparent plastic films/membranes',
+    advantages:['Allow passage of water vapour, reducing the risk of maceration','Allow passage of oxygen to facilitate the healing process','Provide visibility of the wound'],
+    disadvantages:['Limited ability to absorb exudate'],
+    wounds:['Epithelialising wounds','Superficial wounds with small amounts of exudate'],
+    examples:['Hydrofilm®','Tegaderm®']
+  },
+  {
+    category:'Moist', id:'hydrocolloid', name:'Hydrocolloid dressings', exudate:'Low–medium',
+    material:'Film/sheets coated with adhesive and impregnated with hydrocolloid allowing it to lock moisture into the wound',
+    advantages:['Maintain wound hydration by preventing the loss of moisture'],
+    disadvantages:['Can lead to skin maceration due to excessive moisture'],
+    wounds:['Wounds with low to medium levels of exudate','Sloughy wounds','Epithelialising wounds'],
+    examples:['Tegaderm Hydrocolloid®']
+  },
+  {
+    category:'Moist', id:'hydrogel', name:'Hydrogel dressings', exudate:'Low',
+    material:'Dressing that contains water in gel form (typically 60–70%)',
+    advantages:['Facilitates the breakdown of necrotic tissue through re-hydration and subsequent softening'],
+    disadvantages:['Excessive use can cause maceration','Requires a secondary dressing'],
+    wounds:['Wounds with desiccated or necrotic tissue','Necrotic and sloughy wounds'],
+    examples:['Kerralite Cool®','Intrasite gel']
+  },
+  {
+    category:'Absorbent', id:'hydrofibre', name:'Hydrofibre dressings', exudate:'Medium–high',
+    material:'Dressings made almost entirely from hydrofibre-based material which transforms into a soft gel on contact with exudate (an evolution of hydrocolloid)',
+    advantages:['Effective for moderate to high levels of exudate','Aid moist wound healing and autolytic debridement'],
+    disadvantages:['Can sometimes stick to wound edges causing tissue damage on removal'],
+    wounds:['Wounds with medium to high levels of exudate','Necrotic and sloughy wounds','Infected wounds'],
+    examples:['Aquacel®']
+  },
+  {
+    category:'Absorbent', id:'alginate', name:'Alginate dressings', exudate:'Medium–high',
+    material:'Dressings that contain alginates (found in brown seaweeds) which form a gel on contact with exudate',
+    advantages:['Help to debride wound via stimulation of macrophages','Absorb and retain fluid effectively','Easy to apply and remove','Haemostatic'],
+    disadvantages:['Can dry out the wound','Fibres can stick to the wound bed','Can result in skin maceration','May sting on wound contact','Has an odour'],
+    wounds:['Wounds with medium to high levels of exudate','Infected wounds','Fungating wounds'],
+    examples:['Algisite M®','ActivHeal® Alginate']
+  },
+  {
+    category:'Absorbent', id:'foam', name:'Foam dressings', exudate:'Medium–high',
+    material:'Absorb exudate and either transform into a gel-like foam or absorb the exudate into the dressing core, effectively removing it from the wound bed',
+    advantages:['Manage excess exudate effectively whilst avoiding excessive drying','Can be adhesive or non-adhesive'],
+    disadvantages:['May cause odour when wet','Adhesive dressings can cause skin stripping to fragile skin'],
+    wounds:['Wounds with medium to high levels of exudate','Granulating wounds'],
+    examples:['ActivHeal® foam adhesive','Allevyn Gentle®']
+  },
+  {
+    category:'Other', id:'antimicrobial', name:'Antimicrobial dressings', exudate:'Any',
+    material:'Inhibit bacterial growth and kill surface bacteria using honey, iodine or silver',
+    advantages:['Inhibit bacterial growth and kill surface bacteria','Can reduce odours if caused by bacteria'],
+    disadvantages:['Risk of an allergic reaction to agent','Potential for antimicrobial resistance','Limited ability to absorb exudate'],
+    wounds:['Wounds with local infection or bacterial colonisation','Infected wounds of any exudate level'],
+    examples:['Inadine®','Activon Tulle®']
+  },
+  {
+    category:'Other', id:'odour', name:'Odour absorbent dressings', exudate:'Low–medium',
+    material:'Seal and absorb odours using a variety of materials',
+    advantages:['Can reduce wound odours'],
+    disadvantages:['Stop functioning when they become wet'],
+    wounds:['Severely malodorous wounds','Fungating wounds'],
+    examples:['CarboFLEX®']
+  }
+];
+
+let currentTab = 'wound';
+let currentSelection = null;
+
+const CAT_COLORS = { Basic:'#1B6CA8', Moist:'#1A7F6E', Absorbent:'#B8620A', Other:'#5B3F9A' };
+const EXUDATE_COLORS = { high:'#C0392B', medium:'#B8620A', low:'#1E7C4A' };
+
+function switchTab(t) {
+  currentTab = t;
+  currentSelection = null;
+  document.getElementById('tab-wound').classList.toggle('active', t==='wound');
+  document.getElementById('tab-dressing').classList.toggle('active', t==='dressing');
+  buildLeftPanel();
+  showPlaceholder();
+}
+
+function buildLeftPanel() {
+  const lp = document.getElementById('left-panel');
+  if (currentTab === 'wound') {
+    let html = `<div class="panel-head"><h2>Wound presentation</h2></div>`;
+    WOUNDS.forEach(w => {
+      html += `<button class="select-btn ${currentSelection===w.id?'active':''}" onclick="selectWound('${w.id}')">
+        <span class="swatch" style="background:${w.color}"></span>
+        ${w.name}
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>`;
+    });
+    lp.innerHTML = html;
+  } else {
+    const cats = ['Basic','Moist','Absorbent','Other'];
+    let html = `<div class="panel-head"><h2>Dressing category</h2></div>`;
+    cats.forEach(cat => {
+      html += `<div class="panel-section-label">${cat} dressings</div>`;
+      DRESSINGS.filter(d=>d.category===cat).forEach(d => {
+        const exLabelShort = d.exudate.includes('high') ? 'High' : d.exudate.includes('medium') && d.exudate.includes('low') ? 'Med' : d.exudate === 'Low' ? 'Low' : d.exudate === 'Any' ? 'Any' : 'Med';
+        const exClass = d.exudate.includes('high') ? 'high' : d.exudate === 'Low' ? 'low' : 'medium';
+        html += `<button class="select-btn ${currentSelection===d.id?'active':''}" onclick="selectDressing('${d.id}')">
+          <span class="swatch" style="background:${CAT_COLORS[cat]}"></span>
+          ${d.name}
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>`;
+      });
+    });
+    lp.innerHTML = html;
+  }
+}
+
+function showPlaceholder() {
+  document.getElementById('right-panel').innerHTML = `
+    <div class="placeholder-card" id="placeholder">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <h3>No selection yet</h3>
+      <p>Choose a ${currentTab === 'wound' ? 'wound presentation' : 'dressing type'} from the left panel.</p>
+    </div>`;
+}
+
+function selectWound(id) {
+  currentSelection = id;
+  buildLeftPanel();
+  const w = WOUNDS.find(x=>x.id===id);
+  const rp = document.getElementById('right-panel');
+  const levels = [
+    { label:'High exudate', key:'high', color:EXUDATE_COLORS.high },
+    { label:'Medium exudate', key:'medium', color:EXUDATE_COLORS.medium },
+    { label:'Low exudate', key:'low', color:EXUDATE_COLORS.low }
+  ];
+
+  let html = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);overflow:hidden">
+      <div class="result-header">
+        <div class="result-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${w.icon}</svg>
+        </div>
+        <div class="result-title-block">
+          <h2>${w.name} wound</h2>
+          <div class="aim">Treatment aim: ${w.aim}</div>
+        </div>
+        ${w.note ? `<div class="result-note-pill">${w.note}</div>` : ''}
+      </div>`;
+
+  levels.forEach(({ label, key, color }) => {
+    const d = w[key];
+    if (!d) return;
+    const hasContent = d.opts.length > 0 || d.note || d.alt;
+    html += `
+      <div class="exudate-card">
+        <div class="exudate-row-head">
+          <span class="exudate-pip" style="background:${color}"></span>
+          <span class="exudate-label">${label}</span>
+        </div>
+        <div class="exudate-body">`;
+    if (d.opts.length === 0 && d.note && !d.alt) {
+      html += `<span class="dress-chip warn">${d.note}</span>`;
+    } else {
+      html += `<div class="dress-chips">`;
+      d.opts.forEach(o => { html += `<span class="dress-chip primary">${o}</span>`; });
+      html += `</div>`;
+      if (d.note) html += `<div class="alt-label">Note</div><div class="dress-chips"><span class="dress-chip note">${d.note}</span></div>`;
+      if (d.alt) html += `<div class="alt-label">Alternative</div><div class="dress-chips"><span class="dress-chip alt">${d.alt}</span></div>`;
+    }
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+
+  // Clickable dressing cross-reference
+  html += `<div class="tip-note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+    <span>Tap any dressing chip above, or switch to <strong style="color:#fff">Select by dressing type</strong> for full product details including advantages, disadvantages, and examples.</span>
+  </div>`;
+
+  rp.innerHTML = html;
+}
+
+function selectDressing(id) {
+  currentSelection = id;
+  buildLeftPanel();
+  const d = DRESSINGS.find(x=>x.id===id);
+  const rp = document.getElementById('right-panel');
+  const exClass = d.exudate === 'Low' ? 'low' : d.exudate.includes('high') ? 'high' : d.exudate === 'Any' ? 'any' : 'medium';
+
+  const html = `
+    <div class="detail-card">
+      <div class="result-header" style="background:${CAT_COLORS[d.category]}">
+        <div class="result-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="result-title-block">
+          <h2>${d.name}</h2>
+          <div class="aim">${d.category} dressings</div>
+        </div>
+        <div class="result-note-pill">${d.category}</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Material &amp; composition</div>
+        <p class="detail-material">${d.material}</p>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Exudate suitability</div>
+        <span class="exudate-badge ${exClass}">${d.exudate} exudate</span>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-label" style="color:var(--green)">Advantages</div>
+            <ul class="adv-list">${d.advantages.map(a=>`<li>${a}</li>`).join('')}</ul>
+          </div>
+          <div>
+            <div class="detail-label" style="color:var(--red)">Disadvantages</div>
+            <ul class="dis-list">${d.disadvantages.map(a=>`<li>${a}</li>`).join('')}</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Appropriate wound types</div>
+        <div class="wound-tags">${d.wounds.map(w=>`<span class="wound-tag">${w}</span>`).join('')}</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Product examples</div>
+        <div class="example-tags">${d.examples.map(e=>`<span class="example-tag">${e}</span>`).join('')}</div>
+      </div>
+    </div>`;
+
+  rp.innerHTML = html;
+}
+
+// Init
+buildLeftPanel();
+</script>
+</body>
+</html>
