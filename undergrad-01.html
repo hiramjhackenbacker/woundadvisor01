@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NurseRef — Clinical Quick Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --surface: #fffdf9;
+    --surface2: #f0ede6;
+    --border: #d8d3c8;
+    --text: #1a1714;
+    --muted: #7a7068;
+    --accent1: #c84b2f;   /* wound care - terracotta */
+    --accent2: #2e6b9e;   /* drug calc - steel blue */
+    --accent3: #8b1a1a;   /* sepsis - deep red */
+    --accent4: #5c3d8f;   /* anaphylaxis - purple */
+    --green: #2d6a4f;
+    --yellow: #b5880a;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ─── NAV ─── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 2rem;
+  }
+
+  .topbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    padding: 1rem 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .logo span { color: var(--accent1); font-style: italic; }
+
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+
+  .nav-tabs li button {
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 1.3rem 1.1rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-tabs li button:hover { color: var(--text); }
+  .nav-tabs li button.active { color: var(--text); border-bottom-color: currentColor; }
+  .nav-tabs li[data-tab="wounds"] button.active { color: var(--accent1); }
+  .nav-tabs li[data-tab="drugs"] button.active { color: var(--accent2); }
+  .nav-tabs li[data-tab="sepsis"] button.active { color: var(--accent3); }
+  .nav-tabs li[data-tab="anaphylaxis"] button.active { color: var(--accent4); }
+
+  /* ─── PAGES ─── */
+  .page { display: none; max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .page.active { display: block; }
+
+  .page-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header .tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.75rem;
+    color: white;
+  }
+
+  .tag-wounds { background: var(--accent1); }
+  .tag-drugs { background: var(--accent2); }
+  .tag-sepsis { background: var(--accent3); }
+  .tag-anaphylaxis { background: var(--accent4); }
+
+  .page-header h1 {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header p {
+    color: var(--muted);
+    max-width: 60ch;
+  }
+
+  /* ─── WOUND CARE ─── */
+  .dressing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .dressing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+    cursor: default;
+  }
+
+  .dressing-card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+  }
+
+  .card-header {
+    padding: 1rem 1.25rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    background: #fae8e3;
+  }
+
+  .card-title {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    line-height: 1.2;
+  }
+
+  .card-body { padding: 1rem 1.25rem 1.25rem; }
+
+  .card-row {
+    margin-bottom: 0.6rem;
+  }
+
+  .card-row-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .card-row-content {
+    font-size: 0.86rem;
+    color: var(--text);
+  }
+
+  .pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .pill {
+    font-size: 0.75rem;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    font-weight: 500;
+    border: 1px solid;
+  }
+
+  .pill-pro { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .pill-con { background: #fce4e4; color: #b71c1c; border-color: #ef9a9a; }
+  .pill-wound { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+  .pill-example { background: #f3e5f5; color: #6a1b9a; border-color: #ce93d8; }
+  .pill-material { background: #fff8e1; color: #e65100; border-color: #ffcc80; }
+
+  .section-heading {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Selection guide */
+  .selection-guide {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .guide-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .guide-item h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent1);
+    margin-bottom: 0.5rem;
+  }
+
+  .guide-item ul {
+    list-style: none;
+    font-size: 0.83rem;
+    color: var(--text);
+  }
+
+  .guide-item ul li::before { content: '→ '; color: var(--muted); }
+
+  /* ─── DRUG CALCS ─── */
+  .formula-box {
+    background: var(--surface);
+    border: 2px solid var(--accent2);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .formula-title {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--accent2);
+    margin-bottom: 0.75rem;
+  }
+
+  .formula-display {
+    font-family: 'Courier New', monospace;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 2;
+    border: 1px solid var(--border);
+  }
+
+  .formula-fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 0.5rem;
+    font-weight: 600;
+    color: var(--accent2);
+  }
+
+  .formula-fraction .num {
+    border-bottom: 2px solid var(--accent2);
+    padding: 0 0.25rem;
+    padding-bottom: 2px;
+    font-size: 0.95rem;
+  }
+
+  .formula-fraction .den {
+    padding: 2px 0.25rem 0;
+    font-size: 0.95rem;
+  }
+
+  .formula-note {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    font-style: italic;
+  }
+
+  /* Calculator */
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .calc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .calc-card h3 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--accent2);
+  }
+
+  .field-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .field-group input, .field-group select {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+
+  .field-group input:focus, .field-group select:focus {
+    outline: none;
+    border-color: var(--accent2);
+  }
+
+  .calc-btn {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--accent2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s;
+  }
+
+  .calc-btn:hover { opacity: 0.88; }
+
+  .calc-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #e8f4fd;
+    border: 1px solid #90caf9;
+    border-radius: 8px;
+    text-align: center;
+    display: none;
+  }
+
+  .calc-result.show { display: block; }
+
+  .calc-result .result-val {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    color: var(--accent2);
+    display: block;
+  }
+
+  .calc-result .result-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Example cards */
+  .example-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+
+  .example-header {
+    padding: 1rem 1.25rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.92rem;
+    user-select: none;
+  }
+
+  .example-header:hover { background: var(--border); }
+
+  .example-header .chevron {
+    transition: transform 0.3s;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .example-header.open .chevron { transform: rotate(180deg); }
+
+  .example-body {
+    display: none;
+    padding: 1.25rem;
+  }
+
+  .example-body.open { display: block; }
+
+  .steps {
+    counter-reset: step;
+    list-style: none;
+  }
+
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.88rem;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    width: 22px;
+    height: 22px;
+    background: var(--accent2);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .answer-box {
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2e7d32;
+  }
+
+  /* ─── SEPSIS ─── */
+  .sepsis-alert {
+    background: linear-gradient(135deg, #8b1a1a 0%, #c62828 100%);
+    color: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .sepsis-alert .alert-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    margin-top: -0.1rem;
+  }
+
+  .sepsis-alert h2 {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .sepsis-alert p { font-size: 0.88rem; opacity: 0.9; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  .symptom-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .symptom-card-header {
+    padding: 0.85rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: white;
+  }
+
+  .symptom-card-header.adult { background: var(--accent3); }
+  .symptom-card-header.child { background: #6d1a1a; }
+
+  .symptom-list {
+    list-style: none;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .symptom-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.88rem;
+  }
+
+  .symptom-list li .sym-letter {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    color: var(--accent3);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 18px;
+  }
+
+  .symptom-list li .sym-dot {
+    font-size: 1rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .sepsis-bundle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .bundle-header {
+    background: var(--accent3);
+    color: white;
+    padding: 0.85rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .bundle-items {
+    padding: 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .bundle-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: 0.87rem;
+    background: var(--surface2);
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .bundle-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent3);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .sofa-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .sofa-table th {
+    background: var(--accent3);
+    color: white;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .sofa-table td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sofa-table tr:last-child td { border-bottom: none; }
+  .sofa-table tr:nth-child(even) td { background: var(--surface2); }
+
+  /* ─── ANAPHYLAXIS ─── */
+  .anaphylaxis-emergency {
+    background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 100%);
+    color: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .anaphylaxis-emergency h2 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .anaphylaxis-emergency p { font-size: 0.88rem; opacity: 0.9; }
+
+  .epi-highlight {
+    display: inline-block;
+    background: white;
+    color: var(--accent4);
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+  }
+
+  .allergen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .allergen-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+
+  .allergen-card h4 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent4);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .allergen-card ul {
+    list-style: none;
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  .allergen-card ul li::before { content: '• '; color: var(--muted); }
+
+  .body-symptoms {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .body-symptom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .body-part {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.85rem;
+    border-left: 3px solid var(--accent4);
+  }
+
+  .body-part h5 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent4);
+    margin-bottom: 0.4rem;
+  }
+
+  .body-part p { font-size: 0.82rem; color: var(--muted); }
+
+  .action-steps {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .action-steps-header {
+    background: var(--accent4);
+    color: white;
+    padding: 0.85rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .action-step-list {
+    list-style: none;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .action-step-list li {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .action-step-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent4);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .action-step-content h5 {
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .action-step-content p {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .refractory-box {
+    background: #f3e5f5;
+    border: 1px solid #ce93d8;
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .refractory-box h3 {
+    font-family: var(--serif);
+    color: var(--accent4);
+    margin-bottom: 0.75rem;
+  }
+
+  .refractory-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 540px) {
+    .refractory-cols { grid-template-columns: 1fr; }
+  }
+
+  .refractory-col h5 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .refractory-col ul {
+    list-style: none;
+    font-size: 0.83rem;
+  }
+
+  .refractory-col ul li::before { content: '▸ '; color: var(--accent4); }
+
+  /* ─── HOME ─── */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .home-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+  .home-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+
+  .home-card[data-to="wounds"]::before { background: var(--accent1); }
+  .home-card[data-to="drugs"]::before { background: var(--accent2); }
+  .home-card[data-to="sepsis"]::before { background: var(--accent3); }
+  .home-card[data-to="anaphylaxis"]::before { background: var(--accent4); }
+
+  .home-card .icon { font-size: 2.2rem; margin-bottom: 0.75rem; }
+
+  .home-card h2 {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .home-card p { font-size: 0.84rem; color: var(--muted); }
+
+  .home-card .arrow {
+    position: absolute;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    font-size: 1rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+
+  .home-card:hover .arrow { transform: translateX(4px); }
+
+  /* ─── UTILS ─── */
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+  .text-small { font-size: 0.82rem; }
+  .text-muted { color: var(--muted); }
+
+  @media (max-width: 768px) {
+    .topbar { padding: 0 1rem; }
+    .logo { font-size: 1.3rem; }
+    .nav-tabs li button { padding: 1rem 0.75rem; font-size: 0.75rem; }
+    .page { padding: 1.5rem 1rem 3rem; }
+    .page-header h1 { font-size: 1.8rem; }
+    .dressing-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">Nurse<span>Ref</span></div>
+    <ul class="nav-tabs">
+      <li data-tab="home"><button class="active" onclick="goTo('home')">Home</button></li>
+      <li data-tab="wounds"><button onclick="goTo('wounds')">🩹 Wound Care</button></li>
+      <li data-tab="drugs"><button onclick="goTo('drugs')">💊 Drug Calculations</button></li>
+      <li data-tab="sepsis"><button onclick="goTo('sepsis')">🚨 Sepsis</button></li>
+      <li data-tab="anaphylaxis"><button onclick="goTo('anaphylaxis')">⚡ Anaphylaxis</button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div class="page active" id="page-home">
+  <div class="page-header">
+    <h1>Clinical Quick Reference</h1>
+    <p>A nursing education resource covering wound dressing selection, drug calculations, sepsis recognition, and anaphylaxis management.</p>
+  </div>
+  <div class="home-grid">
+    <div class="home-card" data-to="wounds" onclick="goTo('wounds')">
+      <div class="icon">🩹</div>
+      <h2>Wound Care</h2>
+      <p>Dressing types, selection guide, advantages &amp; disadvantages for each product category.</p>
+      <span class="arrow">→</span>
+    </div>
+    <div class="home-card" data-to="drugs" onclick="goTo('drugs')">
+      <div class="icon">💊</div>
+      <h2>Drug Calculations</h2>
+      <p>Formulas, worked examples and interactive calculators for tablets, injections, and IV infusions.</p>
+      <span class="arrow">→</span>
+    </div>
+    <div class="home-card" data-to="sepsis" onclick="goTo('sepsis')">
+      <div class="icon">🚨</div>
+      <h2>Sepsis Management</h2>
+      <p>Recognition criteria, SEPSIS mnemonic, the 1-hour bundle, and quick-reference SOFA scoring.</p>
+      <span class="arrow">→</span>
+    </div>
+    <div class="home-card" data-to="anaphylaxis" onclick="goTo('anaphylaxis')">
+      <div class="icon">⚡</div>
+      <h2>Anaphylaxis</h2>
+      <p>Triggers, symptom recognition by organ system, epinephrine use, and refractory management.</p>
+      <span class="arrow">→</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ WOUND CARE ═══════════════ -->
+<div class="page" id="page-wounds">
+  <div class="page-header">
+    <div class="tag tag-wounds">Wound Care</div>
+    <h1>Wound Dressings Reference</h1>
+    <p>Overview of dressing categories, materials, indications, and product examples for clinical practice.</p>
+  </div>
+
+  <h2 class="section-heading">Simple / Dry Dressings</h2>
+  <div class="dressing-grid">
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">🩹</div>
+        <div class="card-title">Simple Island Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Absorbent pad with adhesive backing</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list">
+            <span class="pill pill-pro">Closed wounds / post-op</span>
+            <span class="pill pill-pro">Absorbs small exudate</span>
+          </div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Not for open/high-exudate wounds</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Closed surgical wounds</span><span class="pill pill-wound">Primary intention</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Alldress®</span><span class="pill pill-example">Primapore®</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">🛡️</div>
+        <div class="card-title">Non-Adherent Wound Contact Layer</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Moist dressings with paraffin or compounds</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Protects wound bed</span><span class="pill pill-pro">Non-adherent</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Limited exudate absorption</span><span class="pill pill-con">Requires secondary dressing</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Superficial wounds</span><span class="pill pill-wound">Burns</span><span class="pill pill-wound">Secondary healing</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Mepitel®</span><span class="pill pill-example">Atraumann®</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">🫧</div>
+        <div class="card-title">Films &amp; Membranes</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Transparent plastic films/membranes</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Allows water vapour passage</span><span class="pill pill-pro">Wound visibility</span><span class="pill pill-pro">Facilitates healing</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Limited exudate absorption</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Epithelialising wounds</span><span class="pill pill-wound">Low-exudate superficial</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Hydrofilm®</span><span class="pill pill-example">Tegaderm®</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="section-heading">💧 Moist Dressings</h2>
+  <div class="dressing-grid">
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">💎</div>
+        <div class="card-title">Hydrocolloid Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Film/sheets with hydrocolloid — locks moisture</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Maintains wound hydration</span><span class="pill pill-pro">Prevents moisture loss</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Can cause skin maceration</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Low–medium exudate</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Tegaderm Hydrocolloid®</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">💧</div>
+        <div class="card-title">Hydrogel Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Water in gel form (~60–70%)</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Breaks down necrotic tissue</span><span class="pill pill-pro">Re-hydration &amp; softening</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Excessive use can cause maceration</span><span class="pill pill-con">Requires secondary dressing</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Desiccated/necrotic tissue</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Kerralite Cool®</span><span class="pill pill-example">Intrasite Gel®</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="section-heading">🧽 Absorbent Dressings</h2>
+  <div class="dressing-grid">
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">🌊</div>
+        <div class="card-title">Hydrofiber Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Hydrofiber-based — converts to soft gel</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Moderate–high exudate</span><span class="pill pill-pro">Autolytic debridement</span><span class="pill pill-pro">Moist wound healing</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Can stick to wound edges on removal</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Medium–high exudate</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Aquacel®</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">🌿</div>
+        <div class="card-title">Alginate Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Seaweed-derived alginates — forms gel</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Debrides wound</span><span class="pill pill-pro">Absorbs &amp; retains fluid</span><span class="pill pill-pro">Haemostatic</span><span class="pill pill-pro">Easy to apply/remove</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Can dry out wound</span><span class="pill pill-con">Skin maceration risk</span><span class="pill pill-con">Odour</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Medium–high exudate</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Algisite M®</span><span class="pill pill-example">ActivHeal® Alginate</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">🫁</div>
+        <div class="card-title">Foam Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Absorbs into gel foam — removes from wound bed</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Manages excess exudate</span><span class="pill pill-pro">Avoids excessive drying</span><span class="pill pill-pro">Adhesive or non-adhesive</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Odour when wet</span><span class="pill pill-con">Can strip fragile skin</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Medium–high exudate</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">ActivHeal® Foam</span><span class="pill pill-example">Allevyn Gentle®</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="section-heading">🔬 Other Specialised</h2>
+  <div class="dressing-grid">
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">🦠</div>
+        <div class="card-title">Antimicrobial Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Honey, iodine or silver</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Kills surface bacteria</span><span class="pill pill-pro">Can reduce odour</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Allergy risk</span><span class="pill pill-con">Antimicrobial resistance risk</span><span class="pill pill-con">Limited exudate absorption</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Local infection/bacterial colonisation</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">Inadine®</span><span class="pill pill-example">Activon Tulle®</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dressing-card">
+      <div class="card-header">
+        <div class="card-icon">💨</div>
+        <div class="card-title">Odour Absorbent Dressings</div>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-row-label">Material</div>
+          <div class="pill-list"><span class="pill pill-material">Variety of odour-sealing materials</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Advantages</div>
+          <div class="pill-list"><span class="pill pill-pro">Reduces wound odour</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Disadvantages</div>
+          <div class="pill-list"><span class="pill pill-con">Stops functioning when wet</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Wound Types</div>
+          <div class="pill-list"><span class="pill pill-wound">Severely malodorous wounds</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-row-label">Examples</div>
+          <div class="pill-list"><span class="pill pill-example">CarboFLEX®</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="selection-guide">
+    <h2 class="section-heading" style="margin-top:0">Dressing Selection Quick Guide</h2>
+    <p class="text-small text-muted">Match wound characteristics to the most appropriate dressing category.</p>
+    <div class="guide-grid">
+      <div class="guide-item">
+        <h4>Dry / Low Exudate</h4>
+        <ul>
+          <li>Simple island dressing</li>
+          <li>Non-adherent contact layer</li>
+          <li>Hydrocolloid</li>
+          <li>Film/membrane</li>
+        </ul>
+      </div>
+      <div class="guide-item">
+        <h4>Medium Exudate</h4>
+        <ul>
+          <li>Hydrofiber (e.g. Aquacel)</li>
+          <li>Alginate</li>
+          <li>Foam dressing</li>
+        </ul>
+      </div>
+      <div class="guide-item">
+        <h4>High Exudate</h4>
+        <ul>
+          <li>Foam dressing</li>
+          <li>Alginate</li>
+          <li>Hydrofiber</li>
+        </ul>
+      </div>
+      <div class="guide-item">
+        <h4>Necrotic / Sloughy</h4>
+        <ul>
+          <li>Hydrogel</li>
+          <li>Hydrofiber</li>
+          <li>Alginate</li>
+        </ul>
+      </div>
+      <div class="guide-item">
+        <h4>Infected Wound</h4>
+        <ul>
+          <li>Antimicrobial (silver/honey/iodine)</li>
+          <li>Seek wound care specialist</li>
+        </ul>
+      </div>
+      <div class="guide-item">
+        <h4>Malodorous</h4>
+        <ul>
+          <li>Odour absorbent (CarboFLEX)</li>
+          <li>Antimicrobial dressing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DRUG CALCS ═══════════════ -->
+<div class="page" id="page-drugs">
+  <div class="page-header">
+    <div class="tag tag-drugs">Drug Calculations</div>
+    <h1>Drug Calculations</h1>
+    <p>Core formulas with worked examples and interactive calculators. Always estimate before calculating, then verify your answer.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-title">Formula 1 — Tablets / Oral &amp; Injectable Doses (SUNRISE / SR over SS)</div>
+    <div class="formula-display">
+      Volume Required =
+      <span class="formula-fraction">
+        <span class="num">Strength Required (SR)</span>
+        <span class="den">Stock Strength (SS)</span>
+      </span>
+      × Volume of Stock
+    </div>
+    <p class="formula-note">💡 Memory tip: <strong>SUNRISE (SR) over SUNSET (SS)</strong> — the required strength is always on top.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-title">Formula 2 — IV Drip Rate (Drops Per Minute)</div>
+    <div class="formula-display">
+      Drip Rate (DPM) =
+      <span class="formula-fraction">
+        <span class="num">Volume (mL) × Drops/mL</span>
+        <span class="den">Time (h) × 60</span>
+      </span>
+    </div>
+    <p class="formula-note">DPM = drops per minute. Always convert litres to mL (×1000) before calculating.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-title">Formula 3 — IV Infusion: Volume, Rate &amp; Time</div>
+    <div class="formula-display">
+      Volume (mL) = Rate (mL/h) × Time (h)
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      Rate =
+      <span class="formula-fraction">
+        <span class="num">Volume (mL)</span>
+        <span class="den">Time (h)</span>
+      </span>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      Time =
+      <span class="formula-fraction">
+        <span class="num">Volume (mL)</span>
+        <span class="den">Rate (mL/h)</span>
+      </span>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Worked Examples</h2>
+
+  <div class="example-card">
+    <div class="example-header" onclick="toggleExample(this)">
+      Example 1 — Injection from Stock Solution: Pethidine 70mg from 10g/200mL
+      <span class="chevron">▼</span>
+    </div>
+    <div class="example-body">
+      <ol class="steps">
+        <li><strong>Identify:</strong> Strength Required (SR) = 70 mg. Stock Strength (SS) = 10 g in 200 mL.</li>
+        <li><strong>Convert units:</strong> 10 g → 10 × 1000 = <strong>10,000 mg</strong> (units must match).</li>
+        <li><strong>Estimate:</strong> 70 mg is a small fraction of 10,000 mg, so expect much less than 200 mL.</li>
+        <li><strong>Apply formula:</strong> Volume = (70 ÷ 10,000) × 200 = 14,000 ÷ 10,000 = <strong>1.4 mL</strong></li>
+        <li><strong>Check:</strong> 1.4 mL is much less than 200 mL — matches our estimate. ✔</li>
+      </ol>
+      <div class="answer-box">✅ Answer: 1.4 mL</div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header" onclick="toggleExample(this)">
+      Example 2 — IV Drip Rate: 1.5 L over 10 hours, giving set 20 drops/mL
+      <span class="chevron">▼</span>
+    </div>
+    <div class="example-body">
+      <ol class="steps">
+        <li><strong>Identify:</strong> Volume = 1.5 L, Drops/mL = 20, Time = 10 hours.</li>
+        <li><strong>Convert:</strong> 1.5 L × 1000 = <strong>1500 mL</strong></li>
+        <li><strong>Estimate:</strong> 150 mL/h × (20/60) ≈ 50 drops/min expected.</li>
+        <li><strong>Apply formula:</strong> DPM = (1500 × 20) ÷ (10 × 60) = 30,000 ÷ 600 = <strong>50 dpm</strong></li>
+        <li><strong>Check:</strong> Matches estimate. ✔</li>
+      </ol>
+      <div class="answer-box">✅ Answer: 50 drops per minute</div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header" onclick="toggleExample(this)">
+      Example 3 — Oral Tablets: 750 mg ciprofloxacin, 500 mg tablets available
+      <span class="chevron">▼</span>
+    </div>
+    <div class="example-body">
+      <ol class="steps">
+        <li><strong>Identify:</strong> SR = 750 mg, SS = 500 mg per tablet. Volume of stock = 1 (tablets are not in solution).</li>
+        <li><strong>Estimate:</strong> 500 mg = 1 tablet, 750 mg = more than 1 but less than 2 tablets.</li>
+        <li><strong>Apply formula:</strong> Tablets = (750 ÷ 500) × 1 = 1.5 tablets</li>
+        <li><strong>Check:</strong> Matches estimate — 1 whole tablet + half tablet. ✔</li>
+      </ol>
+      <div class="answer-box">✅ Answer: 1.5 tablets</div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header" onclick="toggleExample(this)">
+      Example 4 — IV Infusion Volume: 100 mL/h for 1.5 hours
+      <span class="chevron">▼</span>
+    </div>
+    <div class="example-body">
+      <ol class="steps">
+        <li><strong>Identify:</strong> Rate = 100 mL/h, Time = 1.5 h. Finding total Volume.</li>
+        <li><strong>Estimate:</strong> 100 mL in 1 h + 50 mL in 0.5 h = ~150 mL.</li>
+        <li><strong>Apply formula:</strong> Volume = 100 × 1.5 = <strong>150 mL</strong></li>
+        <li><strong>Check:</strong> Matches estimate. ✔</li>
+      </ol>
+      <div class="answer-box">✅ Answer: 150 mL</div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header" onclick="toggleExample(this)">
+      Example 5 — Infusion Duration: 2 L dextrose saline at 160 mL/h
+      <span class="chevron">▼</span>
+    </div>
+    <div class="example-body">
+      <ol class="steps">
+        <li><strong>Identify:</strong> Volume = 2 L = 2000 mL, Rate = 160 mL/h. Finding Time.</li>
+        <li><strong>Estimate:</strong> 2000 ÷ 160 ≈ a bit more than 12 hours.</li>
+        <li><strong>Apply formula:</strong> Time = 2000 ÷ 160 = <strong>12.5 hours</strong></li>
+        <li><strong>Check:</strong> 12.5 h × 160 mL/h = 2000 mL ✔</li>
+      </ol>
+      <div class="answer-box">✅ Answer: 12.5 hours (12 h 30 min)</div>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Interactive Calculators</h2>
+  <div class="calc-grid">
+
+    <div class="calc-card">
+      <h3>💉 Dose / Volume Calculator</h3>
+      <div class="field-group">
+        <label>Strength Required (SR)</label>
+        <input type="number" id="sr" placeholder="e.g. 70">
+      </div>
+      <div class="field-group">
+        <label>SR Unit</label>
+        <select id="sr-unit"><option>mg</option><option>g</option><option>mcg</option><option>mmol</option></select>
+      </div>
+      <div class="field-group">
+        <label>Stock Strength (SS)</label>
+        <input type="number" id="ss" placeholder="e.g. 10000">
+      </div>
+      <div class="field-group">
+        <label>SS Unit (must match SR after conversion)</label>
+        <select id="ss-unit"><option>mg</option><option>g</option><option>mcg</option><option>mmol</option></select>
+      </div>
+      <div class="field-group">
+        <label>Volume of Stock (mL)</label>
+        <input type="number" id="stock-vol" placeholder="e.g. 200">
+      </div>
+      <button class="calc-btn" onclick="calcDose()">Calculate Volume Required</button>
+      <div class="calc-result" id="dose-result">
+        <span class="result-val" id="dose-val">—</span>
+        <span class="result-label">mL required</span>
+      </div>
+    </div>
+
+    <div class="calc-card">
+      <h3>💧 IV Drip Rate Calculator</h3>
+      <div class="field-group">
+        <label>Volume</label>
+        <input type="number" id="drip-vol" placeholder="e.g. 1500">
+      </div>
+      <div class="field-group">
+        <label>Volume Unit</label>
+        <select id="drip-vol-unit"><option>mL</option><option>L</option></select>
+      </div>
+      <div class="field-group">
+        <label>Drops per mL (giving set)</label>
+        <input type="number" id="drops-per-ml" placeholder="e.g. 20">
+      </div>
+      <div class="field-group">
+        <label>Time (hours)</label>
+        <input type="number" id="drip-time" placeholder="e.g. 10">
+      </div>
+      <button class="calc-btn" onclick="calcDrip()">Calculate Drip Rate</button>
+      <div class="calc-result" id="drip-result">
+        <span class="result-val" id="drip-val">—</span>
+        <span class="result-label">drops per minute (dpm)</span>
+      </div>
+    </div>
+
+    <div class="calc-card">
+      <h3>⏱️ Infusion Time / Volume / Rate</h3>
+      <div class="field-group">
+        <label>Find</label>
+        <select id="find-what" onchange="updateFindFields()">
+          <option value="time">Time (h)</option>
+          <option value="volume">Volume (mL)</option>
+          <option value="rate">Rate (mL/h)</option>
+        </select>
+      </div>
+      <div class="field-group" id="field-volume">
+        <label>Volume (mL)</label>
+        <input type="number" id="iv-vol" placeholder="e.g. 2000">
+      </div>
+      <div class="field-group" id="field-rate">
+        <label>Rate (mL/h)</label>
+        <input type="number" id="iv-rate" placeholder="e.g. 160">
+      </div>
+      <div class="field-group" id="field-time">
+        <label>Time (h)</label>
+        <input type="number" id="iv-time" placeholder="e.g. 8">
+      </div>
+      <button class="calc-btn" onclick="calcIV()">Calculate</button>
+      <div class="calc-result" id="iv-result">
+        <span class="result-val" id="iv-val">—</span>
+        <span class="result-label" id="iv-label">result</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="selection-guide mt-3">
+    <h3 style="font-family:var(--serif);font-size:1.15rem;margin-bottom:0.75rem;">⚠️ Key Conversion Tips</h3>
+    <div class="guide-grid">
+      <div class="guide-item">
+        <h4>g → mg</h4>
+        <ul><li>Multiply by 1,000</li><li>e.g. 10 g = 10,000 mg</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>L → mL</h4>
+        <ul><li>Multiply by 1,000</li><li>e.g. 1.5 L = 1,500 mL</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Always estimate first</h4>
+        <ul><li>Common-sense check before formula</li><li>Compare answer to estimate</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Tablets: stock = 1</h4>
+        <ul><li>Volume of stock is always 1 for tablets</li><li>Result is number of tablets</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SEPSIS ═══════════════ -->
+<div class="page" id="page-sepsis">
+  <div class="page-header">
+    <div class="tag tag-sepsis">Emergency</div>
+    <h1>Sepsis Recognition &amp; Management</h1>
+    <p>Sepsis is a life-threatening organ dysfunction caused by a dysregulated host response to infection. Early recognition saves lives.</p>
+  </div>
+
+  <div class="sepsis-alert">
+    <div class="alert-icon">⚠️</div>
+    <div>
+      <h2>Think Sepsis — Act Fast</h2>
+      <p>Sepsis can deteriorate rapidly. If suspected, escalate immediately and initiate the sepsis bundle within the first hour. Every hour of delay increases mortality.</p>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Signs &amp; Symptoms</h2>
+  <div class="two-col">
+    <div class="symptom-card">
+      <div class="symptom-card-header adult">Adult Symptoms — SEPSIS Mnemonic</div>
+      <ul class="symptom-list">
+        <li><span class="sym-letter">S</span><span>Slurred speech or confusion</span></li>
+        <li><span class="sym-letter">E</span><span>Extreme shivering or muscle pain</span></li>
+        <li><span class="sym-letter">P</span><span>Passing no urine in a day</span></li>
+        <li><span class="sym-letter">S</span><span>Severe breathlessness</span></li>
+        <li><span class="sym-letter">I</span><span>"It feels like you're going to die" — impending doom</span></li>
+        <li><span class="sym-letter">S</span><span>Skin mottled, discoloured or pale</span></li>
+      </ul>
+    </div>
+    <div class="symptom-card">
+      <div class="symptom-card-header child">Child Symptoms</div>
+      <ul class="symptom-list">
+        <li><span class="sym-dot">🔴</span><span>Has a fit or convulsion</span></li>
+        <li><span class="sym-dot">🔵</span><span>Looks mottled, bluish or pale</span></li>
+        <li><span class="sym-dot">🔴</span><span>Has a rash that does not fade when pressed (non-blanching)</span></li>
+        <li><span class="sym-dot">🟡</span><span>Very lethargic or difficult to wake</span></li>
+        <li><span class="sym-dot">❄️</span><span>Feels abnormally cold to touch</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Additional Indicators</h2>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;">
+    <div class="pill-list">
+      <span class="pill pill-con">Fever &gt;38°C or &lt;36°C</span>
+      <span class="pill pill-con">Heart rate &gt;90 bpm</span>
+      <span class="pill pill-con">Resp rate &gt;20 breaths/min</span>
+      <span class="pill pill-con">WBC &gt;12 or &lt;4 × 10⁹/L</span>
+      <span class="pill pill-con">Altered mental status</span>
+      <span class="pill pill-con">Sweaty / diaphoretic skin</span>
+      <span class="pill pill-con">Hypotension (MAP &lt;65 mmHg)</span>
+      <span class="pill pill-con">Lactate &gt;2 mmol/L</span>
+    </div>
+  </div>
+
+  <h2 class="section-heading">The 1-Hour Sepsis Bundle</h2>
+  <div class="sepsis-bundle">
+    <div class="bundle-header">
+      <span>Initiate within 1 hour of recognition (Surviving Sepsis Campaign)</span>
+      <span style="font-size:0.75rem;opacity:0.8">ESCALATE IMMEDIATELY</span>
+    </div>
+    <div class="bundle-items">
+      <div class="bundle-item">
+        <span class="bundle-num">1</span>
+        <div><strong>Measure Lactate</strong><br><span style="font-size:0.8rem;color:var(--muted)">Remeasure if &gt;2 mmol/L. Lactate &gt;4 = septic shock marker.</span></div>
+      </div>
+      <div class="bundle-item">
+        <span class="bundle-num">2</span>
+        <div><strong>Blood Cultures</strong><br><span style="font-size:0.8rem;color:var(--muted)">Obtain before starting antibiotics (≥2 sets)</span></div>
+      </div>
+      <div class="bundle-item">
+        <span class="bundle-num">3</span>
+        <div><strong>Broad-Spectrum Antibiotics</strong><br><span style="font-size:0.8rem;color:var(--muted)">Administer IV broad-spectrum antibiotics immediately</span></div>
+      </div>
+      <div class="bundle-item">
+        <span class="bundle-num">4</span>
+        <div><strong>IV Fluid Resuscitation</strong><br><span style="font-size:0.8rem;color:var(--muted)">30 mL/kg crystalloid if hypotensive or lactate ≥4</span></div>
+      </div>
+      <div class="bundle-item">
+        <span class="bundle-num">5</span>
+        <div><strong>Vasopressors</strong><br><span style="font-size:0.8rem;color:var(--muted)">Noradrenaline if MAP &lt;65 mmHg despite fluids</span></div>
+      </div>
+      <div class="bundle-item">
+        <span class="bundle-num">6</span>
+        <div><strong>Monitor &amp; Reassess</strong><br><span style="font-size:0.8rem;color:var(--muted)">Continuous obs, urine output, repeat lactate, escalation</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-heading">qSOFA Quick Screen</h2>
+  <p class="text-small text-muted" style="margin-bottom:1rem;">Score 1 point for each. Score ≥2 = high risk of poor outcome — escalate immediately.</p>
+  <table class="sofa-table">
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Threshold for 1 Point</th>
+        <th>Clinical Significance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Altered mentation</strong></td>
+        <td>GCS &lt; 15</td>
+        <td>Confusion, agitation, reduced responsiveness</td>
+      </tr>
+      <tr>
+        <td><strong>Respiratory rate</strong></td>
+        <td>≥ 22 breaths/min</td>
+        <td>Tachypnoea indicating respiratory compromise</td>
+      </tr>
+      <tr>
+        <td><strong>Systolic BP</strong></td>
+        <td>≤ 100 mmHg</td>
+        <td>Hypotension indicating circulatory compromise</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="selection-guide mt-3">
+    <h3 style="font-family:var(--serif);font-size:1.15rem;margin-bottom:0.5rem;">Key Nursing Actions</h3>
+    <div class="guide-grid">
+      <div class="guide-item">
+        <h4>Recognise Early</h4>
+        <ul><li>Use qSOFA / NEWS2 score</li><li>Think sepsis in any deteriorating patient</li><li>Check for infection source</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Escalate Immediately</h4>
+        <ul><li>Inform senior nurse / MET / ICU</li><li>Document time of recognition</li><li>Initiate sepsis pathway</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Monitoring</h4>
+        <ul><li>Continuous vital signs</li><li>Strict urine output measurement</li><li>Repeat lactate if elevated</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Fluid Management</h4>
+        <ul><li>Large bore IV access ×2</li><li>30 mL/kg crystalloid bolus</li><li>Reassess after each bolus</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ANAPHYLAXIS ═══════════════ -->
+<div class="page" id="page-anaphylaxis">
+  <div class="page-header">
+    <div class="tag tag-anaphylaxis">Emergency</div>
+    <h1>Anaphylaxis Management</h1>
+    <p>Anaphylaxis is a severe, life-threatening systemic allergic reaction affecting multiple organ systems. Immediate treatment is essential.</p>
+  </div>
+
+  <div class="anaphylaxis-emergency">
+    <h2>⚡ Epi First — Epi Fast!</h2>
+    <p>Epinephrine (adrenaline) is the first-line treatment. Use it immediately at the first sign of anaphylaxis. Any delay can worsen outcomes.</p>
+    <span class="epi-highlight">Adrenaline 0.5 mg IM (Adult) — Anterolateral Thigh — No Bolus IV</span>
+  </div>
+
+  <h2 class="section-heading">Common Triggers / Allergens</h2>
+  <div class="allergen-grid">
+    <div class="allergen-card">
+      <h4>🥜 Food</h4>
+      <ul>
+        <li>Peanuts</li>
+        <li>Tree nuts (almonds, cashews, walnuts)</li>
+        <li>Shellfish &amp; fish</li>
+        <li>Cow's milk / eggs</li>
+        <li>Soy / wheat / sesame</li>
+      </ul>
+    </div>
+    <div class="allergen-card">
+      <h4>💊 Medication</h4>
+      <ul>
+        <li>Penicillin</li>
+        <li>Aspirin</li>
+        <li>Ibuprofen &amp; NSAIDs</li>
+        <li>Contrast media</li>
+      </ul>
+    </div>
+    <div class="allergen-card">
+      <h4>🐝 Venom</h4>
+      <ul>
+        <li>Yellow jackets</li>
+        <li>Wasps &amp; hornets</li>
+        <li>Honeybees</li>
+        <li>Fire ants &amp; spiders</li>
+      </ul>
+    </div>
+    <div class="allergen-card">
+      <h4>🧤 Latex</h4>
+      <ul>
+        <li>Rubber gloves</li>
+        <li>Balloons</li>
+        <li>Elastic bands</li>
+        <li>Cross-reactive: banana, kiwi, avocado</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Symptoms by Body System</h2>
+  <div class="body-symptoms">
+    <div class="body-symptom-grid">
+      <div class="body-part">
+        <h5>🫁 Respiratory / Throat</h5>
+        <p>Tightness, hoarseness, difficulty swallowing, stridor, wheeze, shortness of breath, cough</p>
+      </div>
+      <div class="body-part">
+        <h5>💓 Cardiovascular</h5>
+        <p>Weak/rapid pulse, dizziness, passing out, hypotension, cardiac arrest</p>
+      </div>
+      <div class="body-part">
+        <h5>🩺 Skin</h5>
+        <p>Itching, hives (urticaria), redness, swelling, flushing, angioedema</p>
+      </div>
+      <div class="body-part">
+        <h5>👄 Mouth</h5>
+        <p>Itching, swelling of lips and/or tongue, tingling</p>
+      </div>
+      <div class="body-part">
+        <h5>🫃 Gastrointestinal</h5>
+        <p>Vomiting, diarrhoea, cramping, nausea, abdominal pain</p>
+      </div>
+      <div class="body-part">
+        <h5>🧠 Neurological</h5>
+        <p>Feeling of impending doom, headache, confusion, loss of consciousness</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Emergency Management Steps</h2>
+  <div class="action-steps">
+    <div class="action-steps-header">Immediate Response Protocol</div>
+    <ol class="action-step-list">
+      <li>
+        <span class="action-step-num">1</span>
+        <div class="action-step-content">
+          <h5>Remove trigger / call for help</h5>
+          <p>Stop any infusion, remove the allergen if possible. Call MET / emergency team immediately.</p>
+        </div>
+      </li>
+      <li>
+        <span class="action-step-num">2</span>
+        <div class="action-step-content">
+          <h5>Administer Adrenaline (Epinephrine) IM</h5>
+          <p>Adult: 0.5 mg (0.5 mL of 1:1000) IM into anterolateral thigh. Child: 0.01 mg/kg (max 0.5 mg). Repeat every 5–15 min if no improvement. No IV bolus.</p>
+        </div>
+      </li>
+      <li>
+        <span class="action-step-num">3</span>
+        <div class="action-step-content">
+          <h5>Position patient</h5>
+          <p>Lie flat with legs elevated (if hypotensive). Sit upright if respiratory distress predominates. Do not allow sudden standing — risk of cardiac arrest.</p>
+        </div>
+      </li>
+      <li>
+        <span class="action-step-num">4</span>
+        <div class="action-step-content">
+          <h5>High-flow oxygen + airway management</h5>
+          <p>Administer 100% O₂ via non-rebreather mask. Prepare for intubation if airway compromise is imminent.</p>
+        </div>
+      </li>
+      <li>
+        <span class="action-step-num">5</span>
+        <div class="action-step-content">
+          <h5>IV access + fluid resuscitation</h5>
+          <p>Large bore IV. IV fluid bolus (crystalloid 20 mL/kg) for hypotension. Monitor continuously.</p>
+        </div>
+      </li>
+      <li>
+        <span class="action-step-num">6</span>
+        <div class="action-step-content">
+          <h5>Monitor &amp; reassess</h5>
+          <p>Continuous vital signs, SpO₂, ECG. 12-lead ECG. Observe for biphasic reaction (up to 72 h post-reaction).</p>
+        </div>
+      </li>
+      <li>
+        <span class="action-step-num">7</span>
+        <div class="action-step-content">
+          <h5>Secondary medications (after adrenaline)</h5>
+          <p>Antihistamine (e.g. promethazine). Corticosteroid (e.g. hydrocortisone IV) — does not replace adrenaline but may reduce biphasic reactions. Salbutamol nebuliser for bronchospasm.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="refractory-box">
+    <h3>⚠️ Refractory Anaphylaxis</h3>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;">If no improvement after 2 IM adrenaline doses — escalate to ICU. Refractory anaphylaxis requires specialised management.</p>
+    <div class="refractory-cols">
+      <div class="refractory-col">
+        <h5>Second-Line Treatments</h5>
+        <ul>
+          <li>IV titrated adrenaline (no bolus — monitoring required)</li>
+          <li>IV fluid therapy (adequate, with monitoring)</li>
+          <li>Second vasopressor (metaraminol, dopamine)</li>
+          <li>Glucagon if on beta-blockers</li>
+          <li>Methylene blue (case-by-case)</li>
+          <li>Extracorporeal life support (last resort)</li>
+        </ul>
+      </div>
+      <div class="refractory-col">
+        <h5>Special Considerations</h5>
+        <ul>
+          <li>Airway: support, ventilation, positioning</li>
+          <li>Patients on beta-blockers may not respond to adrenaline</li>
+          <li>Two autoinjectors needed — symptoms can recur</li>
+          <li>All patients should be observed ≥4–8 hours post-reaction</li>
+          <li>Refer to allergy specialist for follow-up</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="selection-guide mt-3">
+    <h3 style="font-family:var(--serif);font-size:1.15rem;margin-bottom:0.5rem;">Patient Education Discharge Points</h3>
+    <div class="guide-grid">
+      <div class="guide-item">
+        <h4>Always Carry Epi</h4>
+        <ul><li>Two adrenaline autoinjectors at all times</li><li>Know how to use it</li><li>Teach family members</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Identify Triggers</h4>
+        <ul><li>Medical alert bracelet</li><li>Read food labels carefully</li><li>Inform all healthcare providers</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Action Plan</h4>
+        <ul><li>Written anaphylaxis action plan</li><li>Know when to use epi vs antihistamine</li><li>Always call 000 after epi use</li></ul>
+      </div>
+      <div class="guide-item">
+        <h4>Follow Up</h4>
+        <ul><li>Allergy/immunology referral</li><li>Consider immunotherapy</li><li>Review and update action plan yearly</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── Navigation ───
+  function goTo(tab) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tabs li button').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + tab).classList.add('active');
+    const li = document.querySelector('.nav-tabs li[data-tab="' + tab + '"]');
+    if (li) li.querySelector('button').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── Example accordion ───
+  function toggleExample(header) {
+    header.classList.toggle('open');
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+  }
+
+  // ─── Dose calculator ───
+  function toMg(val, unit) {
+    if (unit === 'g') return val * 1000;
+    if (unit === 'mcg') return val / 1000;
+    return val; // mg or mmol — treat equally
+  }
+
+  function calcDose() {
+    const sr = parseFloat(document.getElementById('sr').value);
+    const srUnit = document.getElementById('sr-unit').value;
+    const ss = parseFloat(document.getElementById('ss').value);
+    const ssUnit = document.getElementById('ss-unit').value;
+    const vol = parseFloat(document.getElementById('stock-vol').value);
+
+    if (isNaN(sr) || isNaN(ss) || isNaN(vol) || ss === 0) {
+      alert('Please fill in all fields correctly.'); return;
+    }
+
+    const srMg = toMg(sr, srUnit);
+    const ssMg = toMg(ss, ssUnit);
+    const result = (srMg / ssMg) * vol;
+
+    document.getElementById('dose-val').textContent = result.toFixed(3).replace(/\.?0+$/, '');
+    document.getElementById('dose-result').classList.add('show');
+  }
+
+  // ─── Drip rate calculator ───
+  function calcDrip() {
+    let vol = parseFloat(document.getElementById('drip-vol').value);
+    const unit = document.getElementById('drip-vol-unit').value;
+    const drops = parseFloat(document.getElementById('drops-per-ml').value);
+    const time = parseFloat(document.getElementById('drip-time').value);
+
+    if (isNaN(vol) || isNaN(drops) || isNaN(time) || time === 0) {
+      alert('Please fill in all fields.'); return;
+    }
+
+    if (unit === 'L') vol *= 1000;
+    const dpm = (vol * drops) / (time * 60);
+
+    document.getElementById('drip-val').textContent = Math.round(dpm);
+    document.getElementById('drip-result').classList.add('show');
+  }
+
+  // ─── IV infusion calculator ───
+  function updateFindFields() {
+    const find = document.getElementById('find-what').value;
+    document.getElementById('field-volume').style.display = find === 'volume' ? 'none' : '';
+    document.getElementById('field-rate').style.display = find === 'rate' ? 'none' : '';
+    document.getElementById('field-time').style.display = find === 'time' ? 'none' : '';
+    document.getElementById('iv-result').classList.remove('show');
+  }
+
+  function calcIV() {
+    const find = document.getElementById('find-what').value;
+    const vol = parseFloat(document.getElementById('iv-vol').value);
+    const rate = parseFloat(document.getElementById('iv-rate').value);
+    const time = parseFloat(document.getElementById('iv-time').value);
+    let result, label;
+
+    if (find === 'time') {
+      if (isNaN(vol) || isNaN(rate) || rate === 0) { alert('Enter volume and rate.'); return; }
+      result = vol / rate;
+      label = 'hours';
+      // Format as h and min
+      const h = Math.floor(result);
+      const m = Math.round((result - h) * 60);
+      document.getElementById('iv-val').textContent = m > 0 ? h + ' h ' + m + ' min' : h + ' h';
+    } else if (find === 'volume') {
+      if (isNaN(rate) || isNaN(time)) { alert('Enter rate and time.'); return; }
+      result = rate * time;
+      label = 'mL';
+      document.getElementById('iv-val').textContent = result.toFixed(1);
+    } else {
+      if (isNaN(vol) || isNaN(time) || time === 0) { alert('Enter volume and time.'); return; }
+      result = vol / time;
+      label = 'mL/h';
+      document.getElementById('iv-val').textContent = result.toFixed(1);
+    }
+
+    document.getElementById('iv-label').textContent = label;
+    document.getElementById('iv-result').classList.add('show');
+  }
+
+  updateFindFields();
+</script>
+</body>
+</html>
