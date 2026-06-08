@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Xplor — Trailer Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c26;
+    --surface2: #1e2433;
+    --border: #2a3045;
+    --accent: #f4a22d;
+    --accent2: #3ecf8e;
+    --danger: #ff5b5b;
+    --warn: #ffb547;
+    --text: #e8ecf4;
+    --text2: #8a94ad;
+    --text3: #5a637a;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; overflow: hidden; }
+
+  /* ── NAV ── */
+  #app { display: flex; flex-direction: column; height: 100dvh; }
+  #topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px 10px; background: var(--surface);
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  #topbar .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.5px; color: var(--accent); }
+  #topbar .logo span { color: var(--text2); font-weight: 400; font-size: .75rem; display: block; letter-spacing: .5px; }
+  #topbar .tare-badge {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 12px; font-size: .7rem; color: var(--text2);
+    text-align: right;
+  }
+  #topbar .tare-badge strong { color: var(--accent); font-size: .85rem; display: block; }
+
+  #tabs {
+    display: flex; background: var(--surface); border-bottom: 1px solid var(--border);
+    flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
+  }
+  #tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 1; min-width: 70px; padding: 10px 4px 8px;
+    background: none; border: none; color: var(--text3); font-family: 'DM Mono', monospace;
+    font-size: .62rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn .icon { font-size: 1.1rem; }
+
+  #content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0; }
+  .page { display: none; animation: fadeIn .2s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin: 12px 14px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .8rem;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--text2); margin-bottom: 12px;
+  }
+
+  /* ── WEIGHT PAGE ── */
+  .weight-hero {
+    background: linear-gradient(135deg, #1a1f30, #161b28);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    margin: 12px 14px; padding: 18px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .w-stat { text-align: center; }
+  .w-stat .val {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.1rem; line-height: 1;
+    transition: color .3s;
+  }
+  .w-stat .lbl { font-size: .62rem; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+  .w-bar-wrap { grid-column: 1/-1; }
+  .w-bar-bg { background: var(--surface2); border-radius: 999px; height: 8px; overflow: hidden; }
+  .w-bar-fill { height: 100%; border-radius: 999px; background: var(--accent2); transition: width .4s ease, background .3s; }
+  .w-bar-lbl { display: flex; justify-content: space-between; font-size: .6rem; color: var(--text3); margin-top: 4px; }
+
+  .weight-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .weight-item:last-child { border-bottom: none; }
+  .wi-check {
+    width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+    background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: all .15s; font-size: .75rem;
+  }
+  .wi-check.on { background: var(--accent2); border-color: var(--accent2); color: #0f1117; }
+  .wi-name { flex: 1; font-size: .78rem; color: var(--text); }
+  .wi-name.off { color: var(--text3); text-decoration: line-through; }
+  .wi-kg { font-size: .78rem; color: var(--accent); font-weight: 500; min-width: 44px; text-align: right; }
+  .wi-edit { background: none; border: none; color: var(--text3); font-size: .85rem; cursor: pointer; padding: 4px; }
+  .wi-del { background: none; border: none; color: var(--danger); font-size: .75rem; cursor: pointer; padding: 4px; opacity: .6; }
+
+  .add-item-row {
+    display: flex; gap: 8px; margin-top: 10px;
+  }
+  .add-item-row input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 10px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .75rem; outline: none;
+  }
+  .add-item-row input:focus { border-color: var(--accent); }
+  .add-item-row input::placeholder { color: var(--text3); }
+  .btn-add {
+    background: var(--accent); color: #0f1117; border: none; border-radius: var(--radius-sm);
+    padding: 8px 14px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .8rem; cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn-add:active { opacity: .75; }
+
+  /* ── COSTS PAGE ── */
+  .cost-hero {
+    background: linear-gradient(135deg, #1a1f30, #161b28);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    margin: 12px 14px; padding: 18px;
+  }
+  .cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .cost-stat .val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--accent); }
+  .cost-stat .lbl { font-size: .6rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .cost-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .75rem; }
+  .cost-row:last-child { border-bottom: none; }
+  .cost-label { color: var(--text2); }
+  .cost-value { color: var(--text); font-weight: 500; }
+  .cost-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cost-form input, .cost-form select {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 10px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .72rem; outline: none; width: 100%;
+  }
+  .cost-form input:focus, .cost-form select:focus { border-color: var(--accent); }
+  .cost-form .full { grid-column: 1/-1; }
+  .cost-form select option { background: var(--surface2); }
+
+  /* ── LOCATION CARDS ── */
+  .loc-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    margin: 10px 14px; overflow: hidden;
+  }
+  .loc-header {
+    padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  }
+  .loc-header .loc-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; }
+  .loc-header .loc-meta { font-size: .65rem; color: var(--text3); margin-top: 2px; }
+  .loc-badge {
+    font-size: .6rem; padding: 3px 8px; border-radius: 999px; font-weight: 600; letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .badge-visited { background: rgba(62,207,142,.12); color: var(--accent2); border: 1px solid rgba(62,207,142,.3); }
+  .badge-booked { background: rgba(244,162,45,.12); color: var(--accent); border: 1px solid rgba(244,162,45,.3); }
+  .badge-prospect { background: rgba(138,148,173,.12); color: var(--text2); border: 1px solid rgba(138,148,173,.2); }
+  .loc-body { padding: 0 14px 14px; display: none; }
+  .loc-body.open { display: block; }
+  .loc-detail { font-size: .72rem; color: var(--text2); line-height: 1.6; }
+  .loc-detail strong { color: var(--text); }
+  .stars { color: var(--accent); font-size: .85rem; }
+  .loc-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .btn-sm {
+    font-size: .65rem; padding: 5px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'DM Mono', monospace; border: 1px solid var(--border); background: var(--surface2); color: var(--text2);
+    transition: all .15s;
+  }
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.danger { border-color: rgba(255,91,91,.3); color: var(--danger); }
+  .btn-sm.primary { background: var(--accent); border-color: var(--accent); color: #0f1117; font-weight: 700; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn .15s ease;
+  }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%; max-width: 520px; padding: 20px; max-height: 90dvh; overflow-y: auto;
+    animation: slideUp .2s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(40px); } to { transform: translateY(0); } }
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 16px; color: var(--text); }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { font-size: .65rem; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; display: block; margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px 11px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .78rem; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-group select option { background: var(--surface2); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-cancel { flex: 1; padding: 11px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: none; color: var(--text2); font-family: 'DM Mono', monospace; font-size: .8rem; cursor: pointer; }
+  .btn-save { flex: 2; padding: 11px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: #0f1117; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; cursor: pointer; }
+  .star-input { display: flex; gap: 4px; }
+  .star-input span { font-size: 1.3rem; cursor: pointer; color: var(--text3); transition: color .1s; }
+  .star-input span.on { color: var(--accent); }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: center; padding: 14px 14px 4px;
+  }
+  .section-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+  .btn-new {
+    background: var(--accent); color: #0f1117; border: none; border-radius: var(--radius-sm);
+    padding: 7px 12px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .72rem; cursor: pointer;
+  }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text3); font-size: .78rem; }
+  .empty-state .icon { font-size: 2rem; margin-bottom: 8px; }
+  .map-link { color: var(--accent2); text-decoration: none; font-size: .72rem; }
+  .rating-row { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .rating-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: .62rem; color: var(--text2); }
+  .rating-chip .r { color: var(--accent); }
+  .tag { display: inline-block; background: rgba(244,162,45,.1); border: 1px solid rgba(244,162,45,.2); color: var(--accent); border-radius: 4px; font-size: .6rem; padding: 2px 6px; margin: 2px 2px 0 0; }
+
+  /* ── SUMMARY / INSIGHTS ── */
+  .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 14px; }
+  .insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .insight-card .i-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--accent2); }
+  .insight-card .i-lbl { font-size: .6rem; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; margin-top: 3px; }
+  .tip-card { background: rgba(62,207,142,.06); border: 1px solid rgba(62,207,142,.2); border-radius: var(--radius); padding: 14px; margin: 10px 14px; }
+  .tip-card .tip-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem; color: var(--accent2); margin-bottom: 6px; }
+  .tip-card p { font-size: .72rem; color: var(--text2); line-height: 1.5; }
+  .scroll-pb { height: 24px; }
+
+  /* weight highlight colors */
+  .ok .val { color: var(--accent2); }
+  .warn .val { color: var(--warn); }
+  .over .val { color: var(--danger); }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="logo">XPLOR<span>Trailer Companion</span></div>
+    <div class="tare-badge">
+      Tare: <strong id="tare-display">850.0 kg</strong>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div id="tabs">
+    <button class="tab-btn active" onclick="showPage('weight')" id="tab-weight">
+      <span class="icon">⚖️</span>WEIGHT
+    </button>
+    <button class="tab-btn" onclick="showPage('costs')" id="tab-costs">
+      <span class="icon">💰</span>COSTS
+    </button>
+    <button class="tab-btn" onclick="showPage('visited')" id="tab-visited">
+      <span class="icon">📍</span>VISITED
+    </button>
+    <button class="tab-btn" onclick="showPage('booked')" id="tab-booked">
+      <span class="icon">📅</span>BOOKED
+    </button>
+    <button class="tab-btn" onclick="showPage('wishlist')" id="tab-wishlist">
+      <span class="icon">🗺️</span>WISHLIST
+    </button>
+    <button class="tab-btn" onclick="showPage('insights')" id="tab-insights">
+      <span class="icon">📊</span>INSIGHTS
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ══ WEIGHT PAGE ══ -->
+    <div class="page active" id="page-weight">
+      <div class="weight-hero" id="weight-hero">
+        <div class="w-stat">
+          <div class="val" id="w-total">0.0</div>
+          <div class="lbl">Total kg</div>
+        </div>
+        <div class="w-stat">
+          <div class="val" id="w-active">0.0</div>
+          <div class="lbl">Active kg</div>
+        </div>
+        <div class="w-bar-wrap">
+          <div class="w-bar-bg"><div class="w-bar-fill" id="w-bar" style="width:0%"></div></div>
+          <div class="w-bar-lbl"><span id="w-pct">0%</span><span id="w-limit-lbl">of limit</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚙️ Weight Limit</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="limit-input" value="1200" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:.78rem;outline:none;" oninput="updateWeightUI()">
+          <span style="font-size:.72rem;color:var(--text3);">kg GVM</span>
+          <div style="font-size:.72rem;color:var(--text3);margin-left:4px;">Tare:</div>
+          <input type="number" id="tare-input" value="850" style="width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:.78rem;outline:none;" oninput="updateTare()">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📦 Items</div>
+        <div id="weight-list"></div>
+        <div class="add-item-row" style="margin-top:12px;">
+          <input type="text" id="new-item-name" placeholder="Item name…" />
+          <input type="number" id="new-item-kg" placeholder="kg" style="width:72px;" />
+          <button class="btn-add" onclick="addWeightItem()">+</button>
+        </div>
+      </div>
+      <div class="scroll-pb"></div>
+    </div>
+
+    <!-- ══ COSTS PAGE ══ -->
+    <div class="page" id="page-costs">
+      <div class="cost-hero">
+        <div class="cost-grid">
+          <div class="cost-stat"><div class="val" id="cost-total">$0</div><div class="lbl">Grand Total</div></div>
+          <div class="cost-stat"><div class="val" id="cost-per-night">$0</div><div class="lbl">Per Night</div></div>
+        </div>
+        <div id="cost-breakdown"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">➕ Add Cost Entry</div>
+        <div class="cost-form">
+          <input type="text" id="cost-name" placeholder="Description" class="full" />
+          <input type="number" id="cost-amount" placeholder="Amount ($)" />
+          <select id="cost-cat">
+            <option value="purchase">Purchase</option>
+            <option value="rego">Rego / Licence</option>
+            <option value="insurance">Insurance</option>
+            <option value="service">Service / Repair</option>
+            <option value="accessory">Accessory</option>
+            <option value="camping">Camping / Site</option>
+            <option value="fuel">Fuel</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="number" id="cost-nights" placeholder="Nights (optional)" />
+          <button class="btn-add full" onclick="addCostEntry()">Add Entry</button>
+        </div>
+      </div>
+
+      <div class="section-header"><h3>Cost Log</h3></div>
+      <div id="cost-list"></div>
+      <div class="scroll-pb"></div>
+    </div>
+
+    <!-- ══ VISITED PAGE ══ -->
+    <div class="page" id="page-visited">
+      <div class="section-header">
+        <h3>📍 Visited Locations</h3>
+        <button class="btn-new" onclick="openLocModal('visited')">+ Add</button>
+      </div>
+      <div id="visited-list"></div>
+      <div class="scroll-pb"></div>
+    </div>
+
+    <!-- ══ BOOKED PAGE ══ -->
+    <div class="page" id="page-booked">
+      <div class="section-header">
+        <h3>📅 Future Bookings</h3>
+        <button class="btn-new" onclick="openLocModal('booked')">+ Add</button>
+      </div>
+      <div id="booked-list"></div>
+      <div class="scroll-pb"></div>
+    </div>
+
+    <!-- ══ WISHLIST PAGE ══ -->
+    <div class="page" id="page-wishlist">
+      <div class="section-header">
+        <h3>🗺️ Prospective Locations</h3>
+        <button class="btn-new" onclick="openLocModal('wishlist')">+ Add</button>
+      </div>
+      <div id="wishlist-list"></div>
+      <div class="scroll-pb"></div>
+    </div>
+
+    <!-- ══ INSIGHTS PAGE ══ -->
+    <div class="page" id="page-insights">
+      <div style="padding:14px 14px 6px;"><div class="card-title">📊 Summary & Insights</div></div>
+      <div class="insight-grid" id="insights-grid"></div>
+      <div id="insights-tips"></div>
+      <div class="scroll-pb"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- LOCATION MODAL -->
+<div class="modal-overlay" id="loc-modal" style="display:none;" onclick="closeLocModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">Add Location</div>
+    <input type="hidden" id="modal-type" />
+    <input type="hidden" id="modal-edit-id" />
+    <div class="form-group"><label>Location Name *</label><input id="m-name" placeholder="e.g. Wilsons Prom NP" /></div>
+    <div class="form-group"><label>State / Region</label><input id="m-region" placeholder="e.g. VIC" /></div>
+    <div class="form-group"><label>Site Number / Name</label><input id="m-site" placeholder="e.g. Site 14B" /></div>
+    <div class="form-group"><label>Google Maps Link</label><input id="m-maps" placeholder="https://maps.google.com/..." /></div>
+    <div class="form-group" id="m-date-grp"><label>Date(s)</label><input id="m-date" type="date" /></div>
+    <div class="form-group" id="m-nights-grp"><label>Nights Stayed</label><input id="m-nights" type="number" placeholder="e.g. 3" /></div>
+    <div class="form-group" id="m-cost-grp"><label>Cost Per Night ($)</label><input id="m-cost" type="number" placeholder="e.g. 45" /></div>
+    <div class="form-group" id="m-fac-grp">
+      <label>Facilities Rating</label>
+      <div class="star-input" id="m-fac-stars">
+        <span onclick="setStar('fac',1)" data-i="1">★</span><span onclick="setStar('fac',2)" data-i="2">★</span>
+        <span onclick="setStar('fac',3)" data-i="3">★</span><span onclick="setStar('fac',4)" data-i="4">★</span>
+        <span onclick="setStar('fac',5)" data-i="5">★</span>
+      </div>
+    </div>
+    <div class="form-group" id="m-overall-grp">
+      <label>Overall Rating</label>
+      <div class="star-input" id="m-overall-stars">
+        <span onclick="setStar('overall',1)" data-i="1">★</span><span onclick="setStar('overall',2)" data-i="2">★</span>
+        <span onclick="setStar('overall',3)" data-i="3">★</span><span onclick="setStar('overall',4)" data-i="4">★</span>
+        <span onclick="setStar('overall',5)" data-i="5">★</span>
+      </div>
+    </div>
+    <div class="form-group" id="m-others-grp"><label>Other Good Sites Nearby</label><input id="m-others" placeholder="e.g. Sandy Point, Tidal River" /></div>
+    <div class="form-group"><label>Notes</label><textarea id="m-notes" placeholder="Access notes, tips, what to bring…"></textarea></div>
+    <div class="form-group" id="m-booking-grp"><label>Booking Reference / URL</label><input id="m-booking" placeholder="e.g. Parks Victoria ref # or URL" /></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLocModal()">Cancel</button>
+      <button class="btn-save" onclick="saveLocation()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const KEY = 'xplor_v2';
+let state = {
+  weightLimit: 1200,
+  tare: 850,
+  items: [
+    {id:1, name:'Tare (trailer base)', kg:850, on:true, fixed:true},
+    {id:2, name:'Rear bike hitch', kg:9.0, on:true},
+    {id:3, name:'ISI rear bike carrier', kg:12.0, on:true},
+    {id:4, name:'Pegs – self tapping', kg:1.1, on:false},
+    {id:5, name:'Family sub-tent', kg:11.3, on:false},
+    {id:6, name:'Annex walls', kg:11.4, on:true},
+    {id:7, name:'Awning roof', kg:5.1, on:true},
+    {id:8, name:'Front awning', kg:5.8, on:true},
+    {id:9, name:'Poles, pegs & bag', kg:4.0, on:true},
+    {id:10, name:'S.Steel ext. table', kg:8.5, on:true},
+    {id:11, name:'Poles', kg:8.7, on:true},
+    {id:12, name:'Groundsheet', kg:2.0, on:false},
+    {id:13, name:'Enduro mat', kg:3.2, on:true},
+    {id:14, name:'Baby Q BBQ', kg:12.0, on:true},
+    {id:15, name:'Pizza stone', kg:1.6, on:true},
+    {id:16, name:'Solar mat', kg:11.0, on:true},
+    {id:17, name:'Stretcher x2', kg:8.0, on:false},
+    {id:18, name:'Family table & benches', kg:18.0, on:true},
+    {id:19, name:'Tool bag (black)', kg:6.0, on:true},
+    {id:20, name:'Toaster & kettle', kg:2.3, on:true},
+    {id:21, name:'Crockery box', kg:3.0, on:true},
+    {id:22, name:'Games box', kg:4.0, on:true},
+    {id:23, name:'Electricals box', kg:3.5, on:true},
+    {id:24, name:'Wet bottles box', kg:5.0, on:true},
+    {id:25, name:'Wine x6', kg:8.5, on:false},
+    {id:26, name:'1st aid kit', kg:2.3, on:true},
+    {id:27, name:'Cords etc. box', kg:4.7, on:true},
+    {id:28, name:'Bike locks & tool box', kg:3.5, on:true},
+    {id:29, name:'Box plates & cookware', kg:9.0, on:true},
+    {id:30, name:'Clothes bag x4', kg:32.0, on:false},
+    {id:31, name:'Clothes bag x2', kg:16.0, on:true},
+    {id:32, name:'Cutlery set', kg:0.8, on:true},
+  ],
+  costs: [
+    {id:1, name:'Trailer purchase', amount:41000, cat:'purchase', nights:0},
+    {id:2, name:'Rego', amount:65, cat:'rego', nights:0},
+    {id:3, name:'Insurance', amount:330, cat:'insurance', nights:0},
+    {id:4, name:'Service', amount:572.22, cat:'service', nights:0},
+    {id:5, name:'Bike rack rear hitch', amount:375, cat:'accessory', nights:0},
+    {id:6, name:'Bike rack rear mount & plug', amount:250, cat:'accessory', nights:0},
+    {id:7, name:'ISI rear bicycle carrier', amount:896, cat:'accessory', nights:0},
+    {id:8, name:'Weber Baby Q', amount:372, cat:'accessory', nights:0},
+    {id:9, name:'HardKorr LED strips x2', amount:70, cat:'accessory', nights:0},
+  ],
+  totalNights: 8,
+  locations: [],
+  nextId: 100,
+};
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+function load() {
+  try {
+    const d = localStorage.getItem(KEY);
+    if (d) { const p = JSON.parse(d); state = {...state, ...p}; }
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if (id==='insights') renderInsights();
+  if (id==='costs') renderCosts();
+}
+
+// ══════════════════════════════════════════════
+// WEIGHT
+// ══════════════════════════════════════════════
+function calcWeights() {
+  const total = state.items.reduce((s,i)=>s+(i.on?i.kg:0),0);
+  const active = total; // tare is always in
+  return { total, active };
+}
+
+function updateTare() {
+  const v = parseFloat(document.getElementById('tare-input').value)||850;
+  state.tare = v;
+  const tareItem = state.items.find(i=>i.fixed);
+  if (tareItem) { tareItem.kg = v; }
+  document.getElementById('tare-display').textContent = v.toFixed(1)+' kg';
+  updateWeightUI();
+  save();
+}
+
+function updateWeightUI() {
+  const limit = parseFloat(document.getElementById('limit-input').value)||1200;
+  state.weightLimit = limit;
+  const { total } = calcWeights();
+  const pct = Math.min((total/limit)*100,100);
+  document.getElementById('w-total').textContent = total.toFixed(1);
+  document.getElementById('w-active').textContent = total.toFixed(1);
+  document.getElementById('w-pct').textContent = Math.round(pct)+'%';
+  document.getElementById('w-limit-lbl').textContent = `of ${limit} kg GVM`;
+  document.getElementById('w-bar').style.width = pct+'%';
+  const hero = document.getElementById('weight-hero');
+  const bar = document.getElementById('w-bar');
+  if (pct > 95) { bar.style.background='var(--danger)'; hero.className='weight-hero over'; }
+  else if (pct > 80) { bar.style.background='var(--warn)'; hero.className='weight-hero warn'; }
+  else { bar.style.background='var(--accent2)'; hero.className='weight-hero ok'; }
+}
+
+function renderWeightList() {
+  const el = document.getElementById('weight-list');
+  el.innerHTML = state.items.map(item=>`
+    <div class="weight-item" id="wi-${item.id}">
+      <div class="wi-check ${item.on?'on':''}" onclick="toggleItem(${item.id})">${item.on?'✓':''}</div>
+      <div class="wi-name${item.on?'':' off'}">${item.name}</div>
+      <div class="wi-kg">${item.kg?item.kg.toFixed(1)+' kg':'—'}</div>
+      ${item.fixed?'':'<button class="wi-edit" onclick="editItem('+item.id+')">✏️</button><button class="wi-del" onclick="deleteItem('+item.id+')">✕</button>'}
+    </div>
+  `).join('');
+  updateWeightUI();
+}
+
+function toggleItem(id) {
+  const item = state.items.find(i=>i.id===id);
+  if (item && !item.fixed) { item.on = !item.on; }
+  else if (item && item.fixed) { item.on = true; } // tare always on
+  renderWeightList(); save();
+}
+
+function addWeightItem() {
+  const name = document.getElementById('new-item-name').value.trim();
+  const kg = parseFloat(document.getElementById('new-item-kg').value);
+  if (!name || isNaN(kg)) { alert('Enter name and weight.'); return; }
+  state.items.push({ id: ++state.nextId, name, kg, on: true });
+  document.getElementById('new-item-name').value='';
+  document.getElementById('new-item-kg').value='';
+  renderWeightList(); save();
+}
+
+function editItem(id) {
+  const item = state.items.find(i=>i.id===id);
+  const newName = prompt('Item name:', item.name);
+  if (newName===null) return;
+  const newKg = parseFloat(prompt('Weight (kg):', item.kg));
+  if (newName.trim()) item.name = newName.trim();
+  if (!isNaN(newKg)) item.kg = newKg;
+  renderWeightList(); save();
+}
+
+function deleteItem(id) {
+  if (!confirm('Remove this item?')) return;
+  state.items = state.items.filter(i=>i.id!==id);
+  renderWeightList(); save();
+}
+
+// ══════════════════════════════════════════════
+// COSTS
+// ══════════════════════════════════════════════
+function renderCosts() {
+  const total = state.costs.reduce((s,c)=>s+c.amount,0);
+  const nights = state.costs.reduce((s,c)=>s+(c.nights||0),0)||state.totalNights||1;
+  const perNight = total / (nights||1);
+  document.getElementById('cost-total').textContent = '$'+fmtMoney(total);
+  document.getElementById('cost-per-night').textContent = '$'+fmtMoney(perNight);
+
+  const cats = {};
+  state.costs.forEach(c=>{ cats[c.cat]=(cats[c.cat]||0)+c.amount; });
+  const catLabels = {purchase:'Purchase',rego:'Rego',insurance:'Insurance',service:'Service',accessory:'Accessories',camping:'Camping',fuel:'Fuel',other:'Other'};
+  document.getElementById('cost-breakdown').innerHTML = Object.entries(cats).map(([k,v])=>`
+    <div class="cost-row"><span class="cost-label">${catLabels[k]||k}</span><span class="cost-value">$${fmtMoney(v)}</span></div>
+  `).join('');
+
+  document.getElementById('cost-list').innerHTML = state.costs.length ? state.costs.map(c=>`
+    <div class="card" style="margin:6px 14px;padding:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:.82rem;font-weight:500;">${c.name}</div>
+          <div style="font-size:.65rem;color:var(--text3);margin-top:2px;">${catLabels[c.cat]||c.cat}${c.nights?' · '+c.nights+' nights':''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:.9rem;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;">$${fmtMoney(c.amount)}</div>
+          <button class="wi-del" onclick="deleteCost(${c.id})">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('') : '<div class="empty-state"><div class="icon">💸</div>No costs yet</div>';
+}
+
+function addCostEntry() {
+  const name = document.getElementById('cost-name').value.trim();
+  const amount = parseFloat(document.getElementById('cost-amount').value);
+  const cat = document.getElementById('cost-cat').value;
+  const nights = parseInt(document.getElementById('cost-nights').value)||0;
+  if (!name || isNaN(amount)) { alert('Enter description and amount.'); return; }
+  state.costs.push({id:++state.nextId, name, amount, cat, nights});
+  if (nights) state.totalNights = (state.totalNights||0)+nights;
+  document.getElementById('cost-name').value='';
+  document.getElementById('cost-amount').value='';
+  document.getElementById('cost-nights').value='';
+  renderCosts(); save();
+}
+
+function deleteCost(id) {
+  if (!confirm('Delete this entry?')) return;
+  state.costs = state.costs.filter(c=>c.id!==id);
+  renderCosts(); save();
+}
+
+function fmtMoney(n) {
+  if (n>=1000) return (n/1000).toFixed(1)+'k';
+  return n.toFixed(2).replace(/\.00$/,'');
+}
+
+// ══════════════════════════════════════════════
+// LOCATIONS
+// ══════════════════════════════════════════════
+let facStar=0, overallStar=0;
+
+function openLocModal(type, id) {
+  facStar=0; overallStar=0;
+  document.getElementById('modal-type').value=type;
+  document.getElementById('modal-edit-id').value=id||'';
+  const titles={visited:'Add Visited Location',booked:'Add Future Booking',wishlist:'Add Prospective Location'};
+  document.getElementById('modal-title').textContent = id ? 'Edit Location' : titles[type];
+  // show/hide fields
+  document.getElementById('m-fac-grp').style.display = type==='visited'?'':'none';
+  document.getElementById('m-overall-grp').style.display = type==='visited'?'':'none';
+  document.getElementById('m-cost-grp').style.display = type==='wishlist'?'none':'';
+  document.getElementById('m-nights-grp').style.display = type==='wishlist'?'none':'';
+  document.getElementById('m-others-grp').style.display = type==='visited'?'':'none';
+  document.getElementById('m-booking-grp').style.display = type==='booked'?'':'none';
+  // clear fields
+  ['m-name','m-region','m-site','m-maps','m-date','m-nights','m-cost','m-others','m-notes','m-booking'].forEach(f=>{
+    const el=document.getElementById(f); if(el) el.value='';
+  });
+  setStarUI('fac',0); setStarUI('overall',0);
+  // if editing, pre-fill
+  if (id) {
+    const loc = state.locations.find(l=>l.id===id);
+    if (loc) {
+      document.getElementById('m-name').value=loc.name||'';
+      document.getElementById('m-region').value=loc.region||'';
+      document.getElementById('m-site').value=loc.site||'';
+      document.getElementById('m-maps').value=loc.maps||'';
+      document.getElementById('m-date').value=loc.date||'';
+      document.getElementById('m-nights').value=loc.nights||'';
+      document.getElementById('m-cost').value=loc.cost||'';
+      document.getElementById('m-others').value=loc.others||'';
+      document.getElementById('m-notes').value=loc.notes||'';
+      document.getElementById('m-booking').value=loc.booking||'';
+      facStar=loc.facRating||0; overallStar=loc.overallRating||0;
+      setStarUI('fac',facStar); setStarUI('overall',overallStar);
+    }
+  }
+  document.getElementById('loc-modal').style.display='flex';
+}
+
+function closeLocModal(e) {
+  if (!e || e.target===document.getElementById('loc-modal'))
+    document.getElementById('loc-modal').style.display='none';
+}
+
+function setStar(type, val) {
+  if (type==='fac') facStar=val;
+  else overallStar=val;
+  setStarUI(type,val);
+}
+
+function setStarUI(type, val) {
+  const container = document.getElementById('m-'+type+'-stars');
+  if (!container) return;
+  container.querySelectorAll('span').forEach(s=>{
+    s.classList.toggle('on', parseInt(s.dataset.i)<=val);
+  });
+}
+
+function saveLocation() {
+  const name = document.getElementById('m-name').value.trim();
+  if (!name) { alert('Location name required'); return; }
+  const type = document.getElementById('modal-type').value;
+  const editId = document.getElementById('modal-edit-id').value;
+  const loc = {
+    id: editId ? parseInt(editId) : ++state.nextId,
+    type,
+    name,
+    region: document.getElementById('m-region').value.trim(),
+    site: document.getElementById('m-site').value.trim(),
+    maps: document.getElementById('m-maps').value.trim(),
+    date: document.getElementById('m-date').value,
+    nights: parseFloat(document.getElementById('m-nights').value)||0,
+    cost: parseFloat(document.getElementById('m-cost').value)||0,
+    facRating: facStar,
+    overallRating: overallStar,
+    others: document.getElementById('m-others').value.trim(),
+    notes: document.getElementById('m-notes').value.trim(),
+    booking: document.getElementById('m-booking').value.trim(),
+  };
+  if (editId) {
+    const idx = state.locations.findIndex(l=>l.id===parseInt(editId));
+    if (idx>=0) state.locations[idx]=loc;
+  } else {
+    state.locations.push(loc);
+  }
+  document.getElementById('loc-modal').style.display='none';
+  renderLocations(type);
+  save();
+}
+
+function renderLocations(type) {
+  const locs = state.locations.filter(l=>l.type===type);
+  const el = document.getElementById(type+'-list');
+  if (!el) return;
+  const badgeMap={visited:'badge-visited',booked:'badge-booked',wishlist:'badge-prospect'};
+  const labelMap={visited:'Visited',booked:'Booked',wishlist:'Wishlist'};
+  if (!locs.length) {
+    el.innerHTML=`<div class="empty-state"><div class="icon">${type==='visited'?'📍':type==='booked'?'📅':'🗺️'}</div>No locations yet</div>`;
+    return;
+  }
+  el.innerHTML = locs.map(loc=>`
+    <div class="loc-card">
+      <div class="loc-header" onclick="toggleLoc(${loc.id})">
+        <div>
+          <div class="loc-name">${loc.name}${loc.region?' <span style="color:var(--text3);font-size:.75rem;">· '+loc.region+'</span>':''}</div>
+          <div class="loc-meta">${loc.date||''}${loc.nights?' · '+loc.nights+' nights':''}${loc.site?' · '+loc.site:''}</div>
+        </div>
+        <span class="loc-badge ${badgeMap[type]}">${labelMap[type]}</span>
+      </div>
+      <div class="loc-body" id="locbody-${loc.id}">
+        <div class="loc-detail">
+          ${loc.maps?`<div><a class="map-link" href="${loc.maps}" target="_blank">🗺 Open in Google Maps</a></div>`:''}
+          ${loc.cost?`<div><strong>Cost:</strong> $${loc.cost.toFixed(2)}/night${loc.nights?' · Total: $'+(loc.cost*loc.nights).toFixed(2):''}</div>`:''}
+          ${(loc.facRating||loc.overallRating)?`<div class="rating-row">
+            ${loc.facRating?`<div class="rating-chip">Facilities <span class="r">${'★'.repeat(loc.facRating)+'☆'.repeat(5-loc.facRating)}</span></div>`:''}
+            ${loc.overallRating?`<div class="rating-chip">Overall <span class="r">${'★'.repeat(loc.overallRating)+'☆'.repeat(5-loc.overallRating)}</span></div>`:''}
+          </div>`:''}
+          ${loc.others?`<div style="margin-top:6px;"><strong>Other sites nearby:</strong><br/>${loc.others.split(',').map(s=>`<span class="tag">${s.trim()}</span>`).join('')}</div>`:''}
+          ${loc.booking?`<div style="margin-top:6px;"><strong>Booking ref:</strong> ${loc.booking.startsWith('http')?`<a class="map-link" href="${loc.booking}" target="_blank">View booking</a>`:loc.booking}</div>`:''}
+          ${loc.notes?`<div style="margin-top:6px;color:var(--text2);">${loc.notes}</div>`:''}
+        </div>
+        <div class="loc-actions">
+          <button class="btn-sm primary" onclick="openLocModal('${loc.type}',${loc.id})">✏️ Edit</button>
+          ${loc.maps?`<button class="btn-sm" onclick="window.open('${loc.maps}','_blank')">🗺 Maps</button>`:''}
+          <button class="btn-sm danger" onclick="deleteLocation(${loc.id},'${type}')">🗑 Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleLoc(id) {
+  const el = document.getElementById('locbody-'+id);
+  if (el) el.classList.toggle('open');
+}
+
+function deleteLocation(id, type) {
+  if (!confirm('Delete this location?')) return;
+  state.locations = state.locations.filter(l=>l.id!==id);
+  renderLocations(type); save();
+}
+
+// ══════════════════════════════════════════════
+// INSIGHTS
+// ══════════════════════════════════════════════
+function renderInsights() {
+  const { total } = calcWeights();
+  const totalCost = state.costs.reduce((s,c)=>s+c.amount,0);
+  const nights = state.costs.reduce((s,c)=>s+(c.nights||0),0)||state.totalNights||1;
+  const visitedCount = state.locations.filter(l=>l.type==='visited').length;
+  const bookedCount = state.locations.filter(l=>l.type==='booked').length;
+  const pct = Math.round((total/state.weightLimit)*100);
+
+  document.getElementById('insights-grid').innerHTML = `
+    <div class="insight-card"><div class="i-val">${total.toFixed(1)}<span style="font-size:1rem">kg</span></div><div class="i-lbl">Current Load</div></div>
+    <div class="insight-card"><div class="i-val">${pct}%</div><div class="i-lbl">of GVM Limit</div></div>
+    <div class="insight-card"><div class="i-val">$${fmtMoney(totalCost)}</div><div class="i-lbl">Total Spend</div></div>
+    <div class="insight-card"><div class="i-val">$${fmtMoney(totalCost/nights)}</div><div class="i-lbl">Per Night</div></div>
+    <div class="insight-card"><div class="i-val">${visitedCount}</div><div class="i-lbl">Sites Visited</div></div>
+    <div class="insight-card"><div class="i-val">${bookedCount}</div><div class="i-lbl">Upcoming Trips</div></div>
+  `;
+
+  const tips = [];
+  const headroom = state.weightLimit - total;
+  if (pct > 95) tips.push({t:'⚠️ Over GVM Warning', b:`You're at ${pct}% of your ${state.weightLimit}kg limit. Consider leaving behind ${Math.ceil(-headroom+1)}kg+ to avoid towing safety issues.`});
+  else if (pct > 80) tips.push({t:'🟡 Weight Getting Heavy', b:`At ${pct}% capacity with ${headroom.toFixed(1)}kg headroom. Clothes bags and wine are easiest to leave at home if needed.`});
+  else tips.push({t:'✅ Weight Looking Good', b:`${headroom.toFixed(1)}kg of spare capacity. You have room for the family sub-tent and stretchers.`});
+  if (nights < 20) tips.push({t:'💡 Cost Per Night Tip', b:`Only ${nights} nights logged. As you camp more, your cost-per-night will drop significantly.`});
+  const topItem = [...state.items].filter(i=>!i.fixed).sort((a,b)=>b.kg-a.kg)[0];
+  if (topItem) tips.push({t:'📦 Heaviest Item', b:`"${topItem.name}" at ${topItem.kg}kg is your heaviest optional item. Toggle it off in Weight to free up capacity.`});
+
+  document.getElementById('insights-tips').innerHTML = tips.map(t=>`
+    <div class="tip-card"><div class="tip-title">${t.t}</div><p>${t.b}</p></div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+load();
+renderWeightList();
+renderCosts();
+['visited','booked','wishlist'].forEach(renderLocations);
+document.getElementById('limit-input').value = state.weightLimit;
+document.getElementById('tare-input').value = state.tare;
+document.getElementById('tare-display').textContent = state.tare.toFixed(1)+' kg';
+updateWeightUI();
+</script>
+</body>
+</html>
