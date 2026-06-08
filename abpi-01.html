@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABPI Measurement Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2035;
+    --teal: #1a7a6e;
+    --teal-light: #22a093;
+    --teal-bg: #e8f5f3;
+    --amber: #d97706;
+    --amber-bg: #fef3c7;
+    --red: #c0392b;
+    --red-bg: #fdf0ef;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --slate: #64748b;
+    --border: #dde5ed;
+    --bg: #f5f8fc;
+    --white: #ffffff;
+    --text: #1e293b;
+    --muted: #94a3b8;
+    --card-shadow: 0 2px 12px rgba(15,32,53,0.08);
+    --card-shadow-hover: 0 6px 24px rgba(15,32,53,0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-icon {
+    width: 40px; height: 40px;
+    background: var(--teal);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    color: #fff;
+    font-size: 1.35rem;
+    letter-spacing: 0.01em;
+  }
+  header p {
+    color: #7fa8c4;
+    font-size: 0.78rem;
+    font-weight: 300;
+    margin-top: 1px;
+  }
+  .step-counter {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #a8c8e0;
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal-light), #6ee7dd);
+    transition: width 0.5s ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* OVERVIEW SECTION */
+  .overview-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+  }
+  .overview-card h2 {
+    font-family: 'DM Serif Display', serif;
+    color: var(--navy);
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .overview-card h2 span { color: var(--teal); }
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .overview-item {
+    background: var(--teal-bg);
+    border-radius: 10px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--teal);
+  }
+  .overview-item strong {
+    display: block;
+    color: var(--teal);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .overview-item span { font-size: 0.85rem; color: var(--navy); }
+  .note-box {
+    background: var(--amber-bg);
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.84rem;
+    color: #78350f;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .note-box .icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* STEPS */
+  .step-section {
+    margin-bottom: 20px;
+  }
+  .step-card {
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .step-card.active { border-color: var(--teal-light); box-shadow: var(--card-shadow-hover); }
+  .step-card.complete { border-color: #86efac; }
+  .step-card.locked { opacity: 0.55; pointer-events: none; }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s;
+  }
+  .step-card.active .step-header { border-bottom-color: var(--border); background: #f8fcfb; }
+  .step-header:hover { background: #f8fcfb; }
+
+  .step-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .step-num.pending { background: #e2e8f0; color: var(--slate); }
+  .step-num.active-num { background: var(--teal); color: white; }
+  .step-num.done { background: var(--green); color: white; font-size: 0.9rem; }
+
+  .step-title-group { flex: 1; }
+  .step-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--navy);
+  }
+  .step-subtitle {
+    font-size: 0.78rem;
+    color: var(--slate);
+    margin-top: 2px;
+  }
+  .step-toggle {
+    font-size: 1.1rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+  .step-card.active .step-toggle { transform: rotate(180deg); color: var(--teal); }
+
+  .step-body {
+    display: none;
+    padding: 22px 22px 24px;
+  }
+  .step-card.active .step-body { display: block; }
+
+  /* INSTRUCTIONS */
+  .instruction {
+    background: var(--teal-bg);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    font-size: 0.875rem;
+    color: #134e4a;
+    border-left: 3px solid var(--teal);
+    line-height: 1.6;
+  }
+  .instruction strong { color: var(--teal); }
+
+  /* INPUTS */
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .input-group .example {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 6px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: #fcfcfc;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    overflow: hidden;
+  }
+  .input-row:focus-within {
+    border-color: var(--teal-light);
+    box-shadow: 0 0 0 3px rgba(26,122,110,0.1);
+    background: white;
+  }
+  .input-row input {
+    flex: 1;
+    padding: 11px 14px;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--navy);
+    outline: none;
+    width: 100%;
+  }
+  .input-row input::placeholder { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+  .unit-badge {
+    padding: 0 12px;
+    font-size: 0.8rem;
+    color: var(--slate);
+    font-weight: 500;
+    border-left: 1px solid var(--border);
+    background: var(--bg);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .input-group .live-val {
+    margin-top: 5px;
+    font-size: 0.78rem;
+    color: var(--teal);
+    font-weight: 600;
+    min-height: 16px;
+  }
+
+  /* DOPPLER ILLUSTRATION */
+  .position-diagram {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 18px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .diagram-body {
+    flex-shrink: 0;
+    width: 70px;
+  }
+  .diagram-body svg { width: 100%; height: auto; }
+  .diagram-labels { flex: 1; }
+  .diagram-labels p {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .diagram-labels p .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* BUTTONS */
+  .btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn-primary {
+    background: var(--teal);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--teal-light); transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--slate);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--white); }
+  .btn-reset {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid var(--red);
+    font-size: 0.82rem;
+    padding: 8px 14px;
+  }
+  .btn-reset:hover { background: var(--red-bg); }
+  .btn-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  /* RESULT PANEL */
+  #result-section { margin-top: 8px; }
+  .result-card {
+    border-radius: 16px;
+    padding: 28px;
+    border: 2px solid;
+    box-shadow: var(--card-shadow-hover);
+    animation: fadeSlide 0.4s ease;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-normal { background: var(--green-bg); border-color: #86efac; }
+  .result-borderline { background: var(--amber-bg); border-color: #fcd34d; }
+  .result-abnormal { background: var(--red-bg); border-color: #fca5a5; }
+  .result-critical { background: #1c0a0a; border-color: var(--red); }
+  .result-inconclusive { background: #f8fafc; border-color: #94a3b8; }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .result-badge {
+    font-size: 2.8rem;
+    font-family: 'DM Serif Display', serif;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .result-normal .result-badge { color: var(--green); }
+  .result-borderline .result-badge { color: var(--amber); }
+  .result-abnormal .result-badge { color: var(--red); }
+  .result-critical .result-badge { color: #ef4444; }
+  .result-inconclusive .result-badge { color: var(--slate); }
+
+  .result-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    margin-bottom: 2px;
+  }
+  .result-range { font-size: 0.82rem; color: var(--slate); }
+
+  .result-interpretation {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.6);
+    margin-bottom: 14px;
+  }
+  .result-critical .result-interpretation { background: rgba(255,255,255,0.08); color: #fecaca; }
+
+  .action-items { margin-top: 6px; }
+  .action-items h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--slate);
+    margin-bottom: 8px;
+  }
+  .action-items ul { list-style: none; }
+  .action-items ul li {
+    font-size: 0.86rem;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    color: var(--text);
+  }
+  .action-items ul li:last-child { border-bottom: none; }
+  .action-items ul li::before { content: "→"; color: var(--teal); flex-shrink: 0; margin-top: 1px; }
+  .result-critical .action-items ul li { color: #fecaca; }
+  .result-critical .action-items ul li::before { color: #ef4444; }
+
+  /* MEASUREMENT SUMMARY TABLE */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 18px;
+    font-size: 0.85rem;
+  }
+  .summary-table th {
+    background: var(--bg);
+    color: var(--slate);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  .summary-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--navy);
+    font-weight: 500;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table .highlight { color: var(--teal); font-weight: 700; }
+  .summary-table .used-val { background: #f0fdf4; }
+
+  /* INTERPRETATION REFERENCE */
+  .ref-table {
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-top: 28px;
+    box-shadow: var(--card-shadow);
+  }
+  .ref-table h3 {
+    padding: 14px 20px;
+    font-family: 'DM Serif Display', serif;
+    color: var(--navy);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .ref-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+    font-size: 0.85rem;
+  }
+  .ref-row:last-child { border-bottom: none; }
+  .ref-range {
+    font-weight: 700;
+    font-family: monospace;
+    width: 80px;
+    flex-shrink: 0;
+    color: var(--navy);
+  }
+  .ref-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .ref-label { font-weight: 600; width: 150px; flex-shrink: 0; }
+  .ref-desc { color: var(--slate); font-size: 0.8rem; flex: 1; }
+
+  /* COMPRESSION GUIDE */
+  .compression-note {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: var(--teal-bg);
+    border-radius: 10px;
+    border-left: 3px solid var(--teal);
+    font-size: 0.84rem;
+    color: #134e4a;
+  }
+  .compression-note strong { display: block; margin-bottom: 4px; color: var(--teal); }
+
+  /* TOOLTIP HINTS */
+  .hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: var(--slate);
+    margin-top: 8px;
+    padding: 5px 10px;
+    background: #f1f5f9;
+    border-radius: 6px;
+  }
+
+  /* OPTIONAL FIELDS */
+  .optional-toggle {
+    font-size: 0.8rem;
+    color: var(--teal);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 14px;
+    padding: 5px 0;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-weight: 500;
+  }
+  .optional-section { display: none; }
+  .optional-section.open { display: block; }
+
+  /* PATIENT NAME */
+  .patient-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .patient-bar label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .patient-bar input {
+    flex: 1;
+    min-width: 140px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--navy);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .patient-bar input:focus { border-color: var(--teal-light); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px 50px; }
+    header { padding: 16px 16px; }
+    header h1 { font-size: 1.1rem; }
+    .input-grid { grid-template-columns: 1fr 1fr; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .position-diagram { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-icon">🩺</div>
+    <div>
+      <h1>ABPI Measurement Tool</h1>
+      <p>Ankle–Brachial Pressure Index · Lower Limb Assessment</p>
+    </div>
+  </div>
+  <div class="step-counter" id="stepCounter">Step 1 of 5</div>
+</header>
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill" style="width:20%"></div>
+</div>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <div class="overview-card">
+    <h2>📋 <span>What is ABPI?</span></h2>
+    <p style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;line-height:1.6;">
+      The Ankle–Brachial Pressure Index (ABPI) compares systolic blood pressure at the ankle to the arm. 
+      It is a simple, non-invasive screening test for <strong>peripheral artery disease (PAD)</strong> and is also used to 
+      assess safety before applying compression therapy.
+    </p>
+    <div class="overview-grid">
+      <div class="overview-item">
+        <strong>Equipment needed</strong>
+        <span>Doppler probe (8–10 MHz), sphygmomanometer, ultrasound gel</span>
+      </div>
+      <div class="overview-item">
+        <strong>Patient position</strong>
+        <span>Supine, resting for ≥5 minutes before measurement</span>
+      </div>
+      <div class="overview-item">
+        <strong>Formula</strong>
+        <span>Ankle systolic ÷ Brachial systolic = ABPI</span>
+      </div>
+      <div class="overview-item">
+        <strong>Normal range</strong>
+        <span>1.0 – 1.4 (ankle pressure normally exceeds arm)</span>
+      </div>
+    </div>
+    <div class="note-box">
+      <span class="icon">💡</span>
+      <span>If wounds or ulcers are present at the cuff site, cover with a protective barrier (e.g. plastic wrap) before applying the cuff. If the patient has significant lower limb pain or cellulitis, proceed with care — the procedure may cause discomfort.</span>
+    </div>
+  </div>
+
+  <!-- PATIENT INFO -->
+  <div class="patient-bar">
+    <label>Patient name / ID</label>
+    <input type="text" id="patientName" placeholder="Optional — for your records" />
+    <label>Date</label>
+    <input type="date" id="assessDate" />
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 1: PATIENT PREPARATION -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="step-section" id="section-1">
+    <div class="step-card active" id="card-1">
+      <div class="step-header" onclick="toggleStep(1)">
+        <div class="step-num active-num" id="num-1">1</div>
+        <div class="step-title-group">
+          <div class="step-title">Patient Preparation</div>
+          <div class="step-subtitle">Position and rest the patient before measuring</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction">
+          <strong>Position the patient supine</strong> (flat on their back) and allow them to rest for at least 
+          <strong>5 minutes</strong> before taking any measurements. Remove footwear and socks. Expose both arms and ankles. 
+          Apply ultrasound gel to the probe site before each measurement.
+        </div>
+
+        <div class="position-diagram">
+          <div class="diagram-body">
+            <svg viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
+              <!-- body outline lying flat -->
+              <ellipse cx="30" cy="12" rx="10" ry="10" fill="#334155" />
+              <rect x="20" y="22" width="20" height="40" rx="5" fill="#334155"/>
+              <!-- arms -->
+              <rect x="6" y="26" width="14" height="8" rx="4" fill="#475569"/>
+              <rect x="40" y="26" width="14" height="8" rx="4" fill="#475569"/>
+              <!-- legs -->
+              <rect x="21" y="62" width="8" height="42" rx="4" fill="#334155"/>
+              <rect x="31" y="62" width="8" height="42" rx="4" fill="#334155"/>
+              <!-- cuff arm left -->
+              <rect x="6" y="27" width="13" height="5" rx="2" fill="#1a7a6e" opacity="0.9"/>
+              <!-- cuff ankle right -->
+              <rect x="31" y="91" width="8" height="6" rx="2" fill="#d97706" opacity="0.9"/>
+            </svg>
+          </div>
+          <div class="diagram-labels">
+            <p><span class="dot" style="background:#1a7a6e"></span> <span>Brachial cuff: 2–3 cm above antecubital fossa (elbow crease)</span></p>
+            <p><span class="dot" style="background:#d97706"></span> <span>Ankle cuff: 5 cm above medial malleolus (inner ankle bone)</span></p>
+            <p style="color:#94a3b8;font-size:0.75rem;margin-top:4px;">Both readings taken with patient flat. Do not measure sitting or standing.</p>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="completeStep(1)">✓ Patient is positioned &amp; resting — Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 2: BRACHIAL PRESSURES -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="step-section" id="section-2">
+    <div class="step-card locked" id="card-2">
+      <div class="step-header" onclick="toggleStep(2)">
+        <div class="step-num pending" id="num-2">2</div>
+        <div class="step-title-group">
+          <div class="step-title">Brachial (Arm) Systolic Pressures</div>
+          <div class="step-subtitle">Measure both arms — the higher value is used in the formula</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction">
+          Place the cuff <strong>2–3 cm above the antecubital fossa</strong>. Apply gel and locate the brachial artery pulse 
+          with the Doppler probe. Inflate the cuff until the Doppler signal disappears, then slowly deflate — 
+          the pressure at which you <em>first hear the signal return</em> is the systolic pressure. 
+          Record both arms. The <strong>highest value</strong> will be used in the ABPI calculation.
+        </div>
+        <div class="input-grid">
+          <div class="input-group">
+            <label>Right Arm</label>
+            <div class="example">e.g. 128 mmHg</div>
+            <div class="input-row">
+              <input type="number" id="brachR" placeholder="128" min="50" max="250" oninput="liveUpdate()">
+              <span class="unit-badge">mmHg</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Left Arm</label>
+            <div class="example">e.g. 124 mmHg</div>
+            <div class="input-row">
+              <input type="number" id="brachL" placeholder="124" min="50" max="250" oninput="liveUpdate()">
+              <span class="unit-badge">mmHg</span>
+            </div>
+          </div>
+        </div>
+        <div class="hint" id="brachHint" style="display:none">
+          🔢 Highest brachial pressure: <strong id="brachMax" style="color:var(--teal);margin-left:4px">— mmHg</strong> &nbsp;·&nbsp; This will be your denominator
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn btn-primary" onclick="completeStep(2)" id="btn-2" disabled>Next: Ankle Pressures →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 3: ANKLE PRESSURES -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="step-section" id="section-3">
+    <div class="step-card locked" id="card-3">
+      <div class="step-header" onclick="toggleStep(3)">
+        <div class="step-num pending" id="num-3">3</div>
+        <div class="step-title-group">
+          <div class="step-title">Ankle Systolic Pressures</div>
+          <div class="step-subtitle">Posterior tibial (PT) and dorsalis pedis (DP) arteries, both feet</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction">
+          Place the cuff <strong>5 cm above the medial malleolus</strong>. Use the Doppler probe to locate each artery 
+          (see locations below), apply gel, and record when the signal returns on deflation.
+          <br><br>
+          <strong>Posterior tibial (PT):</strong> Behind and below the medial malleolus (inner ankle).
+          <strong>Dorsalis pedis (DP):</strong> Dorsum of foot, lateral to the extensor hallucis longus tendon. 
+          <em>Note: ~12% of people congenitally lack a DP pulse — this is normal.</em>
+        </div>
+
+        <p style="font-size:0.8rem;font-weight:600;color:var(--navy);margin-bottom:10px;">Right Foot</p>
+        <div class="input-grid">
+          <div class="input-group">
+            <label>Right PT (Posterior Tibial)</label>
+            <div class="example">e.g. 118 mmHg</div>
+            <div class="input-row">
+              <input type="number" id="ptR" placeholder="118" min="30" max="250" oninput="liveUpdate()">
+              <span class="unit-badge">mmHg</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Right DP (Dorsalis Pedis)</label>
+            <div class="example">e.g. 122 mmHg — or leave blank if absent</div>
+            <div class="input-row">
+              <input type="number" id="dpR" placeholder="122 (optional)" min="30" max="250" oninput="liveUpdate()">
+              <span class="unit-badge">mmHg</span>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:0.8rem;font-weight:600;color:var(--navy);margin-bottom:10px;margin-top:14px;">Left Foot</p>
+        <div class="input-grid">
+          <div class="input-group">
+            <label>Left PT (Posterior Tibial)</label>
+            <div class="example">e.g. 116 mmHg</div>
+            <div class="input-row">
+              <input type="number" id="ptL" placeholder="116" min="30" max="250" oninput="liveUpdate()">
+              <span class="unit-badge">mmHg</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Left DP (Dorsalis Pedis)</label>
+            <div class="example">e.g. 110 mmHg — or leave blank if absent</div>
+            <div class="input-row">
+              <input type="number" id="dpL" placeholder="110 (optional)" min="30" max="250" oninput="liveUpdate()">
+              <span class="unit-badge">mmHg</span>
+            </div>
+          </div>
+        </div>
+        <div class="hint" id="ankleHint" style="display:none">
+          📐 Highest right ankle: <strong id="ankleRMax" style="color:var(--teal)">—</strong> &nbsp;|&nbsp; Highest left ankle: <strong id="ankleLMax" style="color:var(--teal)">—</strong>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn btn-primary" onclick="completeStep(3)" id="btn-3" disabled>Next: Review Measurements →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 4: REVIEW -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="step-section" id="section-4">
+    <div class="step-card locked" id="card-4">
+      <div class="step-header" onclick="toggleStep(4)">
+        <div class="step-num pending" id="num-4">4</div>
+        <div class="step-title-group">
+          <div class="step-title">Review &amp; Verify Measurements</div>
+          <div class="step-subtitle">Confirm all readings before calculating ABPI</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction">
+          Review the values below before calculating. The <strong>highest ankle pressure</strong> from each foot 
+          is divided by the <strong>highest brachial pressure</strong>. The <strong>lowest resulting ABPI value</strong> 
+          across both legs is the patient's overall ABPI score.
+        </div>
+        <table class="summary-table" id="summaryTable">
+          <thead>
+            <tr>
+              <th>Measurement</th>
+              <th>Right</th>
+              <th>Left</th>
+              <th>Used in calc?</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody">
+          </tbody>
+        </table>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="completeStep(4)">✓ Values confirmed — Calculate ABPI</button>
+          <button class="btn btn-secondary" onclick="goToStep(2)">← Edit measurements</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- STEP 5: RESULT -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="step-section" id="section-5">
+    <div class="step-card locked" id="card-5">
+      <div class="step-header" onclick="toggleStep(5)">
+        <div class="step-num pending" id="num-5">5</div>
+        <div class="step-title-group">
+          <div class="step-title">ABPI Result &amp; Interpretation</div>
+          <div class="step-subtitle">Clinical interpretation and recommended actions</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body" id="resultBody">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE TABLE -->
+  <div class="ref-table">
+    <h3>📊 ABPI Interpretation Reference</h3>
+    <div class="ref-row">
+      <span class="ref-range">&gt; 1.4</span>
+      <span class="ref-dot" style="background:#64748b"></span>
+      <span class="ref-label" style="color:#64748b">Inconclusive</span>
+      <span class="ref-desc">Non-compressible vessels (calcification). Refer to vascular lab.</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-range">1.0 – 1.4</span>
+      <span class="ref-dot" style="background:var(--green)"></span>
+      <span class="ref-label" style="color:var(--green)">Normal</span>
+      <span class="ref-desc">PAD excluded in most patients. Compression therapy safe if &gt; 0.8.</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-range">0.9</span>
+      <span class="ref-dot" style="background:var(--amber)"></span>
+      <span class="ref-label" style="color:var(--amber)">Borderline</span>
+      <span class="ref-desc">Consider vascular surgery discussion if symptoms/risk factors present.</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-range">0.5 – 0.9</span>
+      <span class="ref-dot" style="background:#ea580c"></span>
+      <span class="ref-label" style="color:#ea580c">Abnormal (PAD)</span>
+      <span class="ref-desc">Diagnostic of PAD. Manage CVD risk. Refer if not improving at 6 months.</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-range">&lt; 0.5</span>
+      <span class="ref-dot" style="background:var(--red)"></span>
+      <span class="ref-label" style="color:var(--red)">Critical ischaemia</span>
+      <span class="ref-desc">Urgent vascular referral. Do NOT use compression. High amputation risk.</span>
+    </div>
+
+    <div class="compression-note">
+      <strong>🩹 Compression Therapy Safety Guide</strong>
+      ABPI &gt; 0.8 — Full compression hosiery is safe &nbsp;|&nbsp; 
+      ABPI 0.5–0.8 — High compression NOT recommended (risk of necrosis) &nbsp;|&nbsp; 
+      ABPI &lt; 0.5 — Compression is contraindicated
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:28px">
+    <button class="btn btn-reset" onclick="resetAll()">↺ Start New Assessment</button>
+  </div>
+
+</div>
+
+<script>
+  // ─── STATE ────────────────────────────────────────────────────────────────
+  let currentStep = 1;
+  let maxUnlocked = 1;
+  const totalSteps = 5;
+
+  // ─── STEP NAVIGATION ─────────────────────────────────────────────────────
+  function toggleStep(n) {
+    if (n > maxUnlocked) return;
+    const card = document.getElementById('card-' + n);
+    const isOpen = card.classList.contains('active');
+    // Close all
+    for (let i = 1; i <= totalSteps; i++) {
+      document.getElementById('card-' + i).classList.remove('active');
+    }
+    if (!isOpen) {
+      card.classList.add('active');
+      currentStep = n;
+    }
+    updateProgress();
+  }
+
+  function goToStep(n) {
+    if (n > maxUnlocked) return;
+    for (let i = 1; i <= totalSteps; i++) {
+      document.getElementById('card-' + i).classList.remove('active');
+    }
+    document.getElementById('card-' + n).classList.add('active');
+    document.getElementById('card-' + n).classList.remove('locked');
+    currentStep = n;
+    updateProgress();
+    document.getElementById('section-' + n).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function completeStep(n) {
+    // Validate step n
+    if (n === 2 && !validateBrachial()) return;
+    if (n === 3 && !validateAnkle()) return;
+
+    // Mark complete
+    const num = document.getElementById('num-' + n);
+    num.className = 'step-num done';
+    num.textContent = '✓';
+    document.getElementById('card-' + n).classList.remove('active');
+    document.getElementById('card-' + n).classList.add('complete');
+
+    // Open next step
+    const next = n + 1;
+    if (next <= totalSteps) {
+      maxUnlocked = Math.max(maxUnlocked, next);
+      const nextCard = document.getElementById('card-' + next);
+      nextCard.classList.remove('locked');
+      nextCard.classList.add('active');
+      const nextNum = document.getElementById('num-' + next);
+      nextNum.className = 'step-num active-num';
+      currentStep = next;
+
+      if (next === 4) populateSummary();
+      if (next === 5) calculateABPI();
+
+      setTimeout(() => {
+        document.getElementById('section-' + next).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = (maxUnlocked / totalSteps) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('stepCounter').textContent = 'Step ' + Math.min(currentStep, totalSteps) + ' of ' + totalSteps;
+  }
+
+  // ─── VALIDATION ──────────────────────────────────────────────────────────
+  function validateBrachial() {
+    const r = parseFloat(document.getElementById('brachR').value);
+    const l = parseFloat(document.getElementById('brachL').value);
+    if (!r && !l) { alert('Please enter at least one brachial pressure.'); return false; }
+    return true;
+  }
+  function validateAnkle() {
+    const ptR = parseFloat(document.getElementById('ptR').value);
+    const ptL = parseFloat(document.getElementById('ptL').value);
+    if (!ptR && !ptL) { alert('Please enter at least one ankle pressure (PT is required for each limb being assessed).'); return false; }
+    return true;
+  }
+
+  // ─── LIVE UPDATE ──────────────────────────────────────────────────────────
+  function liveUpdate() {
+    // Brachial hint
+    const r = parseFloat(document.getElementById('brachR').value) || 0;
+    const l = parseFloat(document.getElementById('brachL').value) || 0;
+    const brachMax = Math.max(r, l);
+    const brachHint = document.getElementById('brachHint');
+    const btn2 = document.getElementById('btn-2');
+    if (brachMax > 0) {
+      brachHint.style.display = 'inline-flex';
+      document.getElementById('brachMax').textContent = brachMax + ' mmHg';
+      btn2.disabled = false;
+    }
+
+    // Ankle hints
+    const ptR = parseFloat(document.getElementById('ptR').value) || 0;
+    const dpR = parseFloat(document.getElementById('dpR').value) || 0;
+    const ptL = parseFloat(document.getElementById('ptL').value) || 0;
+    const dpL = parseFloat(document.getElementById('dpL').value) || 0;
+    const ankleRMax = Math.max(ptR, dpR);
+    const ankleLMax = Math.max(ptL, dpL);
+    const ankleHint = document.getElementById('ankleHint');
+    const btn3 = document.getElementById('btn-3');
+    if (ankleRMax > 0 || ankleLMax > 0) {
+      ankleHint.style.display = 'inline-flex';
+      document.getElementById('ankleRMax').textContent = ankleRMax > 0 ? ankleRMax + ' mmHg' : '—';
+      document.getElementById('ankleLMax').textContent = ankleLMax > 0 ? ankleLMax + ' mmHg' : '—';
+      if (ptR > 0 || ptL > 0) btn3.disabled = false;
+    }
+  }
+
+  // ─── POPULATE SUMMARY ─────────────────────────────────────────────────────
+  function populateSummary() {
+    const brachR = parseFloat(document.getElementById('brachR').value) || null;
+    const brachL = parseFloat(document.getElementById('brachL').value) || null;
+    const ptR    = parseFloat(document.getElementById('ptR').value) || null;
+    const dpR    = parseFloat(document.getElementById('dpR').value) || null;
+    const ptL    = parseFloat(document.getElementById('ptL').value) || null;
+    const dpL    = parseFloat(document.getElementById('dpL').value) || null;
+
+    const brachMax  = Math.max(brachR||0, brachL||0);
+    const ankleRMax = Math.max(ptR||0, dpR||0);
+    const ankleLMax = Math.max(ptL||0, dpL||0);
+
+    const rows = [
+      ['Brachial (arm)', fmt(brachR), fmt(brachL), `<span class="highlight">Highest: ${brachMax} mmHg ÷ (denominator)</span>`],
+      ['Posterior Tibial (ankle)', fmt(ptR), fmt(ptL), ''],
+      ['Dorsalis Pedis (ankle)', fmt(dpR)||'<em style="color:var(--muted)">not recorded</em>', fmt(dpL)||'<em style="color:var(--muted)">not recorded</em>', ''],
+      ['Highest ankle', `<span class="highlight">${ankleRMax||'—'} mmHg</span>`, `<span class="highlight">${ankleLMax||'—'} mmHg</span>`, 'Used as numerator per side'],
+    ];
+
+    const abpiR = brachMax > 0 && ankleRMax > 0 ? (ankleRMax / brachMax).toFixed(2) : null;
+    const abpiL = brachMax > 0 && ankleLMax > 0 ? (ankleLMax / brachMax).toFixed(2) : null;
+
+    if (abpiR || abpiL) {
+      const lowest = Math.min(abpiR ? parseFloat(abpiR) : 99, abpiL ? parseFloat(abpiL) : 99);
+      rows.push([
+        'ABPI per limb',
+        abpiR ? `<strong>${abpiR}</strong>` : '—',
+        abpiL ? `<strong>${abpiL}</strong>` : '—',
+        `<span class="highlight">Overall ABPI: ${lowest.toFixed(2)} (lowest)</span>`
+      ]);
+    }
+
+    const tbody = document.getElementById('summaryBody');
+    tbody.innerHTML = rows.map(r =>
+      `<tr><td>${r[0]}</td><td>${r[1]||'—'}</td><td>${r[2]||'—'}</td><td>${r[3]||'—'}</td></tr>`
+    ).join('');
+  }
+
+  function fmt(v) { return v ? v + ' mmHg' : null; }
+
+  // ─── CALCULATE ABPI ──────────────────────────────────────────────────────
+  function calculateABPI() {
+    const brachR = parseFloat(document.getElementById('brachR').value) || 0;
+    const brachL = parseFloat(document.getElementById('brachL').value) || 0;
+    const ptR    = parseFloat(document.getElementById('ptR').value) || 0;
+    const dpR    = parseFloat(document.getElementById('dpR').value) || 0;
+    const ptL    = parseFloat(document.getElementById('ptL').value) || 0;
+    const dpL    = parseFloat(document.getElementById('dpL').value) || 0;
+
+    const brachMax  = Math.max(brachR, brachL);
+    const ankleRMax = Math.max(ptR, dpR);
+    const ankleLMax = Math.max(ptL, dpL);
+
+    if (brachMax === 0) return;
+
+    const abpiR = ankleRMax > 0 ? ankleRMax / brachMax : null;
+    const abpiL = ankleLMax > 0 ? ankleLMax / brachMax : null;
+    const vals = [abpiR, abpiL].filter(v => v !== null);
+    const abpi = Math.min(...vals);
+
+    renderResult(abpi, abpiR, abpiL, brachMax, ankleRMax, ankleLMax);
+  }
+
+  function renderResult(abpi, abpiR, abpiL, brachMax, ankleRMax, ankleLMax) {
+    let cls, label, icon, interpretation, actions, compressionNote;
+
+    if (abpi > 1.4) {
+      cls = 'result-inconclusive';
+      icon = '⚠️';
+      label = 'Inconclusive — Vessels may not be compressible';
+      interpretation = 'An ABPI above 1.4 suggests medial arterial calcification causing artificially elevated ankle pressures. This is seen in diabetes, renal dysfunction, and rheumatoid arthritis. The result cannot be used to exclude or confirm PAD.';
+      actions = [
+        'Refer to a vascular laboratory for further assessment',
+        'Consider toe-brachial index (TBI) as an alternative',
+        'Do not use compression therapy without specialist advice',
+        'Document findings and discuss with treating clinician'
+      ];
+    } else if (abpi >= 1.0) {
+      cls = 'result-normal';
+      icon = '✅';
+      label = 'Normal — PAD effectively excluded';
+      interpretation = 'An ABPI of 1.0–1.4 is within the normal range. The ankle pressure meets or exceeds the arm pressure, indicating no significant arterial obstruction in the lower limbs. Peripheral artery disease can be excluded in most patients.';
+      actions = [
+        'No evidence of PAD at this time',
+        'Compression therapy is safe (ABPI > 0.8)',
+        'Continue routine cardiovascular risk monitoring',
+        'Repeat ABPI if symptoms develop or clinical picture changes'
+      ];
+      compressionNote = 'Compression safe: High compression (30–40 mmHg) is appropriate if clinically indicated.';
+    } else if (abpi >= 0.9) {
+      cls = 'result-borderline';
+      icon = '⚠️';
+      label = 'Borderline — Monitor closely';
+      interpretation = 'An ABPI of 0.9 is at the borderline threshold. While this alone is not diagnostic of PAD, further assessment is warranted — particularly if the patient has risk factors such as diabetes, smoking, or typical claudication symptoms.';
+      actions = [
+        'Consider discussion with a vascular surgeon',
+        'Assess for additional PAD risk factors and symptoms',
+        'Exercise testing may help clarify diagnosis',
+        'Compression therapy is generally safe (> 0.8), but use clinical judgement'
+      ];
+    } else if (abpi >= 0.5) {
+      cls = 'result-abnormal';
+      icon = '🔴';
+      label = 'Abnormal — Peripheral Artery Disease Indicated';
+      interpretation = 'An ABPI below 0.9 is diagnostic of peripheral artery disease. The lower the value, the more severe the disease. All patients with ABPI < 0.9 are considered to have a 5-year cardiovascular risk > 20% and require intensive cardiovascular risk factor management.';
+      actions = [
+        'Refer to vascular surgeon if symptoms not improving after 6 months',
+        'Initiate antiplatelet therapy (aspirin or clopidogrel) — discuss with prescriber',
+        'Statin therapy recommended unless contraindicated',
+        'Smoking cessation counselling — high priority',
+        'Advise structured walking programme (20 min/day to tolerance)',
+        abpi < 0.8 ? 'HIGH COMPRESSION HOSIERY IS CONTRAINDICATED (ABPI < 0.8)' : 'Compression therapy may be used with caution — assess clinically',
+        'Monitor HbA1c (target ≤ 50–55 mmol/L) and blood pressure (target 130/80)'
+      ];
+      compressionNote = abpi < 0.8
+        ? '🚫 Compression contraindicated: High compression must NOT be used (risk of skin necrosis).'
+        : '⚠️ Compression caution: Low compression only. Reassess frequently.';
+    } else {
+      cls = 'result-critical';
+      icon = '🚨';
+      label = 'Critical Limb Ischaemia — Urgent Action Required';
+      interpretation = 'An ABPI below 0.5 indicates critical limb ischaemia — a limb- and potentially life-threatening condition with severely impaired circulation. The patient is at high risk of gangrene and amputation. Urgent vascular referral is mandatory.';
+      actions = [
+        '🚨 URGENT vascular surgery referral — do not delay',
+        'Do NOT apply any compression therapy',
+        'Assess for ischaemic rest pain, ulceration, or gangrene',
+        'Initiate or optimise antiplatelet therapy (discuss with prescriber)',
+        'Optimise all cardiovascular risk factors urgently',
+        'Monitor limb closely — any deterioration requires emergency escalation'
+      ];
+      compressionNote = '🚫 Compression ABSOLUTELY CONTRAINDICATED — risk of critical harm.';
+    }
+
+    const patientName = document.getElementById('patientName').value;
+    const date = document.getElementById('assessDate').value;
+
+    const resultHtml = `
+      <div class="result-card ${cls}" id="abpi-result">
+        <div class="result-header">
+          <div>
+            <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.6;margin-bottom:4px">ABPI Score</div>
+            <div class="result-badge">${abpi.toFixed(2)}</div>
+          </div>
+          <div>
+            <div class="result-label">${icon} ${label}</div>
+            ${patientName ? `<div class="result-range">Patient: ${patientName}${date ? ' · ' + date : ''}</div>` : ''}
+            <div class="result-range" style="margin-top:4px">
+              R foot: ${abpiR ? abpiR.toFixed(2) : '—'} &nbsp;|&nbsp; L foot: ${abpiL ? abpiL.toFixed(2) : '—'}
+              &nbsp;|&nbsp; Brachial (highest): ${brachMax} mmHg
+            </div>
+          </div>
+        </div>
+        <div class="result-interpretation">${interpretation}</div>
+        ${compressionNote ? `<div class="note-box" style="margin-bottom:14px"><span class="icon">🩹</span><span>${compressionNote}</span></div>` : ''}
+        <div class="action-items">
+          <h4>Recommended Actions</h4>
+          <ul>${actions.map(a => `<li>${a}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Result</button>
+        <button class="btn btn-reset" onclick="resetAll()">↺ New Assessment</button>
+      </div>
+    `;
+
+    document.getElementById('resultBody').innerHTML = resultHtml;
+    document.getElementById('num-5').className = 'step-num done';
+    document.getElementById('num-5').textContent = '✓';
+    updateProgress();
+  }
+
+  // ─── RESET ────────────────────────────────────────────────────────────────
+  function resetAll() {
+    if (!confirm('Start a new assessment? All current values will be cleared.')) return;
+    ['brachR','brachL','ptR','dpR','ptL','dpL'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('patientName').value = '';
+
+    for (let i = 1; i <= totalSteps; i++) {
+      const card = document.getElementById('card-' + i);
+      card.classList.remove('active','complete','locked');
+      const num = document.getElementById('num-' + i);
+      num.textContent = i;
+      if (i === 1) {
+        card.classList.add('active');
+        num.className = 'step-num active-num';
+      } else {
+        card.classList.add('locked');
+        num.className = 'step-num pending';
+      }
+    }
+    document.getElementById('btn-2').disabled = true;
+    document.getElementById('btn-3').disabled = true;
+    document.getElementById('brachHint').style.display = 'none';
+    document.getElementById('ankleHint').style.display = 'none';
+    document.getElementById('resultBody').innerHTML = '';
+    currentStep = 1;
+    maxUnlocked = 1;
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Set default date
+  document.getElementById('assessDate').valueAsDate = new Date();
+  updateProgress();
+</script>
+</body>
+</html>
