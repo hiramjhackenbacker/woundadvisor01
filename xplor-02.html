@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Xplor — Trailer Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c26;
+    --surface2: #1e2433;
+    --border: #2a3045;
+    --accent: #f4a22d;
+    --accent2: #3ecf8e;
+    --danger: #ff5b5b;
+    --warn: #ffb547;
+    --text: #e8ecf4;
+    --text2: #8a94ad;
+    --text3: #5a637a;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; overflow: hidden; }
+
+  #app { display: flex; flex-direction: column; height: 100dvh; }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px 8px; background: var(--surface);
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+    position: relative; overflow: hidden; min-height: 58px;
+  }
+  #topbar-trailer {
+    position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+    height: 110%; opacity: 0.18; pointer-events: none;
+    filter: grayscale(30%);
+  }
+  #topbar .logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem;
+    letter-spacing: -0.5px; color: var(--accent); position: relative; z-index: 1;
+  }
+  #topbar .logo span { color: var(--text2); font-weight: 400; font-size: .72rem; display: block; letter-spacing: .5px; }
+  #topbar .tare-badge {
+    background: rgba(30,36,51,0.85); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 11px; font-size: .65rem; color: var(--text2);
+    text-align: right; position: relative; z-index: 1; backdrop-filter: blur(4px);
+  }
+  #topbar .tare-badge strong { color: var(--accent); font-size: .82rem; display: block; }
+
+  /* ── TABS ── */
+  #tabs {
+    display: flex; background: var(--surface); border-bottom: 1px solid var(--border);
+    flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
+  }
+  #tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 1; min-width: 62px; padding: 9px 3px 7px;
+    background: none; border: none; color: var(--text3); font-family: 'DM Mono', monospace;
+    font-size: .58rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn .icon { font-size: 1rem; }
+
+  #content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+  .page { display: none; animation: fadeIn .2s ease; padding-bottom: 80px; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── FOOTER WEIGHT SETTINGS ── */
+  #weight-footer {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 8px 14px; flex-shrink: 0; display: none;
+  }
+  #weight-footer.visible { display: block; }
+  .footer-inner { display: flex; align-items: center; gap: 10px; }
+  .footer-inner label { font-size: .62rem; color: var(--text3); white-space: nowrap; }
+  .footer-inner input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 6px 8px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .75rem; outline: none; width: 70px;
+  }
+  .footer-inner input:focus { border-color: var(--accent); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin: 10px 14px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .78rem;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--text2); margin-bottom: 12px;
+  }
+
+  /* ── WEIGHT PAGE ── */
+  .weight-hero {
+    background: linear-gradient(135deg, #1a1f30, #161b28);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    margin: 10px 14px; padding: 16px;
+    display: grid; grid-template-columns: 1fr; gap: 10px;
+  }
+  .w-stat { text-align: center; }
+  .w-stat .val {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; line-height: 1;
+    transition: color .3s;
+  }
+  .w-stat .lbl { font-size: .6rem; color: var(--text3); letter-spacing: .8px; text-transform: uppercase; margin-top: 3px; }
+  .w-bar-wrap { }
+  .w-bar-bg { background: var(--surface2); border-radius: 999px; height: 8px; overflow: hidden; }
+  .w-bar-fill { height: 100%; border-radius: 999px; background: var(--accent2); transition: width .4s ease, background .3s; }
+  .w-bar-lbl { display: flex; justify-content: space-between; font-size: .6rem; color: var(--text3); margin-top: 4px; }
+
+  /* ── WEIGHT SECTION HEADERS ── */
+  .weight-section-hdr {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px 4px; margin-top: 4px;
+  }
+  .weight-section-hdr .wsh-label {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .72rem;
+    text-transform: uppercase; letter-spacing: 1.2px; color: var(--accent);
+  }
+  .weight-section-hdr .wsh-line { flex: 1; height: 1px; background: var(--border); }
+  .weight-section-hdr .wsh-subtotal { font-size: .65rem; color: var(--text3); }
+
+  .weight-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .weight-item:last-child { border-bottom: none; }
+  .wi-check {
+    width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+    background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: all .15s; font-size: .75rem;
+  }
+  .wi-check.on { background: var(--accent2); border-color: var(--accent2); color: #0f1117; }
+  .wi-name { flex: 1; font-size: .78rem; color: var(--text); }
+  .wi-name.off { color: var(--text3); text-decoration: line-through; }
+  .wi-kg { font-size: .78rem; color: var(--accent); font-weight: 500; min-width: 44px; text-align: right; }
+  .wi-edit { background: none; border: none; color: var(--text3); font-size: .82rem; cursor: pointer; padding: 4px; }
+  .wi-del { background: none; border: none; color: var(--danger); font-size: .72rem; cursor: pointer; padding: 4px; opacity: .6; }
+
+  .add-item-row { display: flex; gap: 8px; padding: 10px 14px 14px; }
+  .add-item-row input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 10px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .75rem; outline: none;
+  }
+  .add-item-row input:focus { border-color: var(--accent); }
+  .add-item-row input::placeholder { color: var(--text3); }
+  .add-cat-sel {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 6px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .68rem; outline: none; width: 92px;
+  }
+  .btn-add {
+    background: var(--accent); color: #0f1117; border: none; border-radius: var(--radius-sm);
+    padding: 8px 14px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .8rem; cursor: pointer;
+  }
+
+  /* ── COSTS ── */
+  .cost-hero {
+    background: linear-gradient(135deg, #1a1f30, #161b28);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    margin: 10px 14px; padding: 16px;
+  }
+  .cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .cost-stat .val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; color: var(--accent); }
+  .cost-stat .lbl { font-size: .6rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .cost-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: .74rem; }
+  .cost-row:last-child { border-bottom: none; }
+  .cost-label { color: var(--text2); }
+  .cost-value { color: var(--text); font-weight: 500; }
+  .cost-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cost-form input, .cost-form select {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 10px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .72rem; outline: none; width: 100%;
+  }
+  .cost-form input:focus, .cost-form select:focus { border-color: var(--accent); }
+  .cost-form .full { grid-column: 1/-1; }
+  .cost-form select option { background: var(--surface2); }
+
+  /* ── LOCATIONS ── */
+  .loc-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    margin: 8px 14px; overflow: hidden;
+  }
+  .loc-header { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .loc-header .loc-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .88rem; }
+  .loc-header .loc-meta { font-size: .63rem; color: var(--text3); margin-top: 2px; }
+  .loc-badge { font-size: .58rem; padding: 3px 8px; border-radius: 999px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+  .badge-visited { background: rgba(62,207,142,.12); color: var(--accent2); border: 1px solid rgba(62,207,142,.3); }
+  .badge-booked { background: rgba(244,162,45,.12); color: var(--accent); border: 1px solid rgba(244,162,45,.3); }
+  .badge-prospect { background: rgba(138,148,173,.12); color: var(--text2); border: 1px solid rgba(138,148,173,.2); }
+  .loc-body { padding: 0 14px 14px; display: none; }
+  .loc-body.open { display: block; }
+  .loc-detail { font-size: .72rem; color: var(--text2); line-height: 1.6; }
+  .loc-detail strong { color: var(--text); }
+  .rating-row { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .rating-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: .62rem; color: var(--text2); }
+  .rating-chip .r { color: var(--accent); }
+  .tag { display: inline-block; background: rgba(244,162,45,.1); border: 1px solid rgba(244,162,45,.2); color: var(--accent); border-radius: 4px; font-size: .6rem; padding: 2px 6px; margin: 2px 2px 0 0; }
+  .loc-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .map-link { color: var(--accent2); text-decoration: none; font-size: .72rem; }
+
+  /* ── BUTTONS ── */
+  .btn-sm {
+    font-size: .65rem; padding: 5px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'DM Mono', monospace; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); transition: all .15s;
+  }
+  .btn-sm.danger { border-color: rgba(255,91,91,.3); color: var(--danger); }
+  .btn-sm.primary { background: var(--accent); border-color: var(--accent); color: #0f1117; font-weight: 700; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 4px; }
+  .section-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+  .btn-new { background: var(--accent); color: #0f1117; border: none; border-radius: var(--radius-sm); padding: 7px 12px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .72rem; cursor: pointer; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text3); font-size: .78rem; }
+  .empty-state .icon { font-size: 2rem; margin-bottom: 8px; }
+
+  /* ── INSIGHTS ── */
+  .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 14px; }
+  .insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .insight-card .i-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--accent2); }
+  .insight-card .i-lbl { font-size: .6rem; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; margin-top: 3px; }
+  .tip-card { background: rgba(62,207,142,.06); border: 1px solid rgba(62,207,142,.2); border-radius: var(--radius); padding: 14px; margin: 8px 14px; }
+  .tip-card .tip-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem; color: var(--accent2); margin-bottom: 6px; }
+  .tip-card p { font-size: .72rem; color: var(--text2); line-height: 1.5; }
+
+  /* ── GUIDES PAGE ── */
+  .guide-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    margin: 8px 14px; padding: 14px; display: flex; align-items: center; gap: 12px;
+  }
+  .guide-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .guide-info { flex: 1; min-width: 0; }
+  .guide-name { font-size: .82rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .guide-meta { font-size: .62rem; color: var(--text3); margin-top: 2px; }
+  .guide-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .drop-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius); margin: 10px 14px;
+    padding: 28px 20px; text-align: center; color: var(--text3); font-size: .78rem;
+    cursor: pointer; transition: border-color .2s, background .2s;
+  }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(244,162,45,.05); color: var(--accent); }
+  .drop-zone .dz-icon { font-size: 2rem; margin-bottom: 8px; }
+  #guide-file-input { display: none; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.78); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn .15s ease;
+  }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%; max-width: 520px; padding: 20px; max-height: 92dvh; overflow-y: auto;
+    animation: slideUp .2s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(40px); } to { transform: translateY(0); } }
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; margin-bottom: 16px; color: var(--text); }
+  .form-group { margin-bottom: 11px; }
+  .form-group label { font-size: .62rem; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; display: block; margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px 11px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: .78rem; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group textarea { resize: vertical; min-height: 65px; }
+  .form-group select option { background: var(--surface2); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-cancel { flex: 1; padding: 11px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: none; color: var(--text2); font-family: 'DM Mono', monospace; font-size: .8rem; cursor: pointer; }
+  .btn-save { flex: 2; padding: 11px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: #0f1117; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; cursor: pointer; }
+  .star-input { display: flex; gap: 4px; }
+  .star-input span { font-size: 1.3rem; cursor: pointer; color: var(--text3); transition: color .1s; }
+  .star-input span.on { color: var(--accent); }
+
+  /* ── DRUM PICKER (scrolling number selector) ── */
+  .drum-picker-wrap { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .drum-col { display: flex; flex-direction: column; align-items: center; }
+  .drum-col .drum-lbl { font-size: .58rem; color: var(--text3); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 4px; }
+  .drum {
+    height: 120px; width: 60px; overflow: hidden; position: relative;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    cursor: pointer; user-select: none;
+  }
+  .drum-inner { position: absolute; top: 0; left: 0; right: 0; transition: transform .15s ease; }
+  .drum-item {
+    height: 40px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: .9rem; color: var(--text3);
+    transition: color .1s, font-size .1s;
+  }
+  .drum-item.selected { color: var(--accent); font-size: 1rem; }
+  .drum::before, .drum::after {
+    content: ''; position: absolute; left: 0; right: 0; height: 38px; z-index: 2; pointer-events: none;
+  }
+  .drum::before { top: 0; background: linear-gradient(to bottom, var(--surface2), transparent); }
+  .drum::after { bottom: 0; background: linear-gradient(to top, var(--surface2), transparent); }
+  .drum-highlight {
+    position: absolute; top: 40px; left: 0; right: 0; height: 40px; z-index: 1;
+    border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent);
+    background: rgba(244,162,45,.07); pointer-events: none;
+  }
+  .drum-sep { font-size: 1.2rem; color: var(--text2); font-weight: 700; padding-bottom: 0; margin-top: 20px; }
+
+  /* weight ok/warn/over */
+  .ok .val { color: var(--accent2); }
+  .warn-state .val { color: var(--warn); }
+  .over-state .val { color: var(--danger); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <img id="topbar-trailer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 160'%3E%3Crect x='80' y='30' width='290' height='90' rx='18' fill='%23ccc'/%3E%3Crect x='80' y='30' width='160' height='90' rx='18' fill='%23555'/%3E%3Ccircle cx='180' cy='140' r='22' fill='%23888' stroke='%23444' stroke-width='4'/%3E%3Ccircle cx='180' cy='140' r='10' fill='%23555'/%3E%3Ccircle cx='340' cy='140' r='22' fill='%23888' stroke='%23444' stroke-width='4'/%3E%3Ccircle cx='340' cy='140' r='10' fill='%23555'/%3E%3Crect x='0' y='75' width='90' height='8' rx='4' fill='%23777'/%3E%3Crect x='20' y='83' width='8' height='60' rx='3' fill='%23777'/%3E%3Ccircle cx='24' cy='148' r='10' fill='%23888'/%3E%3C/svg%3E" alt="" />
+    <div class="logo">XPLOR<span>Trailer Companion</span></div>
+    <div class="tare-badge">Selected<strong id="tare-display">850.0 kg</strong></div>
+  </div>
+
+  <!-- TABS -->
+  <div id="tabs">
+    <button class="tab-btn active" onclick="showPage('weight')" id="tab-weight"><span class="icon">⚖️</span>WEIGHT</button>
+    <button class="tab-btn" onclick="showPage('costs')" id="tab-costs"><span class="icon">💰</span>COSTS</button>
+    <button class="tab-btn" onclick="showPage('visited')" id="tab-visited"><span class="icon">📍</span>VISITED</button>
+    <button class="tab-btn" onclick="showPage('booked')" id="tab-booked"><span class="icon">📅</span>BOOKED</button>
+    <button class="tab-btn" onclick="showPage('wishlist')" id="tab-wishlist"><span class="icon">🗺️</span>WISHLIST</button>
+    <button class="tab-btn" onclick="showPage('guides')" id="tab-guides"><span class="icon">📚</span>GUIDES</button>
+    <button class="tab-btn" onclick="showPage('insights')" id="tab-insights"><span class="icon">📊</span>INSIGHTS</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ══ WEIGHT ══ -->
+    <div class="page active" id="page-weight">
+      <div class="weight-hero" id="weight-hero">
+        <div class="w-stat">
+          <div class="val" id="w-total">0.0 <span style="font-size:.75rem;font-weight:400;color:var(--text3)">kg</span></div>
+          <div class="lbl">Current Selected KG</div>
+        </div>
+        <div class="w-bar-wrap">
+          <div class="w-bar-bg"><div class="w-bar-fill" id="w-bar" style="width:0%"></div></div>
+          <div class="w-bar-lbl"><span id="w-pct">0%</span><span id="w-limit-lbl">of limit</span></div>
+        </div>
+      </div>
+
+      <!-- Grouped items -->
+      <div id="weight-list"></div>
+
+      <div class="add-item-row">
+        <input type="text" id="new-item-name" placeholder="New item name…" oninput="autoSentenceCase(this)" />
+        <input type="number" id="new-item-kg" placeholder="kg" style="width:64px;" />
+        <select class="add-cat-sel" id="new-item-cat">
+          <option value="hardware">Hardware</option>
+          <option value="addons">Add-ons</option>
+          <option value="consumables">Consumables</option>
+          <option value="personal">Personal</option>
+        </select>
+        <button class="btn-add" onclick="addWeightItem()">+</button>
+      </div>
+    </div>
+
+    <!-- ══ COSTS ══ -->
+    <div class="page" id="page-costs">
+      <div class="cost-hero">
+        <div class="cost-grid">
+          <div class="cost-stat"><div class="val" id="cost-total">$0</div><div class="lbl">Grand Total</div></div>
+          <div class="cost-stat"><div class="val" id="cost-per-night">$0</div><div class="lbl">Per Night</div></div>
+        </div>
+        <div id="cost-breakdown"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">➕ Add Cost Entry</div>
+        <div class="cost-form">
+          <input type="text" id="cost-name" placeholder="Description" class="full" oninput="autoSentenceCase(this)" />
+          <input type="number" id="cost-amount" placeholder="Amount ($)" />
+          <select id="cost-cat">
+            <option value="purchase">Purchase</option>
+            <option value="rego">Rego / Licence</option>
+            <option value="insurance">Insurance</option>
+            <option value="service">Service / Repair</option>
+            <option value="accessory">Accessory</option>
+            <option value="camping">Camping / Site</option>
+            <option value="fuel">Fuel</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="number" id="cost-nights" placeholder="Nights (opt.)" />
+          <button class="btn-add full" onclick="addCostEntry()">Add Entry</button>
+        </div>
+      </div>
+      <div class="section-header"><h3>Cost Log</h3></div>
+      <div id="cost-list"></div>
+    </div>
+
+    <!-- ══ VISITED ══ -->
+    <div class="page" id="page-visited">
+      <div class="section-header"><h3>📍 Visited Locations</h3><button class="btn-new" onclick="openLocModal('visited')">+ Add</button></div>
+      <div id="visited-list"></div>
+    </div>
+
+    <!-- ══ BOOKED ══ -->
+    <div class="page" id="page-booked">
+      <div class="section-header"><h3>📅 Future Bookings</h3><button class="btn-new" onclick="openLocModal('booked')">+ Add</button></div>
+      <div id="booked-list"></div>
+    </div>
+
+    <!-- ══ WISHLIST ══ -->
+    <div class="page" id="page-wishlist">
+      <div class="section-header"><h3>🗺️ Prospective Locations</h3><button class="btn-new" onclick="openLocModal('wishlist')">+ Add</button></div>
+      <div id="wishlist-list"></div>
+    </div>
+
+    <!-- ══ GUIDES ══ -->
+    <div class="page" id="page-guides">
+      <div class="section-header"><h3>📚 Manuals & Guides</h3></div>
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('guide-file-input').click()"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleGuideDrop(event)">
+        <div class="dz-icon">📁</div>
+        <div>Tap to add PDF, JPG, PNG or other files</div>
+        <div style="font-size:.65rem;margin-top:4px;color:var(--text3)">Files stored in your browser — no upload needed</div>
+      </div>
+      <input type="file" id="guide-file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.txt,.doc,.docx" onchange="handleGuideFiles(this.files)" />
+      <div id="guides-list"></div>
+      <div class="card" style="margin-top:10px;">
+        <div class="card-title">💡 Tips</div>
+        <div style="font-size:.72rem;color:var(--text2);line-height:1.7;">
+          • PDFs and images are stored in your browser's local storage<br>
+          • For large files, bookmark the manufacturer's website instead<br>
+          • Tap any file to view it in a new tab<br>
+          • Add a note to each guide for quick reference
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ INSIGHTS ══ -->
+    <div class="page" id="page-insights">
+      <div style="padding:12px 14px 4px;"><div class="card-title">📊 Summary & Insights</div></div>
+      <div class="insight-grid" id="insights-grid"></div>
+      <div id="insights-tips"></div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- WEIGHT FOOTER (settings) -->
+  <div id="weight-footer">
+    <div class="footer-inner">
+      <label>GVM Limit</label>
+      <input type="number" id="limit-input" value="1200" oninput="updateWeightUI()" />
+      <label>kg</label>
+      <label style="margin-left:6px;">Tare</label>
+      <input type="number" id="tare-input" value="850" oninput="updateTare()" />
+      <label>kg</label>
+      <span style="flex:1;text-align:right;font-size:.62rem;color:var(--text3)" id="footer-headroom"></span>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ══ LOCATION MODAL ══ -->
+<div class="modal-overlay" id="loc-modal" style="display:none;" onclick="closeLocModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">Add Location</div>
+    <input type="hidden" id="modal-type" />
+    <input type="hidden" id="modal-edit-id" />
+    <div class="form-group"><label>Location Name *</label><input id="m-name" placeholder="E.g. Wilsons Prom NP" oninput="autoSentenceCase(this)" /></div>
+    <div class="form-group"><label>State / Region</label><input id="m-region" placeholder="E.g. VIC" /></div>
+    <div class="form-group"><label>Site Number / Name</label><input id="m-site" placeholder="E.g. Site 14B" oninput="autoSentenceCase(this)" /></div>
+    <div class="form-group"><label>Google Maps Link</label><input id="m-maps" placeholder="https://maps.google.com/…" /></div>
+
+    <!-- DRUM DATE PICKER -->
+    <div class="form-group" id="m-date-grp">
+      <label>Date</label>
+      <div class="drum-picker-wrap">
+        <div class="drum-col">
+          <div class="drum-lbl">Day</div>
+          <div class="drum" id="drum-day" onwheel="drumScroll(event,'day')" ontouchstart="drumTouchStart(event,'day')" ontouchmove="drumTouchMove(event,'day')" ontouchend="drumTouchEnd(event,'day')">
+            <div class="drum-highlight"></div>
+            <div class="drum-inner" id="drum-day-inner"></div>
+          </div>
+        </div>
+        <span class="drum-sep">/</span>
+        <div class="drum-col">
+          <div class="drum-lbl">Month</div>
+          <div class="drum" id="drum-month" onwheel="drumScroll(event,'month')" ontouchstart="drumTouchStart(event,'month')" ontouchmove="drumTouchMove(event,'month')" ontouchend="drumTouchEnd(event,'month')">
+            <div class="drum-highlight"></div>
+            <div class="drum-inner" id="drum-month-inner"></div>
+          </div>
+        </div>
+        <span class="drum-sep">/</span>
+        <div class="drum-col">
+          <div class="drum-lbl">Year</div>
+          <div class="drum" id="drum-year" onwheel="drumScroll(event,'year')" ontouchstart="drumTouchStart(event,'year')" ontouchmove="drumTouchMove(event,'year')" ontouchend="drumTouchEnd(event,'year')">
+            <div class="drum-highlight"></div>
+            <div class="drum-inner" id="drum-year-inner"></div>
+          </div>
+        </div>
+      </div>
+      <div id="drum-date-display" style="text-align:center;font-size:.7rem;color:var(--text3);margin-top:6px;"></div>
+    </div>
+
+    <div class="form-group" id="m-nights-grp"><label>Nights Stayed</label><input id="m-nights" type="number" placeholder="E.g. 3" /></div>
+    <div class="form-group" id="m-cost-grp"><label>Cost Per Night ($)</label><input id="m-cost" type="number" placeholder="E.g. 45" /></div>
+    <div class="form-group" id="m-deposit-grp"><label>Deposit Paid ($)</label><input id="m-deposit" type="number" placeholder="E.g. 50" /></div>
+    <div class="form-group" id="m-fac-grp">
+      <label>Facilities Rating</label>
+      <div class="star-input" id="m-fac-stars">
+        <span onclick="setStar('fac',1)" data-i="1">★</span><span onclick="setStar('fac',2)" data-i="2">★</span>
+        <span onclick="setStar('fac',3)" data-i="3">★</span><span onclick="setStar('fac',4)" data-i="4">★</span>
+        <span onclick="setStar('fac',5)" data-i="5">★</span>
+      </div>
+    </div>
+    <div class="form-group" id="m-overall-grp">
+      <label>Overall Rating</label>
+      <div class="star-input" id="m-overall-stars">
+        <span onclick="setStar('overall',1)" data-i="1">★</span><span onclick="setStar('overall',2)" data-i="2">★</span>
+        <span onclick="setStar('overall',3)" data-i="3">★</span><span onclick="setStar('overall',4)" data-i="4">★</span>
+        <span onclick="setStar('overall',5)" data-i="5">★</span>
+      </div>
+    </div>
+    <div class="form-group" id="m-others-grp"><label>Other Good Sites Nearby</label><input id="m-others" placeholder="E.g. Sandy Point, Tidal River" oninput="autoSentenceCase(this)" /></div>
+    <div class="form-group"><label>Notes</label><textarea id="m-notes" placeholder="Access notes, tips, what to bring…"></textarea></div>
+    <div class="form-group" id="m-booking-grp"><label>Booking Reference / URL</label><input id="m-booking" placeholder="E.g. Parks Victoria ref # or URL" /></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLocModal()">Cancel</button>
+      <button class="btn-save" onclick="saveLocation()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE VIEW MODAL -->
+<div class="modal-overlay" id="guide-modal" style="display:none;" onclick="document.getElementById('guide-modal').style.display='none'">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:85dvh;">
+    <div class="modal-title" id="guide-modal-title">View Guide</div>
+    <div id="guide-modal-body"></div>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="btn-cancel" onclick="document.getElementById('guide-modal').style.display='none'">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const KEY = 'xplor_v3';
+let state = {
+  weightLimit: 1200,
+  tare: 850,
+  items: [
+    // hardware
+    {id:1, name:'Tare (trailer base)', kg:850, on:true, fixed:true, cat:'hardware'},
+    {id:2, name:'Rear bike hitch', kg:9.0, on:true, cat:'hardware'},
+    {id:3, name:'ISI rear bike carrier', kg:12.0, on:true, cat:'hardware'},
+    {id:4, name:'Pegs – self tapping', kg:1.1, on:false, cat:'hardware'},
+    // addons
+    {id:5, name:'Family sub-tent', kg:11.3, on:false, cat:'addons'},
+    {id:6, name:'Annex walls', kg:11.4, on:true, cat:'addons'},
+    {id:7, name:'Awning roof', kg:5.1, on:true, cat:'addons'},
+    {id:8, name:'Front awning', kg:5.8, on:true, cat:'addons'},
+    {id:9, name:'Poles, pegs & bag', kg:4.0, on:true, cat:'addons'},
+    {id:10, name:'S.steel ext. table', kg:8.5, on:true, cat:'addons'},
+    {id:11, name:'Poles', kg:8.7, on:true, cat:'addons'},
+    {id:12, name:'Groundsheet', kg:2.0, on:false, cat:'addons'},
+    {id:13, name:'Enduro mat', kg:3.2, on:true, cat:'addons'},
+    {id:14, name:'Baby Q BBQ', kg:12.0, on:true, cat:'addons'},
+    {id:15, name:'Pizza stone', kg:1.6, on:true, cat:'addons'},
+    {id:16, name:'Solar mat', kg:11.0, on:true, cat:'addons'},
+    {id:17, name:'Stretcher x2', kg:8.0, on:false, cat:'addons'},
+    {id:18, name:'Family table & benches', kg:18.0, on:true, cat:'addons'},
+    {id:19, name:'Tool bag (black)', kg:6.0, on:true, cat:'addons'},
+    // consumables
+    {id:20, name:'Toaster & kettle', kg:2.3, on:true, cat:'consumables'},
+    {id:21, name:'Crockery box', kg:3.0, on:true, cat:'consumables'},
+    {id:22, name:'Games box', kg:4.0, on:true, cat:'consumables'},
+    {id:23, name:'Electricals box', kg:3.5, on:true, cat:'consumables'},
+    {id:24, name:'Wet bottles box', kg:5.0, on:true, cat:'consumables'},
+    {id:25, name:'Wine x6', kg:8.5, on:false, cat:'consumables'},
+    {id:26, name:'1st aid kit', kg:2.3, on:true, cat:'consumables'},
+    {id:27, name:'Cords etc. box', kg:4.7, on:true, cat:'consumables'},
+    {id:28, name:'Bike locks & tool box', kg:3.5, on:true, cat:'consumables'},
+    {id:29, name:'Box plates & cookware', kg:9.0, on:true, cat:'consumables'},
+    {id:30, name:'Cutlery set', kg:0.8, on:true, cat:'consumables'},
+    // personal
+    {id:31, name:'Clothes bag x4', kg:32.0, on:false, cat:'personal'},
+    {id:32, name:'Clothes bag x2', kg:16.0, on:true, cat:'personal'},
+  ],
+  costs: [
+    {id:1, name:'Trailer purchase', amount:41000, cat:'purchase', nights:0},
+    {id:2, name:'Rego', amount:65, cat:'rego', nights:0},
+    {id:3, name:'Insurance', amount:330, cat:'insurance', nights:0},
+    {id:4, name:'Service', amount:572.22, cat:'service', nights:0},
+    {id:5, name:'Bike rack rear hitch', amount:375, cat:'accessory', nights:0},
+    {id:6, name:'Bike rack rear mount & plug', amount:250, cat:'accessory', nights:0},
+    {id:7, name:'ISI rear bicycle carrier', amount:896, cat:'accessory', nights:0},
+    {id:8, name:'Weber Baby Q', amount:372, cat:'accessory', nights:0},
+    {id:9, name:'HardKorr LED strips x2', amount:70, cat:'accessory', nights:0},
+  ],
+  totalNights: 8,
+  locations: [],
+  guides: [],
+  nextId: 200,
+};
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+function load() {
+  try { const d=localStorage.getItem(KEY); if(d){const p=JSON.parse(d);state={...state,...p};} } catch(e){}
+}
+
+// ══════════════════════════════════════════════
+// SENTENCE CASE
+// ══════════════════════════════════════════════
+function toSentenceCase(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+function autoSentenceCase(el) {
+  const v = el.value;
+  if (v.length === 1) el.value = v.toUpperCase();
+}
+
+// ══════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('weight-footer').classList.toggle('visible', id==='weight');
+  if (id==='insights') renderInsights();
+  if (id==='costs') renderCosts();
+  if (id==='guides') renderGuides();
+}
+
+// ══════════════════════════════════════════════
+// DRUM DATE PICKER
+// ══════════════════════════════════════════════
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let drumState = { day:1, month:1, year:2025 };
+let touchStart = {};
+
+function initDrum() {
+  const now = new Date();
+  drumState.day = now.getDate();
+  drumState.month = now.getMonth()+1;
+  drumState.year = now.getFullYear();
+
+  // Build day items 1–31
+  buildDrumItems('day', Array.from({length:31},(_,i)=>(i+1).toString().padStart(2,'0')), drumState.day-1);
+  // Build month items
+  buildDrumItems('month', MONTHS, drumState.month-1);
+  // Build year items (current-2 to current+5)
+  const years = Array.from({length:8},(_,i)=>String(now.getFullYear()-2+i));
+  buildDrumItems('year', years, 2);
+  drumState.year = now.getFullYear();
+  updateDrumDisplay();
+}
+
+function buildDrumItems(type, items, selectedIdx) {
+  const inner = document.getElementById('drum-'+type+'-inner');
+  // Add padding items top/bottom so selected always centres
+  const padded = ['','', ...items, '',''];
+  inner.innerHTML = padded.map((v,i)=>`<div class="drum-item${i-2===selectedIdx?' selected':''}" data-val="${v}">${v}</div>`).join('');
+  inner.style.transform = `translateY(${-selectedIdx * 40}px)`;
+  inner._idx = selectedIdx;
+  inner._items = items;
+}
+
+function drumScroll(e, type) {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 1 : -1;
+  moveDrum(type, delta);
+}
+
+function drumTouchStart(e, type) {
+  touchStart[type] = e.touches[0].clientY;
+}
+function drumTouchMove(e, type) { e.preventDefault(); }
+function drumTouchEnd(e, type) {
+  const diff = touchStart[type] - e.changedTouches[0].clientY;
+  if (Math.abs(diff) > 8) moveDrum(type, diff > 0 ? 1 : -1);
+}
+
+function moveDrum(type, delta) {
+  const inner = document.getElementById('drum-'+type+'-inner');
+  const items = inner._items;
+  let idx = inner._idx + delta;
+  if (idx < 0) idx = 0;
+  if (idx >= items.length) idx = items.length-1;
+  inner._idx = idx;
+  inner.style.transform = `translateY(${-idx * 40}px)`;
+  inner.querySelectorAll('.drum-item').forEach((el,i)=>{
+    el.classList.toggle('selected', i-2 === idx);
+  });
+  if (type==='day') drumState.day = parseInt(items[idx]);
+  else if (type==='month') drumState.month = MONTHS.indexOf(items[idx])+1;
+  else if (type==='year') drumState.year = parseInt(items[idx]);
+  updateDrumDisplay();
+}
+
+function updateDrumDisplay() {
+  const d = document.getElementById('drum-date-display');
+  if (d) {
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    d.textContent = `${drumState.day} ${months[drumState.month-1]} ${drumState.year}`;
+  }
+}
+
+function getDrumDate() {
+  return `${drumState.year}-${String(drumState.month).padStart(2,'0')}-${String(drumState.day).padStart(2,'0')}`;
+}
+
+function setDrumDate(dateStr) {
+  if (!dateStr) { initDrum(); return; }
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) { initDrum(); return; }
+  const y = parseInt(parts[0]), m = parseInt(parts[1]), d = parseInt(parts[2]);
+  drumState.day=d; drumState.month=m; drumState.year=y;
+  // Update day drum
+  const dayInner = document.getElementById('drum-day-inner');
+  if (dayInner && dayInner._items) {
+    const idx = d - 1;
+    dayInner._idx = idx;
+    dayInner.style.transform = `translateY(${-idx*40}px)`;
+    dayInner.querySelectorAll('.drum-item').forEach((el,i)=>el.classList.toggle('selected',i-2===idx));
+  }
+  // Update month drum
+  const monInner = document.getElementById('drum-month-inner');
+  if (monInner && monInner._items) {
+    const idx = m - 1;
+    monInner._idx = idx;
+    monInner.style.transform = `translateY(${-idx*40}px)`;
+    monInner.querySelectorAll('.drum-item').forEach((el,i)=>el.classList.toggle('selected',i-2===idx));
+  }
+  // Update year drum
+  const yrInner = document.getElementById('drum-year-inner');
+  if (yrInner && yrInner._items) {
+    const idx = yrInner._items.indexOf(String(y));
+    if (idx >= 0) {
+      yrInner._idx = idx;
+      yrInner.style.transform = `translateY(${-idx*40}px)`;
+      yrInner.querySelectorAll('.drum-item').forEach((el,i)=>el.classList.toggle('selected',i-2===idx));
+    }
+  }
+  updateDrumDisplay();
+}
+
+// ══════════════════════════════════════════════
+// WEIGHT
+// ══════════════════════════════════════════════
+const GROUPS = [
+  { key:'hardware', label:'Trailer Hardware', hint:'Mandatory towing & structural items' },
+  { key:'addons', label:'Add-ons', hint:'Shelter, furniture & accessories' },
+  { key:'consumables', label:'Consumables', hint:'Kitchen, boxes & equipment' },
+  { key:'personal', label:'Personal', hint:'Clothing & personal gear' },
+];
+
+function calcTotal() {
+  return state.items.reduce((s,i)=>s+(i.on?i.kg:0),0);
+}
+
+function updateTare() {
+  const v = parseFloat(document.getElementById('tare-input').value)||850;
+  state.tare = v;
+  const t = state.items.find(i=>i.fixed);
+  if (t) t.kg = v;
+  document.getElementById('tare-display').textContent = calcTotal().toFixed(1)+' kg';
+  updateWeightUI(); save();
+}
+
+function updateWeightUI() {
+  const limit = parseFloat(document.getElementById('limit-input').value)||1200;
+  state.weightLimit = limit;
+  const total = calcTotal();
+  const pct = Math.min((total/limit)*100,100);
+  document.getElementById('w-total').innerHTML = `${total.toFixed(1)} <span style="font-size:.75rem;font-weight:400;color:var(--text3)">kg</span>`;
+  document.getElementById('w-pct').textContent = Math.round(pct)+'%';
+  document.getElementById('w-limit-lbl').textContent = `of ${limit} kg GVM`;
+  document.getElementById('w-bar').style.width = pct+'%';
+  document.getElementById('tare-display').textContent = total.toFixed(1)+' kg';
+  const headroom = (limit - total).toFixed(1);
+  const fh = document.getElementById('footer-headroom');
+  if (fh) fh.textContent = `${headroom} kg headroom`;
+  const hero = document.getElementById('weight-hero');
+  const bar = document.getElementById('w-bar');
+  if (pct > 95) { bar.style.background='var(--danger)'; hero.className='weight-hero over-state'; }
+  else if (pct > 80) { bar.style.background='var(--warn)'; hero.className='weight-hero warn-state'; }
+  else { bar.style.background='var(--accent2)'; hero.className='weight-hero ok'; }
+}
+
+function renderWeightList() {
+  const container = document.getElementById('weight-list');
+  let html = '';
+  GROUPS.forEach(g => {
+    const items = state.items.filter(i=>i.cat===g.key);
+    const subtotal = items.filter(i=>i.on).reduce((s,i)=>s+i.kg,0);
+    html += `<div class="weight-section-hdr">
+      <span class="wsh-label">${g.label}</span>
+      <span class="wsh-line"></span>
+      <span class="wsh-subtotal">${subtotal.toFixed(1)} kg</span>
+    </div>`;
+    html += `<div class="weight-group-items" id="wg-${g.key}">`;
+    items.forEach(item => {
+      html += `<div class="weight-item" id="wi-${item.id}">
+        <div class="wi-check ${item.on?'on':''}" onclick="toggleItem(${item.id})">${item.on?'✓':''}</div>
+        <div class="wi-name${item.on?'':' off'}">${item.name}</div>
+        <div class="wi-kg">${item.kg?item.kg.toFixed(1)+' kg':'—'}</div>
+        ${item.fixed?'':'<button class="wi-edit" onclick="editItem('+item.id+')">✏️</button><button class="wi-del" onclick="deleteItem('+item.id+')">✕</button>'}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+  updateWeightUI();
+}
+
+function toggleItem(id) {
+  const item = state.items.find(i=>i.id===id);
+  if (!item || item.fixed) return;
+  item.on = !item.on;
+  renderWeightList(); save();
+}
+
+function addWeightItem() {
+  const name = toSentenceCase(document.getElementById('new-item-name').value.trim());
+  const kg = parseFloat(document.getElementById('new-item-kg').value);
+  const cat = document.getElementById('new-item-cat').value;
+  if (!name || isNaN(kg)) { alert('Enter name and weight.'); return; }
+  state.items.push({id:++state.nextId, name, kg, on:true, cat});
+  document.getElementById('new-item-name').value='';
+  document.getElementById('new-item-kg').value='';
+  renderWeightList(); save();
+}
+
+function editItem(id) {
+  const item = state.items.find(i=>i.id===id);
+  const n = prompt('Item name:', item.name); if(n===null) return;
+  const k = parseFloat(prompt('Weight (kg):', item.kg));
+  if(n.trim()) item.name=toSentenceCase(n.trim());
+  if(!isNaN(k)) item.kg=k;
+  renderWeightList(); save();
+}
+
+function deleteItem(id) {
+  if(!confirm('Remove this item?')) return;
+  state.items=state.items.filter(i=>i.id!==id);
+  renderWeightList(); save();
+}
+
+// ══════════════════════════════════════════════
+// COSTS
+// ══════════════════════════════════════════════
+function renderCosts() {
+  const total = state.costs.reduce((s,c)=>s+c.amount,0);
+  const nights = state.costs.reduce((s,c)=>s+(c.nights||0),0)||state.totalNights||1;
+  document.getElementById('cost-total').textContent='$'+fmtMoney(total);
+  document.getElementById('cost-per-night').textContent='$'+fmtMoney(total/nights);
+  const cats={};
+  state.costs.forEach(c=>{cats[c.cat]=(cats[c.cat]||0)+c.amount;});
+  const cl={purchase:'Purchase',rego:'Rego',insurance:'Insurance',service:'Service',accessory:'Accessories',camping:'Camping',fuel:'Fuel',other:'Other'};
+  document.getElementById('cost-breakdown').innerHTML=Object.entries(cats).map(([k,v])=>`
+    <div class="cost-row"><span class="cost-label">${cl[k]||k}</span><span class="cost-value">$${fmtMoney(v)}</span></div>`).join('');
+  document.getElementById('cost-list').innerHTML=state.costs.length?state.costs.map(c=>`
+    <div class="card" style="margin:6px 14px;padding:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:.82rem;font-weight:500;">${c.name}</div>
+          <div style="font-size:.63rem;color:var(--text3);margin-top:2px;">${cl[c.cat]||c.cat}${c.nights?' · '+c.nights+' nights':''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:.88rem;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;">$${fmtMoney(c.amount)}</div>
+          <button class="wi-del" onclick="deleteCost(${c.id})">✕</button>
+        </div>
+      </div>
+    </div>`).join(''):'<div class="empty-state"><div class="icon">💸</div>No costs yet</div>';
+}
+
+function addCostEntry() {
+  const name=toSentenceCase(document.getElementById('cost-name').value.trim());
+  const amount=parseFloat(document.getElementById('cost-amount').value);
+  const cat=document.getElementById('cost-cat').value;
+  const nights=parseInt(document.getElementById('cost-nights').value)||0;
+  if(!name||isNaN(amount)){alert('Enter description and amount.');return;}
+  state.costs.push({id:++state.nextId,name,amount,cat,nights});
+  if(nights) state.totalNights=(state.totalNights||0)+nights;
+  document.getElementById('cost-name').value='';
+  document.getElementById('cost-amount').value='';
+  document.getElementById('cost-nights').value='';
+  renderCosts(); save();
+}
+
+function deleteCost(id) {
+  if(!confirm('Delete this entry?')) return;
+  state.costs=state.costs.filter(c=>c.id!==id);
+  renderCosts(); save();
+}
+
+function fmtMoney(n) {
+  if(n>=1000) return (n/1000).toFixed(1)+'k';
+  return n.toFixed(2).replace(/\.00$/,'');
+}
+
+// ══════════════════════════════════════════════
+// LOCATIONS
+// ══════════════════════════════════════════════
+let facStar=0, overallStar=0;
+
+function openLocModal(type, id) {
+  facStar=0; overallStar=0;
+  document.getElementById('modal-type').value=type;
+  document.getElementById('modal-edit-id').value=id||'';
+  const titles={visited:'Add Visited Location',booked:'Add Future Booking',wishlist:'Add Prospective Location'};
+  document.getElementById('modal-title').textContent=id?'Edit Location':titles[type];
+  document.getElementById('m-fac-grp').style.display=type==='visited'?'':'none';
+  document.getElementById('m-overall-grp').style.display=type==='visited'?'':'none';
+  document.getElementById('m-cost-grp').style.display=type==='wishlist'?'none':'';
+  document.getElementById('m-nights-grp').style.display=type==='wishlist'?'none':'';
+  document.getElementById('m-deposit-grp').style.display=type==='booked'?'':'none';
+  document.getElementById('m-others-grp').style.display=type==='visited'?'':'none';
+  document.getElementById('m-booking-grp').style.display=type==='booked'?'':'none';
+  ['m-name','m-region','m-site','m-maps','m-nights','m-cost','m-deposit','m-others','m-notes','m-booking'].forEach(f=>{
+    const el=document.getElementById(f); if(el) el.value='';
+  });
+  setStarUI('fac',0); setStarUI('overall',0);
+  initDrum();
+  if(id){
+    const loc=state.locations.find(l=>l.id===id);
+    if(loc){
+      document.getElementById('m-name').value=loc.name||'';
+      document.getElementById('m-region').value=loc.region||'';
+      document.getElementById('m-site').value=loc.site||'';
+      document.getElementById('m-maps').value=loc.maps||'';
+      document.getElementById('m-nights').value=loc.nights||'';
+      document.getElementById('m-cost').value=loc.cost||'';
+      document.getElementById('m-deposit').value=loc.deposit||'';
+      document.getElementById('m-others').value=loc.others||'';
+      document.getElementById('m-notes').value=loc.notes||'';
+      document.getElementById('m-booking').value=loc.booking||'';
+      facStar=loc.facRating||0; overallStar=loc.overallRating||0;
+      setStarUI('fac',facStar); setStarUI('overall',overallStar);
+      if(loc.date) setTimeout(()=>setDrumDate(loc.date), 50);
+    }
+  }
+  document.getElementById('loc-modal').style.display='flex';
+}
+
+function closeLocModal(e) {
+  if(!e||e.target===document.getElementById('loc-modal'))
+    document.getElementById('loc-modal').style.display='none';
+}
+
+function setStar(type,val){
+  if(type==='fac') facStar=val; else overallStar=val;
+  setStarUI(type,val);
+}
+function setStarUI(type,val){
+  const c=document.getElementById('m-'+type+'-stars');
+  if(!c) return;
+  c.querySelectorAll('span').forEach(s=>s.classList.toggle('on',parseInt(s.dataset.i)<=val));
+}
+
+function saveLocation() {
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){alert('Location name required');return;}
+  const type=document.getElementById('modal-type').value;
+  const editId=document.getElementById('modal-edit-id').value;
+  const loc={
+    id: editId?parseInt(editId):++state.nextId, type,
+    name: toSentenceCase(name),
+    region: document.getElementById('m-region').value.trim(),
+    site: document.getElementById('m-site').value.trim(),
+    maps: document.getElementById('m-maps').value.trim(),
+    date: getDrumDate(),
+    nights: parseFloat(document.getElementById('m-nights').value)||0,
+    cost: parseFloat(document.getElementById('m-cost').value)||0,
+    deposit: parseFloat(document.getElementById('m-deposit').value)||0,
+    facRating: facStar, overallRating: overallStar,
+    others: document.getElementById('m-others').value.trim(),
+    notes: document.getElementById('m-notes').value.trim(),
+    booking: document.getElementById('m-booking').value.trim(),
+  };
+  if(editId){const idx=state.locations.findIndex(l=>l.id===parseInt(editId));if(idx>=0)state.locations[idx]=loc;}
+  else state.locations.push(loc);
+  document.getElementById('loc-modal').style.display='none';
+  renderLocations(type); save();
+}
+
+function renderLocations(type) {
+  const locs=state.locations.filter(l=>l.type===type);
+  const el=document.getElementById(type+'-list');
+  if(!el) return;
+  const bm={visited:'badge-visited',booked:'badge-booked',wishlist:'badge-prospect'};
+  const lm={visited:'Visited',booked:'Booked',wishlist:'Wishlist'};
+  if(!locs.length){el.innerHTML=`<div class="empty-state"><div class="icon">${type==='visited'?'📍':type==='booked'?'📅':'🗺️'}</div>No locations yet</div>`;return;}
+  el.innerHTML=locs.map(loc=>{
+    const dateStr=loc.date?loc.date.split('-').reverse().join('/'):'';
+    return `<div class="loc-card">
+      <div class="loc-header" onclick="toggleLoc(${loc.id})">
+        <div>
+          <div class="loc-name">${loc.name}${loc.region?' <span style="color:var(--text3);font-size:.73rem;">· '+loc.region+'</span>':''}</div>
+          <div class="loc-meta">${dateStr}${loc.nights?' · '+loc.nights+' nights':''}${loc.site?' · '+loc.site:''}</div>
+        </div>
+        <span class="loc-badge ${bm[type]}">${lm[type]}</span>
+      </div>
+      <div class="loc-body" id="locbody-${loc.id}">
+        <div class="loc-detail">
+          ${loc.maps?`<div><a class="map-link" href="${loc.maps}" target="_blank">🗺 Open in Google Maps</a></div>`:''}
+          ${loc.cost?`<div><strong>Cost:</strong> $${loc.cost.toFixed(2)}/night${loc.nights?' · Total: $'+(loc.cost*loc.nights).toFixed(2):''}</div>`:''}
+          ${loc.deposit?`<div><strong>Deposit paid:</strong> $${loc.deposit.toFixed(2)}</div>`:''}
+          ${(loc.facRating||loc.overallRating)?`<div class="rating-row">
+            ${loc.facRating?`<div class="rating-chip">Facilities <span class="r">${'★'.repeat(loc.facRating)+'☆'.repeat(5-loc.facRating)}</span></div>`:''}
+            ${loc.overallRating?`<div class="rating-chip">Overall <span class="r">${'★'.repeat(loc.overallRating)+'☆'.repeat(5-loc.overallRating)}</span></div>`:''}
+          </div>`:''}
+          ${loc.others?`<div style="margin-top:6px;"><strong>Other sites nearby:</strong><br/>${loc.others.split(',').map(s=>`<span class="tag">${s.trim()}</span>`).join('')}</div>`:''}
+          ${loc.booking?`<div style="margin-top:6px;"><strong>Booking ref:</strong> ${loc.booking.startsWith('http')?`<a class="map-link" href="${loc.booking}" target="_blank">View booking</a>`:loc.booking}</div>`:''}
+          ${loc.notes?`<div style="margin-top:6px;color:var(--text2);">${loc.notes}</div>`:''}
+        </div>
+        <div class="loc-actions">
+          <button class="btn-sm primary" onclick="openLocModal('${loc.type}',${loc.id})">✏️ Edit</button>
+          ${loc.maps?`<button class="btn-sm" onclick="window.open('${loc.maps}','_blank')">🗺 Maps</button>`:''}
+          <button class="btn-sm danger" onclick="deleteLocation(${loc.id},'${type}')">🗑 Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleLoc(id){const el=document.getElementById('locbody-'+id);if(el)el.classList.toggle('open');}
+function deleteLocation(id,type){if(!confirm('Delete?'))return;state.locations=state.locations.filter(l=>l.id!==id);renderLocations(type);save();}
+
+// ══════════════════════════════════════════════
+// GUIDES
+// ══════════════════════════════════════════════
+function handleGuideDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  handleGuideFiles(e.dataTransfer.files);
+}
+
+function handleGuideFiles(files) {
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const guide = {
+        id: ++state.nextId,
+        name: toSentenceCase(file.name),
+        type: file.type,
+        size: file.size,
+        data: ev.target.result,
+        note: '',
+        added: new Date().toISOString().split('T')[0],
+      };
+      state.guides.push(guide);
+      try { save(); } catch(e) {
+        // If too large for localStorage, store without data
+        guide.data = null;
+        guide.note = '[File too large — stored as reference only]';
+        save();
+      }
+      renderGuides();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function getGuideIcon(type) {
+  if (type.includes('pdf')) return '📄';
+  if (type.includes('image')) return '🖼️';
+  if (type.includes('word') || type.includes('document')) return '📝';
+  if (type.includes('text')) return '📋';
+  return '📎';
+}
+
+function renderGuides() {
+  const el = document.getElementById('guides-list');
+  if (!state.guides.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">📚</div>No guides yet — add your manuals above</div>';
+    return;
+  }
+  el.innerHTML = state.guides.map(g => `
+    <div class="guide-card">
+      <div class="guide-icon">${getGuideIcon(g.type)}</div>
+      <div class="guide-info">
+        <div class="guide-name">${g.name}</div>
+        <div class="guide-meta">${g.note||formatBytes(g.size)} · Added ${g.added}</div>
+      </div>
+      <div class="guide-actions">
+        ${g.data?`<button class="btn-sm primary" onclick="viewGuide(${g.id})">View</button>`:''}
+        <button class="btn-sm danger" onclick="deleteGuide(${g.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewGuide(id) {
+  const g = state.guides.find(x=>x.id===id);
+  if (!g || !g.data) return;
+  document.getElementById('guide-modal-title').textContent = g.name;
+  const body = document.getElementById('guide-modal-body');
+  if (g.type.includes('image')) {
+    body.innerHTML = `<img src="${g.data}" style="width:100%;border-radius:8px;" />`;
+  } else if (g.type.includes('pdf')) {
+    body.innerHTML = `<iframe src="${g.data}" style="width:100%;height:60dvh;border:none;border-radius:8px;"></iframe>`;
+  } else {
+    body.innerHTML = `<a href="${g.data}" download="${g.name}" style="color:var(--accent);font-size:.82rem;">⬇️ Download ${g.name}</a>`;
+  }
+  document.getElementById('guide-modal').style.display = 'flex';
+}
+
+function deleteGuide(id) {
+  if (!confirm('Remove this guide?')) return;
+  state.guides = state.guides.filter(g=>g.id!==id);
+  renderGuides(); save();
+}
+
+function formatBytes(b) {
+  if (!b) return '';
+  if (b < 1024) return b+'B';
+  if (b < 1048576) return (b/1024).toFixed(0)+'KB';
+  return (b/1048576).toFixed(1)+'MB';
+}
+
+// ══════════════════════════════════════════════
+// INSIGHTS
+// ══════════════════════════════════════════════
+function renderInsights() {
+  const total=calcTotal();
+  const totalCost=state.costs.reduce((s,c)=>s+c.amount,0);
+  const nights=state.costs.reduce((s,c)=>s+(c.nights||0),0)||state.totalNights||1;
+  const visitedCount=state.locations.filter(l=>l.type==='visited').length;
+  const bookedCount=state.locations.filter(l=>l.type==='booked').length;
+  const pct=Math.round((total/state.weightLimit)*100);
+  document.getElementById('insights-grid').innerHTML=`
+    <div class="insight-card"><div class="i-val">${total.toFixed(1)}<span style="font-size:.9rem">kg</span></div><div class="i-lbl">Selected Load</div></div>
+    <div class="insight-card"><div class="i-val">${pct}%</div><div class="i-lbl">of GVM Limit</div></div>
+    <div class="insight-card"><div class="i-val">$${fmtMoney(totalCost)}</div><div class="i-lbl">Total Spend</div></div>
+    <div class="insight-card"><div class="i-val">$${fmtMoney(totalCost/nights)}</div><div class="i-lbl">Per Night</div></div>
+    <div class="insight-card"><div class="i-val">${visitedCount}</div><div class="i-lbl">Sites Visited</div></div>
+    <div class="insight-card"><div class="i-val">${bookedCount}</div><div class="i-lbl">Upcoming Trips</div></div>`;
+  const tips=[];
+  const headroom=state.weightLimit-total;
+  if(pct>95) tips.push({t:'⚠️ Over GVM Warning',b:`At ${pct}% of your ${state.weightLimit}kg limit. Leave behind ${Math.ceil(-headroom+1)}kg+ before towing.`});
+  else if(pct>80) tips.push({t:'🟡 Weight Getting Heavy',b:`At ${pct}% with ${headroom.toFixed(1)}kg headroom. Clothes bags and wine are easiest to leave home.`});
+  else tips.push({t:'✅ Weight Looking Good',b:`${headroom.toFixed(1)}kg of spare capacity. Room for the family sub-tent and stretchers if needed.`});
+  if(nights<20) tips.push({t:'💡 Cost Per Night',b:`Only ${nights} nights logged. As you camp more, your cost-per-night will drop significantly — you're currently amortising over a small sample.`});
+  const top=[...state.items].filter(i=>!i.fixed).sort((a,b)=>b.kg-a.kg)[0];
+  if(top) tips.push({t:'📦 Heaviest Optional Item',b:`"${top.name}" at ${top.kg}kg. Toggle it off in the Weight tab to free up capacity.`});
+  document.getElementById('insights-tips').innerHTML=tips.map(t=>`
+    <div class="tip-card"><div class="tip-title">${t.t}</div><p>${t.b}</p></div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+load();
+initDrum();
+renderWeightList();
+renderCosts();
+['visited','booked','wishlist'].forEach(renderLocations);
+renderGuides();
+document.getElementById('limit-input').value=state.weightLimit;
+document.getElementById('tare-input').value=state.tare;
+updateWeightUI();
+// Show weight footer on load
+document.getElementById('weight-footer').classList.add('visible');
+</script>
+</body>
+</html>
