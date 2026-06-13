@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IV Furosemide — Nursing Decision Pathway</title>
+<style>
+  :root{--bg:#f5f7fa;--card:#ffffff;--muted:#6b7280;--accent:#0ea5a4;--danger:#ef4444;}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#0f1724}
+  .wrap{max-width:980px;margin:12px auto;padding:12px}
+  header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  h1{font-size:18px;margin:0}
+  .card{background:var(--card);border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06);margin-top:12px}
+  label{font-size:13px;color:var(--muted)}
+  input,select,textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef6;margin-top:6px;box-sizing:border-box}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .col{flex:1;min-width:140px}
+  button{background:var(--accent);color:white;border:none;padding:8px 10px;border-radius:8px;font-weight:600}
+  .btn-ghost{background:transparent;border:1px solid #e6eef6;color:var(--muted)}
+  .small{font-size:13px;color:var(--muted)}
+  .alert{padding:8px;border-radius:8px;margin-top:8px}
+  .warn{background:#fff7ed;border:1px solid #ffedd5;color:#92400e}
+  .danger{background:#fff1f2;border:1px solid #fecaca;color:#991b1b}
+  .ok{background:#ecfeff;border:1px solid #cffafe;color:#065f46}
+  pre{background:#0f1724;color:#e6eef6;padding:8px;border-radius:6px;overflow:auto}
+  .flow{margin-top:8px}
+  .compact{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+  footer{font-size:12px;color:var(--muted);margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>IV Furosemide — Nursing Decision Pathway</h1>
+    <div class="small">Decision support — configurable thresholds</div>
+  </header>
+
+  <section class="card" aria-label="patient-checks">
+    <div class="small">Step 1 — Admission & exclusion checks (based on supplied CHS HITH protocol)</div>
+    <div class="flow compact" style="margin-top:8px">
+      <div>
+        <label>Pre-existing diagnosis of CCF?</label>
+        <select id="hasCcf"><option value="">—</option><option>Yes</option><option>No</option></select>
+      </div>
+      <div>
+        <label>MEWS core vitals within 0-1 (stable)?</label>
+        <select id="mewsOk"><option value="">—</option><option>Yes</option><option>No</option></select>
+      </div>
+      <div>
+        <label>Acute pulmonary oedema (APO)?</label>
+        <select id="isApo"><option value="">—</option><option>No</option><option>Yes</option></select>
+      </div>
+      <div>
+        <label>Severe aortic stenosis (AVA &lt;1cm²)?</label>
+        <select id="aorticStenosis"><option value="">—</option><option>No</option><option>Yes</option></select>
+      </div>
+    </div>
+    <div style="margin-top:10px" class="small">If any absolute exclusion present (e.g., GFR &lt;20, severe aortic stenosis, severe hepatic failure, haemoglobin &lt;90 g/L) — not suitable for HITH </div>
+  </section>
+
+  <section class="card" aria-label="baseline-measures">
+    <div class="small">Step 2 — Baseline investigations (enter latest values)</div>
+    <div class="row" style="margin-top:8px">
+      <div class="col">
+        <label>eGFR (mL/min)</label><input id="egfr" type="number" step="0.1" placeholder="e.g., 45">
+      </div>
+      <div class="col">
+        <label>Potassium (K, mmol/L)</label><input id="k" type="number" step="0.1" placeholder="e.g., 4.1">
+      </div>
+      <div class="col">
+        <label>Sodium (Na, mmol/L)</label><input id="na" type="number" step="0.1" placeholder="e.g., 138">
+      </div>
+      <div class="col">
+        <label>Urea (mmol/L)</label><input id="urea" type="number" step="0.1">
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div class="col">
+        <label>Creatinine (µmol/L)</label><input id="creat" type="number" step="0.1">
+      </div>
+      <div class="col">
+        <label>Haemoglobin (g/L)</label><input id="hb" type="number">
+      </div>
+      <div class="col">
+        <label>ECG done prior to first dose?</label>
+        <select id="ecgDone"><option value="">—</option><option>Yes</option><option>No</option></select>
+      </div>
+      <div class="col">
+        <label>IV access type</label>
+        <select id="ivType"><option value="">—</option><option>IV cannula</option><option>PICC</option></select>
+      </div>
+    </div>
+
+    <div style="margin-top:10px" class="small">Default exclusion check and suggested action shown below; adjust thresholds under "Settings" if required.</div>
+    <div id="baselineAlert" class="alert" style="display:none"></div>
+  </section>
+
+  <section class="card" aria-label="vitals">
+    <div class="small">Step 3 — Vitals (before & after administration)</div>
+    <div class="row" style="margin-top:8px">
+      <div class="col"><label>Systolic BP (mmHg)</label><input id="sbp" type="number" step="1"></div>
+      <div class="col"><label>Heart rate (bpm)</label><input id="hr" type="number" step="1"></div>
+      <div class="col"><label>Respiratory rate (bpm)</label><input id="rr" type="number" step="1"></div>
+      <div class="col"><label>SpO2 (%)</label><input id="spo2" type="number" step="0.1"></div>
+    </div>
+    <div style="margin-top:8px" class="small">If hypotension (MEWS BP component ≥2) or symptomatic hypotension — correct prior to IV furosemide and escalate.</div>
+    <div id="vitalsAlert" class="alert" style="display:none"></div>
+  </section>
+
+  <section class="card" aria-label="lab-thresholds">
+    <div class="small">Settings — configurable thresholds (defaults are shown; confirm with local policy)</div>
+    <div class="row" style="margin-top:8px">
+      <div class="col"><label>Min eGFR to allow HITH</label><input id="cfgEgfr" type="number" value="20" step="1"></div>
+      <div class="col"><label>Hypokalaemia warn threshold (mmol/L)</label><input id="cfgKlowWarn" type="number" value="3.5" step="0.1"></div>
+      <div class="col"><label>Hypokalaemia urgent threshold (hold/replace) (mmol/L)</label><input id="cfgKlowHold" type="number" value="3.0" step="0.1"></div>
+      <div class="col"><label>Hyperkalaemia threshold (mmol/L)</label><input id="cfgKhigh" type="number" value="5.5" step="0.1"></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div class="col"><label>Min Hb (g/L)</label><input id="cfgHb" type="number" value="90"></div>
+      <div class="col"><label>Alert SBP threshold (mmHg)</label><input id="cfgSbp" type="number" value="90"></div>
+      <div class="col"><label>Max infusion rate (mg/min) (info)</label><input disabled value="4 mg/min for >80mg bolus" /></div>
+      <div class="col"><label>Max daily furosemide (mg)</label><input id="cfgMaxDaily" type="number" value="1000"></div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="decision-actions">
+    <div class="small">Decision outcome & suggested actions</div>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <button id="runCheck">Run check</button>
+      <button id="printBtn" class="btn-ghost">Print / Export</button>
+    </div>
+
+    <div id="decisionOutput" style="margin-top:10px"></div>
+  </section>
+
+  <section class="card" aria-label="quick-guidance">
+    <div class="small">Quick nursing guidance (condensed)</div>
+    <ul style="margin-top:8px">
+      <li>Confirm referral checklist & first dose ideally given in hospital; ECG prior to first dose.</li>
+      <li>Correct severe hypovolaemia, hypotension, hypokalaemia/hyponatraemia prior to IV furosemide.</li>
+      <li>Doses & administration: bolus 20–80 mg over 2–5 min (neat); >80 mg diluted and given ≤4 mg/min to avoid ototoxicity. Infusion 5–30 mg/hr (max daily 1000 mg).</li>
+      <li>Monitor vitals before and after dose; notify medical staff if MEWS threshold reached (e.g., BP MEWS ≥2).</li>
+      <li>Document ECG, baseline labs, IV access, and escalation steps in clinical notes.</li>
+    </ul>
+  </section>
+
+  <footer>Tool for decision support only — validate thresholds locally. Exported/printed summary intended for clinical charting.</footer>
+</div>
+
+<script>
+  // Utility
+  const $ = id=>document.getElementById(id);
+  function show(el, txt, cls='warn'){ el.style.display='block'; el.className='alert ' + cls; el.textContent = txt; }
+  function hide(el){ el.style.display='none'; el.textContent=''; }
+
+  function runChecks(){
+    // Gather inputs
+    const hasCcf = $('hasCcf').value;
+    const mewsOk = $('mewsOk').value;
+    const isApo = $('isApo').value;
+    const aortic = $('aorticStenosis').value;
+
+    const egfr = parseFloat($('egfr').value||NaN);
+    const k = parseFloat($('k').value||NaN);
+    const na = parseFloat($('na').value||NaN);
+    const urea = parseFloat($('urea').value||NaN);
+    const creat = parseFloat($('creat').value||NaN);
+    const hb = parseFloat($('hb').value||NaN);
+    const ecgDone = $('ecgDone').value;
+    const ivType = $('ivType').value;
+
+    const sbp = parseFloat($('sbp').value||NaN);
+    const hr = parseFloat($('hr').value||NaN);
+    const rr = parseFloat($('rr').value||NaN);
+    const spo2 = parseFloat($('spo2').value||NaN);
+
+    // config
+    const cfgEgfr = parseFloat($('cfgEgfr').value);
+    const kLowWarn = parseFloat($('cfgKlowWarn').value);
+    const kLowHold = parseFloat($('cfgKlowHold').value);
+    const kHigh = parseFloat($('cfgKhigh').value);
+    const cfgHb = parseFloat($('cfgHb').value);
+    const cfgSbp = parseFloat($('cfgSbp').value);
+
+    // Start decision building
+    let notes = [];
+    let level = 'ok';
+
+    // Admission/exclusion checks
+    if(hasCcf !== 'Yes'){ notes.push('No pre-existing CCF recorded — patient not eligible for HITH IV furosemide without specialist review.'); level='danger'; }
+    if(mewsOk !== 'Yes'){ notes.push('MEWS not within 0-1 for core vital sign — patient unstable for HITH. Escalate to medical staff.'); level='danger'; }
+    if(isApo === 'Yes'){ notes.push('Acute pulmonary oedema (APO) suspected — manage as per local acute protocols (likely inpatient).'); level='danger'; }
+    if(aortic === 'Yes'){ notes.push('Severe/critical aortic stenosis — higher risk; not appropriate for HITH.'); level='danger'; }
+
+    // Baseline labs exclusions
+    if(!isNaN(egfr) && egfr < cfgEgfr){ notes.push(`eGFR ${egfr} mL/min < configured minimum ${cfgEgfr} mL/min — contraindication to HITH IV furosemide.`); level='danger'; }
+    if(!isNaN(hb) && hb < cfgHb){ notes.push(`Haemoglobin ${hb} g/L < configured minimum ${cfgHb} g/L — discuss with admitting consultant.`); if(level!=='danger') level='warn'; }
+    if(!ecgDone || ecgDone !== 'Yes'){ notes.push('ECG not documented prior to first dose — perform ECG before first IV furosemide dose.'); if(level==='ok') level='warn'; }
+    if(!ivType){ notes.push('IV access type not recorded — ensure appropriate IV access (cannula or PICC).'); if(level==='ok') level='warn'; }
+
+    // Potassium logic
+    if(!isNaN(k)){
+      if(k <= kLowHold){ notes.push(`Potassium ${k} mmol/L ≤ ${kLowHold} — urgent correction required; hold IV furosemide until K corrected and notify medical officer.`); level='danger'; }
+      else if(k > kLowHold && k < kLowWarn){ notes.push(`Potassium ${k} mmol/L between ${kLowHold} and ${kLowWarn} — consider replacement and senior review before infusion.`); if(level==='ok') level='warn'; }
+      else if(k >= kHigh){ notes.push(`Potassium ${k} mmol/L ≥ ${kHigh} — hyperkalaemia; review, consider holding or modifying therapy and notify medical officer.`); level='danger'; }
+      else { notes.push(`Potassium ${k} mmol/L within configured range.`); }
+    } else {
+      notes.push('Potassium not available — obtain serum electrolytes prior to infusion.');
+      level = 'danger';
+    }
+
+    // Vitals
+    if(!isNaN(sbp) && sbp < cfgSbp){ notes.push(`Systolic BP ${sbp} mmHg < configured alert ${cfgSbp} — correct hypotension prior to infusion and escalate.`); level='danger'; }
+    if(!isNaN(spo2) && spo2 < 92){ notes.push(`SpO2 ${spo2}% low — check oxygen requirement and usual baseline; escalate if symptomatic.`); if(level==='ok') level='warn'; }
+
+    // Summary suggestions
+    let actions = [];
+    if(level === 'danger'){
+      actions.push('NOT suitable for HITH/hold infusion — escalate immediately to HITH consultant/Registrar or treating cardiologist.');
+    } else {
+      actions.push('Suitable for HITH IV furosemide pending clinician confirmation.');
+      actions.push('Ensure ECG done, IV access secure, and baseline electrolytes documented.');
+      actions.push('Administer per prescription: bolus or infusion. For bolus >80 mg dilute and give ≤4 mg/min to avoid ototoxicity.');
+      actions.push('Monitor vitals pre and post dose; repeat electrolytes as ordered.');
+    }
+
+    // Output
+    const out = $('decisionOutput');
+    out.innerHTML = '';
+    const head = document.createElement('div');
+    head.className = (level === 'danger') ? 'danger' : (level === 'warn' ? 'warn' : 'ok');
+    head.style.padding = '10px';
+    head.style.borderRadius = '8px';
+    head.innerHTML = `<strong>Overall level:</strong> ${level.toUpperCase()}`;
+    out.appendChild(head);
+
+    const ndiv = document.createElement('div'); ndiv.style.marginTop='8px';
+    ndiv.innerHTML = `<strong>Key findings / checks:</strong><ul>${notes.map(n=>'<li>'+escapeHtml(n)+'</li>').join('')}</ul>`;
+    out.appendChild(ndiv);
+
+    const adiv = document.createElement('div'); adiv.style.marginTop='8px';
+    adiv.innerHTML = `<strong>Suggested actions:</strong><ul>${actions.map(a=>'<li>'+escapeHtml(a)+'</li>').join('')}</ul>`;
+    out.appendChild(adiv);
+
+    // printable summary
+    const sumBtn = document.createElement('button');
+    sumBtn.textContent = 'Print summary';
+    sumBtn.style.marginTop='8px';
+    sumBtn.addEventListener('click', ()=>printSummary({hasCcf,mewsOk,isApo,aortic,egfr,k,na,urea,creat,hb,ecgDone,ivType,sbp,hr,rr,spo2,notes,actions,level}));
+    out.appendChild(sumBtn);
+
+    // alerts area
+    const ba = $('baselineAlert'); if(level==='danger') show(ba,'Immediate exclusion/urgent issues present — do NOT proceed with infusion. Escalate to medical staff.','danger'); else if(level==='warn') show(ba,'Warnings present — review before proceeding and/or escalate as required.','warn'); else show(ba,'Checks OK — proceed per clinician order.','ok');
+    const va = $('vitalsAlert'); hide(va);
+  }
+
+  function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function printSummary(data){
+    const w = window.open('','_blank','width=800,height=600');
+    const html = `
+      <html><head><title>Furosemide Decision Summary</title>
+      <style>body{font-family:Arial;padding:18px;color:#0b1320}h2{margin:6px 0}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8px;text-align:left} .danger{color:#b91c1c;font-weight:700}</style>
+      </head><body>
+      <h2>IV Furosemide — Decision Summary</h2>
+      <p><strong>Overall level:</strong> ${escapeHtml(data.level)}</p>
+      <h3>Inputs</h3>
+      <table>
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td>Pre-existing CCF</td><td>${escapeHtml(data.hasCcf)}</td></tr>
+        <tr><td>MEWS core vitals 0-1</td><td>${escapeHtml(data.mewsOk)}</td></tr>
+        <tr><td>Acute pulmonary oedema</td><td>${escapeHtml(data.isApo)}</td></tr>
+        <tr><td>Severe aortic stenosis</td><td>${escapeHtml(data.aortic)}</td></tr>
+        <tr><td>eGFR</td><td>${escapeHtml(data.egfr)}</td></tr>
+        <tr><td>Potassium (K)</td><td>${escapeHtml(data.k)}</td></tr>
+        <tr><td>Na</td><td>${escapeHtml(data.na)}</td></tr>
+        <tr><td>Urea</td><td>${escapeHtml(data.urea)}</td></tr>
+        <tr><td>Creat</td><td>${escapeHtml(data.creat)}</td></tr>
+        <tr><td>Hb</td><td>${escapeHtml(data.hb)}</td></tr>
+        <tr><td>ECG done</td><td>${escapeHtml(data.ecgDone)}</td></tr>
+        <tr><td>IV access</td><td>${escapeHtml(data.ivType)}</td></tr>
+        <tr><td>SBP</td><td>${escapeHtml(data.sbp)}</td></tr>
+        <tr><td>HR</td><td>${escapeHtml(data.hr)}</td></tr>
+        <tr><td>RR</td><td>${escapeHtml(data.rr)}</td></tr>
+        <tr><td>SpO2</td><td>${escapeHtml(data.spo2)}</td></tr>
+      </table>
+      <h3>Key findings</h3>
+      <ul>${data.notes.map(n=>'<li>'+escapeHtml(n)+'</li>').join('')}</ul>
+      <h3>Suggested actions</h3>
+      <ul>${data.actions.map(a=>'<li>'+escapeHtml(a)+'</li>').join('')}</ul>
+      <p>Generated: ${new Date().toLocaleString()}</p>
+      </body></html>`;
+    w.document.write(html); w.document.close();
+    w.print();
+  }
+
+  // print/export main button binds to print last result by gathering visible output
+  $('printBtn').addEventListener('click', ()=>{ window.print(); });
+
+  $('runCheck').addEventListener('click', runChecks);
+
+  // initialize small helpers: set sensible placeholders from protocol ranges
+  (function init(){
+    $('egfr').placeholder = 'e.g., 45';
+    $('k').placeholder = 'e.g., 4.1';
+    // nothing else required
+  })();
+</script>
+</body>
+</html>
