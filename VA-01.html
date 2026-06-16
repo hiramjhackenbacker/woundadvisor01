@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>VA Assessment · SVHM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --navy:#1B3A6B; --navy2:#2A5298; --bg:#EEF2F7; --card:#fff;
+  --text:#1E293B; --muted:#64748B; --border:#E2E8F0;
+  --var:#C97B00; --var-bg:#FFFBEB; --var-border:#FDE68A;
+  --val:#6D28D9; --val-bg:#F5F3FF; --val-border:#C4B5FD;
+  --ok:#059669; --ok-bg:#ECFDF5;
+  --red:#DC2626; --red-bg:#FEF2F2;
+  --r:12px; --shadow:0 2px 16px rgba(0,0,0,0.09);
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;font-size:15px;}
+
+/* ── Header ── */
+.hdr{background:var(--navy);color:#fff;padding:14px 18px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.25);}
+.hdr-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.hdr-logo{background:rgba(255,255,255,.15);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hdr-name{font-size:17px;font-weight:800;letter-spacing:-.4px;}
+.hdr-sub{font-size:11px;opacity:.65;font-weight:500;}
+.steps{display:flex;}
+.step{flex:1;text-align:center;padding:9px 2px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;opacity:.4;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+.step.done{opacity:.6;border-bottom-color:rgba(255,255,255,.35);}
+.step.act{opacity:1;border-bottom-color:#fff;}
+.step.act-r{opacity:1;border-bottom-color:#FDE68A;}
+.step.act-l{opacity:1;border-bottom-color:#C4B5FD;}
+.step.act-s{opacity:1;border-bottom-color:#6EE7B7;}
+
+/* ── Layout ── */
+.main{flex:1;padding:18px 14px 90px;max-width:580px;margin:0 auto;width:100%;}
+.fade{animation:fd .2s ease;}
+@keyframes fd{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Cards ── */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;}
+.ch{padding:14px 18px 10px;border-bottom:1px solid var(--border);}
+.ch-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);}
+.cb{padding:18px;}
+
+/* ── Eye banner ── */
+.eye-banner{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r);margin-bottom:14px;}
+.eye-banner.r{background:var(--var-bg);border:2px solid var(--var-border);}
+.eye-banner.l{background:var(--val-bg);border:2px solid var(--val-border);}
+.eb-ico{font-size:26px;}
+.eb-title{font-size:19px;font-weight:900;letter-spacing:-.5px;}
+.r .eb-title{color:var(--var);}
+.l .eb-title{color:var(--val);}
+.eb-sub{font-size:11px;color:var(--muted);font-weight:500;margin-top:2px;}
+
+/* ── Toggle groups ── */
+.tog{display:flex;gap:8px;margin-top:10px;}
+.tbtn{flex:1;padding:11px 8px;border:2px solid var(--border);border-radius:10px;background:transparent;cursor:pointer;text-align:center;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);transition:all .13s;}
+.tbtn:hover{border-color:var(--navy);color:var(--navy);}
+.tbtn.ar{background:var(--var-bg);border-color:var(--var);color:var(--var);}
+.tbtn.al{background:var(--val-bg);border-color:var(--val);color:var(--val);}
+.tbtn.an{background:#EFF6FF;border-color:var(--navy);color:var(--navy);}
+
+/* ── Section label ── */
+.sl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:16px;}
+.sl:first-child{margin-top:0;}
+
+/* ── Chart line selector ── */
+.chart-grid{display:flex;flex-direction:column;gap:5px;}
+.cline{display:flex;align-items:center;padding:9px 13px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .12s;gap:10px;user-select:none;}
+.cline:hover{border-color:var(--navy2);background:#EFF6FF;}
+.cline.sr{background:var(--var-bg);border-color:var(--var);}
+.cline.sl2{background:var(--val-bg);border-color:var(--val);}
+.cl-frac{font-size:17px;font-weight:900;min-width:56px;font-variant-numeric:tabular-nums;letter-spacing:-.3px;}
+.sr .cl-frac{color:var(--var);}
+.sl2 .cl-frac{color:var(--val);}
+.cl-meta{flex:1;}
+.cl-logmar{font-size:10px;color:var(--muted);font-weight:600;}
+.cl-at{font-size:10px;color:var(--muted);}
+.cl-at span{font-weight:700;}
+.cl-check{font-size:17px;opacity:0;transition:opacity .12s;}
+.cline.sr .cl-check,.cline.sl2 .cl-check{opacity:1;}
+.can-read-top-line{font-size:11px;color:var(--muted);text-align:center;padding:8px;font-style:italic;}
+
+/* ── Minus selector ── */
+.minus-wrap{background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px;}
+.minus-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;}
+.minus-opts{display:flex;gap:7px;}
+.mbtn{flex:1;padding:11px 6px;border:2px solid var(--border);border-radius:8px;background:white;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s;}
+.mbtn-v{font-size:16px;font-weight:800;display:block;color:var(--navy);}
+.mbtn-s{font-size:9px;color:var(--muted);display:block;margin-top:2px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;}
+.mbtn.act{background:var(--navy);border-color:var(--navy);}
+.mbtn.act .mbtn-v,.mbtn.act .mbtn-s{color:white;}
+.minus-warn{font-size:11px;color:#92400E;background:#FFFBEB;border:1px solid #FDE68A;border-radius:7px;padding:8px 10px;margin-top:10px;line-height:1.5;}
+
+/* ── Special results ── */
+.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.sp-btn{padding:14px 8px;border:2px solid var(--border);border-radius:10px;background:transparent;cursor:pointer;text-align:center;font-family:inherit;transition:all .13s;}
+.sp-btn:hover{border-color:var(--navy);background:#EFF6FF;}
+.sp-code{font-size:20px;font-weight:900;color:var(--navy);display:block;}
+.sp-name{font-size:10px;color:var(--muted);font-weight:600;display:block;margin-top:2px;letter-spacing:.2px;}
+.sp-btn.sr{background:var(--var-bg);border-color:var(--var);}
+.sp-btn.sl2{background:var(--val-bg);border-color:var(--val);}
+.sp-btn.sr .sp-code{color:var(--var);}
+.sp-btn.sl2 .sp-code{color:var(--val);}
+
+/* ── Result preview ── */
+.rprev{background:var(--navy);color:white;border-radius:10px;padding:14px 16px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;}
+.rprev-lbl{font-size:10px;opacity:.65;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.rprev-val{font-size:22px;font-weight:900;letter-spacing:-.6px;font-family:monospace;}
+
+/* ── Checklist ── */
+.chk-list{display:flex;flex-direction:column;gap:7px;}
+.chk-item{display:flex;align-items:center;gap:11px;padding:11px 13px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .13s;user-select:none;}
+.chk-item.done{background:var(--ok-bg);border-color:var(--ok);}
+.chk-box{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .13s;}
+.chk-item.done .chk-box{background:var(--ok);border-color:var(--ok);color:white;}
+.chk-txt{font-size:13px;font-weight:500;line-height:1.4;}
+
+/* ── Forms ── */
+.fgroup{margin-bottom:14px;}
+.flbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.finput{width:100%;padding:11px 13px;border:2px solid var(--border);border-radius:10px;font-family:inherit;font-size:15px;color:var(--text);outline:none;transition:border-color .13s;}
+.finput:focus{border-color:var(--navy);}
+.frow{display:flex;gap:10px;}
+.frow .fgroup{flex:1;}
+
+/* ── Summary ── */
+.summ-eye{border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.summ-eye.r{background:var(--var-bg);border:2px solid var(--var-border);}
+.summ-eye.l{background:var(--val-bg);border:2px solid var(--val-border);}
+.summ-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.summ-eye.r .summ-lbl{color:var(--var);}
+.summ-eye.l .summ-lbl{color:var(--val);}
+.summ-val{font-size:36px;font-weight:900;letter-spacing:-1px;font-family:monospace;}
+.summ-eye.r .summ-val{color:var(--var);}
+.summ-eye.l .summ-val{color:var(--val);}
+.summ-corr{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;}
+.summ-corr span{font-weight:800;color:var(--text);}
+
+/* ── MRO box ── */
+.mro{background:var(--navy);border-radius:var(--r);padding:18px;margin-bottom:14px;position:relative;}
+.mro-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:.55;font-weight:700;margin-bottom:8px;}
+.mro-txt{font-size:15px;font-weight:700;line-height:1.7;font-family:'Courier New',monospace;color:white;word-break:break-word;}
+.mro-txt .vr{color:#FDE68A;background:rgba(253,230,138,.15);border-radius:3px;padding:1px 3px;}
+.mro-txt .vl{color:#C4B5FD;background:rgba(196,181,253,.12);border-radius:3px;padding:1px 3px;}
+.copy-btn{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:white;padding:6px 12px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.3px;transition:background .13s;}
+.copy-btn:hover{background:rgba(255,255,255,.25);}
+.copy-btn.copied{background:rgba(6,214,160,.3);}
+
+/* ── Paper guide ── */
+.paper{background:white;border:2px dashed var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.paper-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.pfield{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.pfield:last-child{border-bottom:none;}
+.pf-lbl{font-size:11px;font-weight:700;color:var(--muted);min-width:90px;}
+.pf-val{font-size:14px;font-weight:800;color:var(--text);font-family:monospace;}
+.pf-corr{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;}
+.chkbox{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:2px solid var(--navy);border-radius:3px;font-size:10px;}
+.chkbox.ticked{background:var(--navy);color:white;}
+.pf-hint{font-size:10px;color:var(--muted);font-style:italic;margin-top:1px;}
+
+/* ── Info ── */
+.info{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:9px;padding:11px 13px;font-size:12px;color:#1E40AF;line-height:1.55;margin-bottom:12px;}
+.warn{background:#FFFBEB;border:1px solid #FDE68A;border-radius:9px;padding:11px 13px;font-size:12px;color:#92400E;line-height:1.55;margin-bottom:12px;}
+.divider{display:flex;align-items:center;gap:8px;margin:14px 0;color:var(--muted);font-size:11px;font-weight:700;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── Nav bar ── */
+.nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:10px;z-index:100;}
+.nbtn{flex:1;padding:13px;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;transition:all .13s;letter-spacing:-.2px;}
+.nbtn.back{background:var(--bg);color:var(--navy);}
+.nbtn.next{background:var(--navy);color:white;}
+.nbtn.next:disabled{opacity:.35;cursor:not-allowed;}
+.nbtn.next-r{background:var(--var);}
+.nbtn.next-l{background:var(--val);}
+.nbtn.next-ok{background:var(--ok);}
+
+/* ── Reset ── */
+.reset-btn{display:block;width:100%;padding:13px;border:2px solid var(--border);border-radius:10px;background:transparent;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);text-align:center;margin-top:6px;transition:all .13s;}
+.reset-btn:hover{border-color:var(--red);color:var(--red);}
+
+@media(min-width:600px){
+  .nav{left:50%;transform:translateX(-50%);right:auto;width:580px;}
+}
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────
+const state = {
+  step: 0,
+  day: 'D1',
+  date: new Date().toLocaleDateString('en-AU'),
+  checks: [false, false, false, false, false, false],
+  r: { corr: null, dist: '3m', line: null, minus: 0, special: null },
+  l: { corr: null, dist: '3m', line: null, minus: 0, special: null },
+};
+
+// ── Chart data ─────────────────────────────────────────────────────────
+const LINES = [
+  { frac: '6/60',  logmar: '1.0', d1m5: '6/120' },
+  { frac: '6/48',  logmar: '0.9', d1m5: '6/96'  },
+  { frac: '6/38',  logmar: '0.8', d1m5: '6/76'  },
+  { frac: '6/30',  logmar: '0.7', d1m5: '6/60'  },
+  { frac: '6/24',  logmar: '0.6', d1m5: '6/48'  },
+  { frac: '6/19',  logmar: '0.5', d1m5: '6/38'  },
+  { frac: '6/15',  logmar: '0.4', d1m5: '6/30'  },
+  { frac: '6/12',  logmar: '0.3', d1m5: '6/24'  },
+  { frac: '6/9.5', logmar: '0.2', d1m5: '6/19'  },
+  { frac: '6/7.5', logmar: '0.1', d1m5: '6/15'  },
+  { frac: '6/6',   logmar: '0.0', d1m5: '6/12'  },
+];
+const SPECIALS = [
+  { code: 'CF',  name: 'Count Fingers' },
+  { code: 'HM',  name: 'Hand Movements' },
+  { code: 'LP',  name: 'Light Perception' },
+  { code: 'NPL', name: 'No Percept. Light' },
+];
+const CHECKS = [
+  'Performed hand hygiene / PPE as required',
+  'Confirmed patient ID (name + DOB)',
+  'Explained procedure, gained consent',
+  'Patient seated comfortably — pain check done',
+  'Positioned at correct distance from LogMAR chart',
+  'Distance glasses on (if patient uses them)',
+];
+const DAYS = ['D1','D2','D3','D4','D5'];
+
+// ── Helpers ────────────────────────────────────────────────────────────
+function recordedFrac(eye) {
+  if (eye.line === null) return null;
+  return eye.dist === '3m' ? LINES[eye.line].frac : LINES[eye.line].d1m5;
+}
+function eyeResult(eye) {
+  if (eye.special) return eye.special;
+  const frac = recordedFrac(eye);
+  if (!frac) return null;
+  return eye.minus > 0 ? `${frac} (-${eye.minus})` : frac;
+}
+function eyeLabel(eye, which) {
+  const val = eyeResult(eye);
+  if (!val) return `VA${which} = ?`;
+  const corr = eye.corr === null ? '(??)' : eye.corr ? '(C)' : '(UC)';
+  return `VA${which} ${corr} = ${val}`;
+}
+function canAdvanceEye(eye) {
+  if (eye.corr === null) return false;
+  if (eye.special) return true;
+  if (eye.line !== null) return true;
+  return false;
+}
+
+// ── Render helpers ─────────────────────────────────────────────────────
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k,v]) => {
+    if (k === 'cls') el.className = v;
+    else if (k === 'html') el.innerHTML = v;
+    else if (k.startsWith('on')) el[k] = v;
+    else el.setAttribute(k, v);
+  });
+  children.flat(Infinity).filter(Boolean).forEach(c => {
+    el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return el;
+}
+function div(cls, ...children) { return h('div',{cls},...children); }
+function span(cls, text) { const s = document.createElement('span'); s.className=cls; s.textContent=text; return s; }
+
+// ── Step header ────────────────────────────────────────────────────────
+function renderHeader() {
+  const labels = ['Setup','Right Eye','Left Eye','Summary'];
+  const acts = ['act','act-r','act-l','act-s'];
+  return h('div',{cls:'hdr'},
+    div('hdr-top',
+      div('hdr-logo','👁'),
+      h('div',{},
+        div('hdr-name','Visual Acuity Assessment'),
+        div('hdr-sub','SVHM · LogMAR Chart Testing Tool')
+      )
+    ),
+    div('steps', ...labels.map((lbl,i) => {
+      let cls = 'step';
+      if (i < state.step) cls += ' done';
+      else if (i === state.step) cls += ' ' + acts[i];
+      return h('div',{cls},lbl);
+    }))
+  );
+}
+
+// ── Nav bar ────────────────────────────────────────────────────────────
+function renderNav(canNext, nextLabel, nextCls, onNext, onBack) {
+  const bar = div('nav');
+  if (state.step > 0) {
+    const b = h('button',{cls:'nbtn back',onclick:()=>{onBack();render();}},'← Back');
+    bar.appendChild(b);
+  }
+  const n = h('button',{cls:`nbtn next ${nextCls}`,onclick:()=>{if(canNext){onNext();render();}}},nextLabel+' →');
+  if (!canNext) n.disabled = true;
+  bar.appendChild(n);
+  return bar;
+}
+
+// ── Step 0: Setup ──────────────────────────────────────────────────────
+function renderSetup() {
+  const wrap = div('main fade');
+
+  // Day / Date
+  const card0 = div('card',
+    div('ch', h('div',{cls:'ch-title'},'Test Session')),
+    div('cb',
+      div('frow',
+        div('fgroup',
+          h('label',{cls:'flbl'},'Day Number'),
+          h('select',{cls:'finput',onchange:e=>state.day=e.target.value},
+            ...DAYS.map(d => {
+              const o = h('option',{value:d},d);
+              if (d===state.day) o.selected=true;
+              return o;
+            })
+          )
+        ),
+        div('fgroup',
+          h('label',{cls:'flbl'},'Date'),
+          h('input',{cls:'finput',type:'text',value:state.date,oninput:e=>state.date=e.target.value,placeholder:'dd/mm/yyyy'})
+        )
+      )
+    )
+  );
+  wrap.appendChild(card0);
+
+  // Pre-test checklist
+  const card1 = div('card',
+    div('ch', h('div',{cls:'ch-title'},'Pre-Test Checklist')),
+    div('cb',
+      div('info','Tick each item before starting the assessment. All items should be complete before testing begins.'),
+      div('chk-list',
+        ...CHECKS.map((txt,i) => {
+          const item = div('chk-item' + (state.checks[i] ? ' done':''),
+            div('chk-box', state.checks[i]?'✓':''),
+            div('chk-txt', txt)
+          );
+          item.onclick = () => { state.checks[i] = !state.checks[i]; render(); };
+          return item;
+        })
+      )
+    )
+  );
+  wrap.appendChild(card1);
+
+  const allChecked = state.checks.every(Boolean);
+  const nav = renderNav(true, allChecked ? 'Start Testing' : 'Skip to Testing', 'next', ()=>{state.step=1;}, ()=>{state.step=0;});
+  wrap.appendChild(nav);
+  return wrap;
+}
+
+// ── Eye test step ──────────────────────────────────────────────────────
+function renderEyeStep(which) {
+  const eye = which==='r' ? state.r : state.l;
+  const isR = which==='r';
+  const sel = isR ? 'sr' : 'sl2';
+  const tbtnAct = isR ? 'ar' : 'al';
+  const eyeName = isR ? 'RIGHT EYE (VAR)' : 'LEFT EYE (VAL)';
+  const occlude = isR ? 'Cover the patient\'s LEFT eye with the lorgnette occluder' : 'Cover the patient\'s RIGHT eye with the lorgnette occluder';
+
+  const wrap = div('main fade');
+
+  // Eye banner
+  wrap.appendChild(
+    div('eye-banner '+which,
+      div('eb-ico', isR?'👁':'👁'),
+      h('div',{},
+        div('eb-title', eyeName),
+        div('eb-sub', occlude)
+      )
+    )
+  );
+
+  // Correction card
+  const corrCard = div('card',
+    div('ch', div('ch-title','Optical Correction')),
+    div('cb',
+      div('sl','Is the patient wearing distance correction?'),
+      div('tog',
+        mkTbtn('Corrected (C)',eye.corr===true,tbtnAct,()=>{eye.corr=true;render();}),
+        mkTbtn('Uncorrected (UC)',eye.corr===false,tbtnAct,()=>{eye.corr=false;render();})
+      )
+    )
+  );
+  wrap.appendChild(corrCard);
+
+  // Distance card
+  const distCard = div('card',
+    div('ch', div('ch-title','Testing Distance')),
+    div('cb',
+      div('sl','Distance from LogMAR chart'),
+      div('tog',
+        mkTbtn('3 metres (standard)',eye.dist==='3m','an',()=>{eye.dist='3m';eye.line=null;eye.special=null;render();}),
+        mkTbtn('1.5 metres (closer)',eye.dist==='1.5m','an',()=>{eye.dist='1.5m';eye.line=null;eye.special=null;render();})
+      ),
+      eye.dist==='1.5m' ? h('div',{cls:'warn',style:'margin-top:10px;margin-bottom:0'},'⚠️ At 1.5m, recorded values are doubled. Results will auto-convert below.') : null
+    )
+  );
+  wrap.appendChild(distCard);
+
+  // Chart selector card
+  const chartCard = div('card',
+    div('ch', div('ch-title','Chart Reading — Lowest Line Read')),
+    div('cb',
+      div('info','Tap the lowest line the patient could read. Encourage best guesses. Start from the top (6/60).'),
+      div('sl','Chart lines — tap the patient\'s lowest line'),
+      div('chart-grid',
+        ...LINES.map((ln,i) => {
+          const recorded = eye.dist==='3m' ? ln.frac : ln.d1m5;
+          const isSelected = eye.line===i;
+          const clsStr = 'cline' + (isSelected ? ' '+sel : '');
+          const row = h('div',{cls:clsStr},
+            div('cl-frac', ln.frac),
+            h('div',{cls:'cl-meta'},
+              div('cl-logmar','LogMAR '+ln.logmar),
+              eye.dist==='1.5m' ? h('div',{cls:'cl-at'},'Records as ',h('span',{},recorded)) : null
+            ),
+            div('cl-check','✓')
+          );
+          row.onclick = () => {
+            if (eye.line===i) { eye.line=null; eye.minus=0; }
+            else { eye.line=i; eye.minus=0; eye.special=null; }
+            render();
+          };
+          return row;
+        })
+      ),
+
+      // Minus letters (appears when line selected)
+      eye.line !== null ? (() => {
+        const frac = recordedFrac(eye);
+        const m = div('minus-wrap',
+          div('minus-title',`Letters missed on ${frac}?`),
+          div('minus-opts',
+            ...[0,1,2].map(n => {
+              const btn = div('mbtn'+(eye.minus===n?' act':''),
+                h('span',{cls:'mbtn-v'}, n===0?frac:`${frac} (-${n})`),
+                h('span',{cls:'mbtn-s'}, n===0?'All correct':`${n} letter${n>1?'s':''} wrong`)
+              );
+              btn.onclick = () => { eye.minus=n; render(); };
+              return btn;
+            })
+          ),
+          h('div',{cls:'minus-warn'},'⚠️ If the patient missed 3+ letters on this line, select the line above instead.')
+        );
+        return m;
+      })() : null
+    )
+  );
+  wrap.appendChild(chartCard);
+
+  // Special results
+  const spCard = div('card',
+    div('ch', div('ch-title','If Unable to Read Any Line')),
+    div('cb',
+      div('sl','Select the appropriate result'),
+      div('sp-grid',
+        ...SPECIALS.map(s => {
+          const isSelected = eye.special===s.code;
+          const btn = div('sp-btn'+(isSelected?' '+sel:''),
+            h('span',{cls:'sp-code'},s.code),
+            h('span',{cls:'sp-name'},s.name)
+          );
+          btn.onclick = () => {
+            if (eye.special===s.code) eye.special=null;
+            else { eye.special=s.code; eye.line=null; eye.minus=0; }
+            render();
+          };
+          return btn;
+        })
+      )
+    )
+  );
+  wrap.appendChild(spCard);
+
+  // Live result preview
+  if (canAdvanceEye(eye) && eye.corr !== null) {
+    const result = eyeResult(eye);
+    const corr = eye.corr ? '(C)' : '(UC)';
+    const label = isR ? 'VAR' : 'VAL';
+    const prev = div('rprev',
+      h('div',{},
+        div('rprev-lbl','Recorded result'),
+        div('rprev-val',`${label} ${corr} = ${result}`)
+      ),
+      h('div',{style:'font-size:22px'},'✓')
+    );
+    wrap.appendChild(prev);
+  }
+
+  const onBack = () => { state.step -= 1; };
+  const onNext = () => { state.step += 1; };
+  const canNext = canAdvanceEye(eye) && eye.corr !== null;
+  const nextLabel = isR ? 'Test Left Eye' : 'View Summary';
+  const nextCls = isR ? 'next-r' : 'next-l';
+  wrap.appendChild(renderNav(canNext, nextLabel, nextCls, onNext, onBack));
+
+  return wrap;
+}
+
+function mkTbtn(label, active, activeClass, fn) {
+  const btn = div('tbtn'+(active?' '+activeClass:''), label);
+  btn.onclick = () => fn();
+  return btn;
+}
+
+// ── Step 3: Summary ────────────────────────────────────────────────────
+function renderSummary() {
+  const wrap = div('main fade');
+
+  const rResult = eyeResult(state.r);
+  const lResult = eyeResult(state.l);
+  const rCorr = state.r.corr ? '(C)' : '(UC)';
+  const lCorr = state.l.corr ? '(C)' : '(UC)';
+
+  // Eye result cards
+  [['r','RIGHT EYE','VAR',rResult,rCorr,state.r],['l','LEFT EYE','VAL',lResult,lCorr,state.l]].forEach(([cls,name,abbr,result,corr,eye])=>{
+    wrap.appendChild(
+      div('summ-eye '+cls,
+        div('summ-lbl',`${name} (${abbr})`),
+        div('summ-val', result||'—'),
+        div('summ-corr','Correction: ', h('span',{},eye.corr===true?'Corrected (C)':eye.corr===false?'Uncorrected (UC)':'Not recorded'))
+      )
+    );
+  });
+
+  // MRO format
+  const mro = div('mro');
+  mro.appendChild(div('mro-lbl','MRO / Electronic Record Entry'));
+  const mroLine = `${state.day}: ${state.date}  `;
+  const mroR = `VAR ${rCorr} = ${rResult||'?'}`;
+  const mroL = `VAL ${lCorr} = ${lResult||'?'}`;
+  const mroFull = `${mroLine}${mroR},  ${mroL}`;
+  const mroTxt = div('mro-txt');
+  mroTxt.innerHTML = `${state.day}: ${state.date}&nbsp;&nbsp;<span class="vr">VAR ${rCorr} = ${rResult||'?'}</span>,&nbsp;&nbsp;<span class="vl">VAL ${lCorr} = ${lResult||'?'}</span>`;
+  mro.appendChild(mroTxt);
+  const copyBtn = h('button',{cls:'copy-btn',onclick:()=>{
+    navigator.clipboard.writeText(mroFull).then(()=>{
+      copyBtn.textContent='Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(()=>{copyBtn.textContent='Copy';copyBtn.classList.remove('copied');},2000);
+    });
+  }},'Copy');
+  mro.appendChild(copyBtn);
+  wrap.appendChild(mro);
+
+  // Paper record guide
+  const paper = div('paper');
+  paper.appendChild(div('paper-title','📋 Paper Record · What to Write'));
+
+  const fields = [
+    { lbl:'Day / Date', val:`${state.day} / ${state.date}`, hint:'Fill in the D_/date cell on the left' },
+    { lbl:'VAR (right)', val:rResult||'—', hint:`Tick "corrected" box: ${state.r.corr?'YES ✓':'NO'}`, corr:state.r.corr },
+    { lbl:'VAL (left)', val:lResult||'—', hint:`Tick "corrected" box: ${state.l.corr?'YES ✓':'NO'}`, corr:state.l.corr },
+  ];
+
+  fields.forEach(f => {
+    const row = div('pfield',
+      h('div',{cls:'pf-lbl'},f.lbl),
+      h('div',{style:'flex:1'},
+        div('pf-val', f.val),
+        f.corr !== undefined ? h('div',{cls:'pf-corr'},
+          h('span',{cls:'chkbox'+(f.corr?' ticked':'')}, f.corr?'✓':''),
+          f.corr?'corrected (tick box)':'corrected (leave blank)'
+        ) : null,
+        div('pf-hint', f.hint)
+      )
+    );
+    paper.appendChild(row);
+  });
+  wrap.appendChild(paper);
+
+  // Distance note
+  if (state.r.dist==='1.5m' || state.l.dist==='1.5m') {
+    wrap.appendChild(h('div',{cls:'warn'},'📏 One or both eyes were tested at 1.5m — values shown are already adjusted (denominator ×2). Record exactly as shown above.'));
+  }
+
+  // Reset
+  const resetBtn = h('button',{cls:'reset-btn',onclick:()=>{
+    if(!confirm('Start a new assessment? All data will be cleared.')) return;
+    Object.assign(state,{
+      step:0, day:'D1', date:new Date().toLocaleDateString('en-AU'),
+      checks:[false,false,false,false,false,false],
+      r:{corr:null,dist:'3m',line:null,minus:0,special:null},
+      l:{corr:null,dist:'3m',line:null,minus:0,special:null},
+    });
+    render();
+  }},'↩ New Assessment');
+  wrap.appendChild(resetBtn);
+
+  const nav = renderNav(false,'Done','next-ok',()=>{},()=>{state.step=2;});
+  // Override — just back button
+  const navEl = div('nav');
+  navEl.appendChild(h('button',{cls:'nbtn back',onclick:()=>{state.step=2;render();}},'← Back'));
+  navEl.appendChild(h('button',{cls:'nbtn next next-ok',onclick:()=>{
+    window.print && window.print();
+  }},'🖨 Print'));
+  wrap.appendChild(navEl);
+
+  return wrap;
+}
+
+// ── Main render ────────────────────────────────────────────────────────
+function render() {
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+  root.appendChild(renderHeader());
+  let content;
+  if (state.step === 0) content = renderSetup();
+  else if (state.step === 1) content = renderEyeStep('r');
+  else if (state.step === 2) content = renderEyeStep('l');
+  else content = renderSummary();
+  root.appendChild(content);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>
