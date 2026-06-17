@@ -4,25 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AssetPulse Admin</title>
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-const firebaseConfig = {
-  apiKey: "AIzaSyCufzGhXrJEd_o414KUDlsle1GwAgdmnWY",
-  authDomain: "assetpulse-82ee2.firebaseapp.com",
-  projectId: "assetpulse-82ee2",
-  storageBucket: "assetpulse-82ee2.firebasestorage.app",
-  messagingSenderId: "668835873339",
-  appId: "1:668835873339:web:606738af77dda982dc921e",
-  databaseURL: "https://assetpulse-82ee2-default-rtdb.asia-southeast1.firebasedatabase.app"
+<!-- Firebase compat SDK — loads synchronously, no module race -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+const _FB_DB_URL = "https://assetpulse-82ee2-default-rtdb.asia-southeast1.firebasedatabase.app";
+const _FB_KEY    = "AIzaSyCufzGhXrJEd_o414KUDlsle1GwAgdmnWY";
+firebase.initializeApp({
+  apiKey:       _FB_KEY,
+  authDomain:   "assetpulse-82ee2.firebaseapp.com",
+  projectId:    "assetpulse-82ee2",
+  databaseURL:  _FB_DB_URL,
+  storageBucket:"assetpulse-82ee2.firebasestorage.app",
+  messagingSenderId:"668835873339",
+  appId:        "1:668835873339:web:606738af77dda982dc921e"
+});
+const _db = firebase.database();
+
+// Read once
+window.FBget = async (key) => {
+  try {
+    const snap = await _db.ref('assetpulse/' + key).once('value');
+    return snap.exists() ? snap.val() : null;
+  } catch(e) { console.error('FBget', key, e); return null; }
 };
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-window.FBget = async (key) => { try { const s = await get(ref(db,'assetpulse/'+key)); return s.exists()?s.val():null; } catch(e){return null;} };
-window.FBset = async (key, val) => { try { await set(ref(db,'assetpulse/'+key), val); return true; } catch(e){return false;} };
-window.FBlisten = (key, cb) => onValue(ref(db,'assetpulse/'+key), s => cb(s.exists()?s.val():null));
-document.dispatchEvent(new Event('fb-ready'));
-<\/script>
+// Write
+window.FBset = async (key, val) => {
+  try {
+    await _db.ref('assetpulse/' + key).set(val);
+    return true;
+  } catch(e) { console.error('FBset', key, e); return false; }
+};
+// Live listener
+window.FBlisten = (key, cb) => {
+  _db.ref('assetpulse/' + key).on('value', snap => cb(snap.exists() ? snap.val() : null));
+};
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 :root{
@@ -366,13 +383,7 @@ async function addAct(msg,color='var(--ac)'){
 }
 
 async function boot(){
-  // Wait for Firebase module to be ready
-  await new Promise(resolve => {
-    if(window.FBget) return resolve();
-    document.addEventListener('fb-ready', resolve, {once:true});
-    setTimeout(resolve, 4000); // fallback timeout
-  });
-  document.getElementById('lmsg').textContent='Loading equipment register…';
+  document.getElementById('lmsg').textContent='Connecting to Firebase…';
   DB.eq=await SG(KEYS.eq)||[];
   DB.ep=await SG(KEYS.ep)||[];
   DB.sf=await SG(KEYS.sf)||[];
