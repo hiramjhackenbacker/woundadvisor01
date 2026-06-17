@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AssetPulse Field</title>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+const firebaseConfig = {
+  apiKey: "AIzaSyCufzGhXrJEd_o414KUDlsle1GwAgdmnWY",
+  authDomain: "assetpulse-82ee2.firebaseapp.com",
+  projectId: "assetpulse-82ee2",
+  storageBucket: "assetpulse-82ee2.firebasestorage.app",
+  messagingSenderId: "668835873339",
+  appId: "1:668835873339:web:606738af77dda982dc921e",
+  databaseURL: "https://assetpulse-82ee2-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+window.FBget = async (key) => { try { const s = await get(ref(db,'assetpulse/'+key)); return s.exists()?s.val():null; } catch(e){return null;} };
+window.FBset = async (key, val) => { try { await set(ref(db,'assetpulse/'+key), val); return true; } catch(e){return false;} };
+document.dispatchEvent(new Event('fb-ready'));
+<\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#070d1a;--sf:#0f1929;--sf2:#162237;--bd:#1c2e47;
+  --ac:#00e5ff;--ac3:#10b981;--wn:#f59e0b;--dg:#ef4444;
+  --cl:#e879f9;--cdim:rgba(232,121,249,.1);--cborder:rgba(232,121,249,.32);
+  --tx:#e2e8f0;--mu:#5a7299;--r:13px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.022) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+#ls{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.llogo{font-family:'Space Mono',monospace;font-size:1rem;color:var(--ac);display:flex;align-items:center;gap:9px}
+.ldot{width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pd 1.4s infinite}
+@keyframes pd{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.6)}50%{box-shadow:0 0 0 7px rgba(0,229,255,0)}}
+.lbar{width:140px;height:3px;background:var(--bd);border-radius:2px;overflow:hidden}
+.lfill{height:100%;background:var(--ac);animation:lf 1.2s ease forwards}
+@keyframes lf{from{width:0}to{width:100%}}
+.lmsg{font-size:.68rem;color:var(--mu)}
+header{padding:14px 16px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);position:relative;z-index:2;background:rgba(7,13,26,.93);backdrop-filter:blur(18px)}
+.logo{font-family:'Space Mono',monospace;font-size:.9rem;font-weight:700;color:var(--ac);display:flex;align-items:center;gap:8px}
+.ldot2{width:7px;height:7px;border-radius:50%;background:var(--ac);animation:pd 2s infinite;flex-shrink:0}
+.lsub{font-size:.54rem;color:var(--mu);font-family:'DM Sans',sans-serif;font-weight:400;margin-top:1px}
+.mepill{display:flex;align-items:center;gap:7px;background:var(--sf2);border:1px solid var(--bd);border-radius:22px;padding:5px 11px 5px 5px;cursor:pointer}
+.meav{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,var(--ac));display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;color:#fff;flex-shrink:0}
+.menm{font-size:.68rem;font-weight:600}
+.mesub{font-size:.52rem;color:var(--mu)}
+main{flex:1;display:flex;flex-direction:column;padding:16px;position:relative;z-index:1;max-width:480px;margin:0 auto;width:100%;overflow-y:auto}
+.page{display:none;flex:1;flex-direction:column;animation:fi .18s ease}
+.page.active{display:flex}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.greet-hi{font-size:.74rem;color:var(--mu)}
+.greet-nm{font-size:1.3rem;font-weight:700;margin-top:1px}
+.nostaff{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.28);border-radius:var(--r);padding:13px;margin:14px 0;font-size:.78rem;color:var(--wn);line-height:1.6}
+.mstrip{display:flex;align-items:center;gap:10px;background:var(--cdim);border:1.5px solid var(--cborder);border-radius:var(--r);padding:12px 14px;margin:16px 0 20px;cursor:pointer;transition:all .15s}
+.mstrip:active{transform:scale(.985)}
+.mstxt{flex:1}
+.msttl{font-size:.82rem;font-weight:700;color:var(--cl)}
+.mssub{font-size:.67rem;color:var(--mu);margin-top:1px}
+.msbdg{background:var(--cl);color:#1a0a1f;font-family:'Space Mono',monospace;font-weight:700;font-size:.74rem;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bigs{display:flex;flex-direction:column;gap:12px;flex:1;justify-content:center;margin-bottom:8px}
+.bigb{display:flex;align-items:center;gap:14px;border-radius:16px;padding:20px 18px;border:none;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+.bigb:active{transform:scale(.982)}
+.bigb.iss{background:linear-gradient(135deg,rgba(232,121,249,.14),rgba(124,58,237,.09));border:1.5px solid var(--cborder)}
+.bigb.ret{background:linear-gradient(135deg,rgba(16,185,129,.14),rgba(0,229,255,.07));border:1.5px solid rgba(16,185,129,.3)}
+.bigb:disabled{opacity:.38;pointer-events:none}
+.bigi{font-size:2rem;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bigb.iss .bigi{background:rgba(232,121,249,.12)}
+.bigb.ret .bigi{background:rgba(16,185,129,.12)}
+.bigt{flex:1}.bigtl{font-size:1rem;font-weight:700}
+.bigb.iss .bigtl{color:var(--cl)}.bigb.ret .bigtl{color:var(--ac3)}
+.bigsb{font-size:.7rem;color:var(--mu);margin-top:2px;line-height:1.35}
+.bigch{font-size:1.5rem;opacity:.45;flex-shrink:0}
+.rsec{margin-top:auto;padding-top:10px}
+.rtl{font-family:'Space Mono',monospace;font-size:.59rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px}
+.rit{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.rit:last-child{border-bottom:none}
+.rdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.rtxt{font-size:.74rem;flex:1}
+.rtm{font-size:.59rem;color:var(--mu)}
+.fhdr{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.bbk{width:36px;height:36px;border-radius:9px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--tx)}
+.bbk:active{border-color:var(--ac)}
+.ftl{font-size:1rem;font-weight:700}
+.ftl.iss{color:var(--cl)}.ftl.ret{color:var(--ac3)}
+.fst{font-size:.65rem;color:var(--mu);margin-top:1px}
+.sdots{display:flex;gap:5px;justify-content:center;margin-bottom:15px}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--bd);transition:all .2s}
+.sdot.act{background:var(--cl);width:16px;border-radius:3px}
+.sdot.dn{background:var(--ac3)}
+.scon{background:#000;border-radius:var(--r);overflow:hidden;position:relative;aspect-ratio:1;width:100%;max-width:320px;margin:0 auto 13px}
+.scon div[id$="-reader"]{width:100%}
+.scon div[id$="-reader"] video{width:100%!important}
+.scon div[id$="-reader"] img{display:none}
+.sovl{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.sfr{width:62%;aspect-ratio:1;border-radius:9px;box-shadow:0 0 0 1000px rgba(0,0,0,.45)}
+.sfr.iss{border:2.5px solid var(--cl)}.sfr.ret{border:2.5px solid var(--ac3)}
+.sst{text-align:center;padding:11px;background:var(--sf2);border-radius:var(--r);margin-bottom:12px;font-size:.82rem;border:1px solid var(--bd)}
+.sst.sc.iss{color:var(--cl);border-color:var(--cborder)}.sst.sc.ret{color:var(--ac3);border-color:rgba(16,185,129,.3)}
+.sst.ok{color:var(--ac3);border-color:rgba(16,185,129,.3)}.sst.idle{color:var(--mu)}
+.mr{display:flex;gap:7px;margin-bottom:8px}
+.mr input{flex:1}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.card.fd{border-color:var(--cborder);background:linear-gradient(135deg,var(--sf),rgba(232,121,249,.04))}
+.fdhdr{display:flex;align-items:center;gap:11px;margin-bottom:3px}
+.fdic{font-size:1.8rem;width:44px;height:44px;border-radius:11px;background:var(--sf2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fdnm{font-size:.94rem;font-weight:700}
+.fdid{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--ac);margin-top:1px}
+.fdmt{font-size:.7rem;color:var(--mu);margin-top:5px;line-height:1.55}
+.fg{margin-bottom:12px}
+.fl{font-size:.65rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block}
+.fi,.fs{width:100%;padding:12px 14px;background:var(--sf2);border:1.5px solid var(--bd);border-radius:9px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.fi:focus,.fs:focus{border-color:var(--ac)}
+.fi.fcl:focus{border-color:var(--cl)}
+.fi.frt:focus{border-color:var(--ac3)}
+.fs{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%235a7299' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px}
+.hint{font-size:.62rem;color:var(--mu);margin-top:3px}
+.chips{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.chip{display:flex;align-items:center;gap:9px;background:var(--sf2);border:1.5px solid var(--bd);border-radius:9px;padding:10px 12px}
+.chipic{font-size:1.2rem;flex-shrink:0}
+.chipinf{flex:1}
+.chipnm{font-weight:600;font-size:.8rem}
+.chipid{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--ac)}
+.chiprm{color:var(--mu);cursor:pointer;font-size:1rem;padding:4px;flex-shrink:0}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 18px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s;width:100%;margin-bottom:8px}
+.btnc{background:var(--cl);color:#1a0a1f}.btnc:active{background:#d65fe0;transform:scale(.98)}
+.btng{background:var(--ac3);color:#04201a}.btng:active{background:#0ea571;transform:scale(.98)}
+.btns{background:var(--sf2);color:var(--tx);border:1.5px solid var(--bd);font-weight:600}.btns:active{border-color:var(--ac)}
+.btn:disabled{opacity:.38;pointer-events:none}
+.btn svg{width:17px;height:17px;flex-shrink:0}
+.cfscr{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px}
+.cfic{width:82px;height:82px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin-bottom:18px;animation:pop .38s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.cfic.iss{background:var(--cdim);border:2px solid var(--cborder)}
+.cfic.ret{background:rgba(16,185,129,.1);border:2px solid rgba(16,185,129,.3)}
+.cftl{font-size:1.15rem;font-weight:700;margin-bottom:7px}
+.cfsb{font-size:.8rem;color:var(--mu);line-height:1.6;margin-bottom:24px;max-width:300px}
+.cfsb strong{color:var(--tx)}
+nav{display:flex;border-top:1px solid var(--bd);background:rgba(7,13,26,.94);backdrop-filter:blur(18px);position:relative;z-index:2}
+.nv{flex:1;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.6rem;font-weight:600;color:var(--mu);cursor:pointer;transition:color .15s}
+.nv svg{width:19px;height:19px}
+.nv.active{color:var(--ac)}
+.mback{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.76);backdrop-filter:blur(5px);align-items:flex-end}
+.mback.open{display:flex}
+.modal{background:var(--sf);border:1px solid var(--bd);border-radius:16px 16px 0 0;padding:16px;width:100%;max-height:88vh;overflow-y:auto;animation:slu .22s ease}
+@keyframes slu{from{transform:translateY(100%)}to{transform:none}}
+.mh{width:34px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 12px}
+.mt{font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;margin-bottom:2px}
+.ms{font-size:.67rem;color:var(--mu);margin-bottom:12px}
+.toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(18px);background:var(--sf2);border:1px solid var(--bd);padding:9px 16px;border-radius:24px;font-size:.76rem;font-weight:600;opacity:0;transition:all .3s;z-index:300;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--ac3);color:var(--ac3)}
+.toast.warn{border-color:var(--wn);color:var(--wn)}
+.toast.info{border-color:var(--ac);color:var(--ac)}
+.empty{text-align:center;padding:28px 12px;color:var(--mu);font-size:.78rem;line-height:1.7}
+.mono{font-family:'Space Mono',monospace;font-size:.66rem}
+</style>
+</head>
+<body>
+<div id="ls">
+  <div class="llogo"><div class="ldot"></div>AssetPulse Field</div>
+  <div class="lbar"><div class="lfill"></div></div>
+  <div class="lmsg" id="lmsg">Loading…</div>
+</div>
+
+<header>
+  <div class="logo"><div class="ldot2"></div><div>AssetPulse<div class="lsub">Field App</div></div></div>
+  <div class="mepill" onclick="OM('m-me')">
+    <div class="meav" id="me-av">?</div>
+    <div><div class="menm" id="me-nm">Select staff</div><div class="mesub">Tap to change</div></div>
+  </div>
+</header>
+
+<main>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div><div class="greet-hi" id="gt"></div><div class="greet-nm" id="gnm">AssetPulse Field</div></div>
+  <div id="nostaff-warn" class="nostaff" style="display:none">
+    ⚠️ No staff members found in the system. Ask your administrator to add staff via the Admin app before you can issue or return equipment.
+  </div>
+  <div class="mstrip" onclick="showPage('mine')">
+    <div class="msbdg" id="mc">0</div>
+    <div class="mstxt"><div class="msttl">Equipment with you</div><div class="mssub">Currently checked out to your patient visits</div></div>
+    <div style="font-size:1.2rem;color:var(--cl);opacity:.7">›</div>
+  </div>
+  <div class="bigs">
+    <button class="bigb iss" id="btn-iss" onclick="startIssue()">
+      <div class="bigi">📤</div>
+      <div class="bigt"><div class="bigtl">Book Out Equipment</div><div class="bigsb">Scan an item to take it to a patient visit</div></div>
+      <div class="bigch">›</div>
+    </button>
+    <button class="bigb ret" id="btn-ret" onclick="startReturn()">
+      <div class="bigi">📥</div>
+      <div class="bigt"><div class="bigtl">Return Equipment</div><div class="bigsb">Scan items to check them back in</div></div>
+      <div class="bigch">›</div>
+    </button>
+  </div>
+  <div class="rsec">
+    <div class="rtl">Your recent activity</div>
+    <div id="rec-list"></div>
+  </div>
+</div>
+
+<!-- ISSUE FLOW -->
+<div id="page-issue" class="page">
+  <div class="fhdr">
+    <div class="bbk" onclick="cancelFlow()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+    <div><div class="ftl iss">Book Out Equipment</div><div class="fst" id="iss-steplbl">Step 1 of 2 — Scan item</div></div>
+  </div>
+  <div class="sdots"><div class="sdot act" id="d1"></div><div class="sdot" id="d2"></div></div>
+
+  <div id="iss-s1">
+    <div class="sst idle iss" id="iss-sst">📷 Point camera at barcode</div>
+    <div class="scon"><div id="iss-reader"></div><div class="sovl"><div class="sfr iss"></div></div></div>
+    <div class="mr"><input class="fi fcl" id="iss-man" placeholder="Or type asset ID e.g. IVP-002"><button class="btns" style="width:auto;margin:0;padding:12px 16px" onclick="manLookup('iss')">Go</button></div>
+    <div class="card fd" id="iss-fc" style="display:none">
+      <div class="fdhdr"><div class="fdic" id="iss-fic"></div><div><div class="fdnm" id="iss-fnm"></div><div class="fdid" id="iss-fid"></div></div></div>
+      <div class="fdmt" id="iss-fmt"></div>
+    </div>
+    <button class="btn btnc" id="iss-cont" disabled onclick="goStep2()">Continue →</button>
+  </div>
+
+  <div id="iss-s2" style="display:none">
+    <div class="card fd" style="margin-bottom:15px">
+      <div class="fdhdr" style="margin-bottom:0"><div class="fdic" id="iss-cic"></div><div><div class="fdnm" id="iss-cnm"></div><div class="fdid" id="iss-cid"></div></div></div>
+    </div>
+    <div class="fg"><label class="fl" style="color:var(--cl)">Patient UR Number *</label><input class="fi fcl" id="p-ur" placeholder="e.g. 284751" inputmode="numeric"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="fg"><label class="fl" style="color:var(--cl)">Surname *</label><input class="fi fcl" id="p-sn" placeholder="e.g. Smith"></div>
+      <div class="fg"><label class="fl">First Name</label><input class="fi" id="p-fn" placeholder="e.g. Jane"></div>
+    </div>
+    <div class="fg"><label class="fl" style="color:var(--cl)">Patient Actual Address *</label><input class="fi fcl" id="p-addr" placeholder="e.g. 42 Karaka St, Papatoetoe, Auckland 2025"><div class="hint">Required to locate equipment if unreturned</div></div>
+    <button class="btn btnc" onclick="confirmIssue()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Confirm Booked Out</button>
+    <button class="btns btn" onclick="goStep1()">Back</button>
+  </div>
+</div>
+
+<!-- RETURN FLOW -->
+<div id="page-return" class="page">
+  <div class="fhdr">
+    <div class="bbk" onclick="cancelFlow()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+    <div><div class="ftl ret">Return Equipment</div><div class="fst">Scan each item you're returning</div></div>
+  </div>
+  <div class="sst idle ret" id="ret-sst">📷 Point camera at barcode</div>
+  <div class="scon"><div id="ret-reader"></div><div class="sovl"><div class="sfr ret"></div></div></div>
+  <div class="mr"><input class="fi frt" id="ret-man" placeholder="Or type asset ID e.g. IVP-001"><button class="btns" style="width:auto;margin:0;padding:12px 16px" onclick="manLookup('ret')">Go</button></div>
+  <div class="chips" id="ret-chips"></div>
+  <button class="btn btng" id="ret-cfm" disabled onclick="confirmReturn()">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Confirm Return — <span id="ret-cnt">0</span> item(s)
+  </button>
+</div>
+
+<!-- CONFIRM -->
+<div id="page-confirm" class="page">
+  <div class="cfscr">
+    <div class="cfic" id="cf-ic">✅</div>
+    <div class="cftl" id="cf-tl"></div>
+    <div class="cfsb" id="cf-sb"></div>
+    <button class="btns btn" style="max-width:240px" onclick="showPage('home')">Back to Home</button>
+  </div>
+</div>
+
+<!-- MY EQUIPMENT -->
+<div id="page-mine" class="page">
+  <div class="fhdr">
+    <div class="bbk" onclick="showPage('home')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+    <div><div class="ftl" style="color:var(--cl)">Equipment With You</div><div class="fst">Currently booked out under your name</div></div>
+  </div>
+  <div id="mine-list"></div>
+</div>
+
+</main>
+
+<nav>
+  <div class="nv active" onclick="showPage('home')" id="nv-h"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9.5 12 2l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="nv" onclick="startIssue()" id="nv-s"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Scan</div>
+  <div class="nv" onclick="showPage('mine')" id="nv-m"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>With You</div>
+</nav>
+
+<!-- Staff picker modal -->
+<div class="mback" id="m-me">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt">Select Your Name</div>
+    <div class="ms">Choose who is using this device</div>
+    <div id="sf-picker"></div>
+    <button class="btns btn" onclick="CM('m-me')">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// SHARED KEYS — must match Admin app exactly
+// ═══════════════════════════════════════
+const KEYS = {
+  eq: 'assetpulse_v1_equipment',
+  ep: 'assetpulse_v1_episodes',
+  sf: 'assetpulse_v1_staff',
+  ct: 'assetpulse_v1_categories',
+  ac: 'assetpulse_v1_activity'
+};
+
+let DB = { eq: [], ep: [], sf: [], ct: [], ac: [] };
+let ME = null;
+let retQ = [];
+let issAsset = null;
+let myRecent = [];
+
+// ── Firebase storage adapters ──
+async function SG(k) { return await window.FBget(k); }
+async function SS(k, v) { return await window.FBset(k, v); }
+async function addAct(msg, color = 'var(--ac)') {
+  try {
+    const l = await SG(KEYS.ac) || [];
+    l.unshift({ msg, color, ts: new Date().toISOString() });
+    if (l.length > 100) l.pop();
+    await SS(KEYS.ac, l);
+    DB.ac = l;
+  } catch(e) { console.warn('addAct error', e); }
+}
+
+// ── BOOT ──
+async function boot() {
+  // Wait for Firebase module
+  await new Promise(resolve => {
+    if (window.FBget) return resolve();
+    document.addEventListener('fb-ready', resolve, { once: true });
+    setTimeout(resolve, 4000);
+  });
+  document.getElementById('lmsg').textContent = 'Loading equipment data…';
+  DB.eq = await SG(KEYS.eq) || [];
+  DB.ep = await SG(KEYS.ep) || [];
+  DB.sf = await SG(KEYS.sf) || [];
+  DB.ct = await SG(KEYS.ct) || [];
+  DB.ac = await SG(KEYS.ac) || [];
+
+  // Restore previously selected staff
+  const saved = localStorage.getItem('assetpulse_field_staff');
+  if (saved) {
+    const found = DB.sf.find(s => s.display === saved);
+    if (found) ME = found;
+  }
+
+  document.getElementById('ls').style.display = 'none';
+  updateGreeting();
+  updateMePill();
+  renderRecent();
+  updateMineCount();
+  updateButtons();
+}
+
+function ini(n) { return (n || '').split(' ').map(p => p.replace('.', '').charAt(0)).join('').toUpperCase().slice(0, 2); }
+
+function updateGreeting() {
+  const h = new Date().getHours();
+  document.getElementById('gt').textContent = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('gnm').textContent = ME ? ME.display : 'Welcome';
+}
+
+function updateMePill() {
+  if (ME) {
+    document.getElementById('me-av').textContent = ini(ME.display);
+    document.getElementById('me-nm').textContent = ME.display;
+  } else {
+    document.getElementById('me-av').textContent = '?';
+    document.getElementById('me-nm').textContent = 'Select staff';
+  }
+}
+
+function updateButtons() {
+  const noSf = !DB.sf.length;
+  document.getElementById('nostaff-warn').style.display = noSf ? 'block' : 'none';
+  document.getElementById('btn-iss').disabled = !ME;
+  document.getElementById('btn-ret').disabled = !ME;
+}
+
+function updateMineCount() {
+  if (!ME) { document.getElementById('mc').textContent = '0'; return; }
+  const count = myOpenItems().length;
+  document.getElementById('mc').textContent = count;
+}
+
+function myOpenItems() {
+  if (!ME) return [];
+  return DB.ep.filter(ep =>
+    ep.staff === ME.display &&
+    ep.status !== 'returned' &&
+    ep.equipment.some(id => !(ep.itemReturns && ep.itemReturns[id]))
+  );
+}
+
+function renderRecent() {
+  const el = document.getElementById('rec-list');
+  if (!myRecent.length) {
+    el.innerHTML = '<div style="font-size:.73rem;color:var(--mu);padding:8px 0">No recent activity — book out or return equipment to see it here.</div>';
+    return;
+  }
+  el.innerHTML = myRecent.slice(0, 5).map(a =>
+    `<div class="rit"><div class="rdot" style="background:${a.color}"></div><div class="rtxt">${a.text}<div class="rtm">${a.time}</div></div></div>`
+  ).join('');
+}
+
+function renderMineList() {
+  const items = myOpenItems();
+  if (!items.length) {
+    document.getElementById('mine-list').innerHTML = '<div class="empty">Nothing currently booked out under your name.<br>Tap <strong>Book Out Equipment</strong> from Home to issue items.</div>';
+    return;
+  }
+  const groups = {};
+  items.forEach(ep => {
+    if (!groups[ep.ur]) groups[ep.ur] = { ep, pendingIds: ep.equipment.filter(id => !(ep.itemReturns && ep.itemReturns[id])) };
+  });
+  document.getElementById('mine-list').innerHTML = Object.values(groups).map(({ ep, pendingIds }) => {
+    const chips = pendingIds.map(id => {
+      const e = DB.eq.find(x => x.id === id);
+      return e ? `<div class="chip"><div class="chipic">${e.icon || '📦'}</div><div class="chipinf"><div class="chipnm">${e.name}</div><div class="chipid">${e.id}</div></div></div>` : '';
+    }).join('');
+    return `<div class="card fd" style="margin-bottom:12px">
+      <div style="font-weight:700;font-size:.88rem">${ep.surname}${ep.firstname ? ', ' + ep.firstname : ''}</div>
+      <div class="fdid" style="margin-bottom:1px">UR: ${ep.ur}</div>
+      <div style="font-size:.68rem;color:var(--mu);margin-bottom:10px">📍 ${ep.address}</div>
+      ${chips}
+      <button class="btn btng" style="margin:6px 0 0" onclick="startReturn()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Return These Items
+      </button>
+    </div>`;
+  }).join('');
+}
+
+// ── STAFF PICKER ──
+function OM(id) { document.getElementById(id).classList.add('open'); }
+function CM(id) { document.getElementById(id).classList.remove('open'); }
+
+function openMePicker() {
+  const el = document.getElementById('sf-picker');
+  if (!DB.sf.length) {
+    el.innerHTML = '<div class="empty">No staff registered yet.<br>Ask your administrator to add staff in the Admin app.</div>';
+  } else {
+    el.innerHTML = DB.sf.map(s => `
+      <div style="display:flex;align-items:center;gap:10px;padding:11px;background:var(--sf2);border:1px solid ${ME && ME.display === s.display ? 'var(--ac)' : 'var(--bd)'};border-radius:9px;margin-bottom:7px;cursor:pointer" onclick="selectMe('${s.display}')">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,var(--ac));display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#fff;flex-shrink:0">${ini(s.display)}</div>
+        <div><div style="font-weight:600;font-size:.84rem">${s.display}</div><div style="font-size:.65rem;color:var(--mu)">${s.role || 'Staff'}</div></div>
+        ${ME && ME.display === s.display ? '<div style="margin-left:auto;color:var(--ac);font-size:1rem">✓</div>' : ''}
+      </div>`).join('');
+  }
+  OM('m-me');
+}
+
+function selectMe(display) {
+  ME = DB.sf.find(s => s.display === display);
+  if (ME) {
+    localStorage.setItem('assetpulse_field_staff', display);
+    updateMePill();
+    updateGreeting();
+    updateMineCount();
+    updateButtons();
+    CM('m-me');
+    showToast('Signed in as ' + display, 'ok');
+  }
+}
+
+// ── NAVIGATION ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nv').forEach(n => n.classList.remove('active'));
+  if (id === 'home') { document.getElementById('nv-h').classList.add('active'); renderRecent(); updateMineCount(); }
+  if (id === 'mine') { document.getElementById('nv-m').classList.add('active'); renderMineList(); }
+  if (id === 'issue' || id === 'return') document.getElementById('nv-s').classList.add('active');
+  if (id !== 'issue') stopScan('iss');
+  if (id !== 'return') stopScan('ret');
+}
+
+function cancelFlow() { stopScan('iss'); stopScan('ret'); resetIss(); resetRet(); showPage('home'); }
+
+// ── SCANNER ──
+const scans = { iss: null, ret: null };
+const scanning = { iss: false, ret: false };
+
+function startScan(mode) {
+  if (scanning[mode]) return;
+  scanning[mode] = true;
+  const st = document.getElementById(mode + '-sst');
+  st.className = 'sst sc ' + mode;
+  st.textContent = '🔍 Scanning…';
+  scans[mode] = new Html5Qrcode(mode + '-reader');
+  scans[mode].start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 200, height: 200 } },
+    code => onScan(mode, code), () => {}
+  ).catch(() => {
+    st.className = 'sst idle';
+    st.textContent = '⚠️ Camera access denied — type the ID below';
+    scanning[mode] = false;
+  });
+}
+
+function stopScan(mode) {
+  if (scans[mode]) { scans[mode].stop().catch(() => {}); scans[mode] = null; }
+  scanning[mode] = false;
+}
+
+function onScan(mode, code) {
+  if (mode === 'iss') handleIssScan(code);
+  else handleRetScan(code);
+}
+
+function manLookup(mode) {
+  const code = document.getElementById(mode + '-man').value.trim();
+  if (!code) return;
+  onScan(mode, code);
+}
+
+// ── ISSUE FLOW ──
+function startIssue() {
+  if (!ME) { openMePicker(); return; }
+  resetIss();
+  showPage('issue');
+  setTimeout(() => startScan('iss'), 180);
+}
+
+function resetIss() {
+  issAsset = null;
+  document.getElementById('iss-s1').style.display = 'block';
+  document.getElementById('iss-s2').style.display = 'none';
+  document.getElementById('iss-fc').style.display = 'none';
+  document.getElementById('iss-cont').disabled = true;
+  document.getElementById('iss-man').value = '';
+  document.getElementById('d1').className = 'sdot act';
+  document.getElementById('d2').className = 'sdot';
+  document.getElementById('iss-steplbl').textContent = 'Step 1 of 2 — Scan item';
+  ['p-ur', 'p-sn', 'p-fn', 'p-addr'].forEach(id => document.getElementById(id).value = '');
+}
+
+function handleIssScan(code) {
+  // reload DB to get latest status from admin
+  SG(KEYS.eq).then(data => {
+    if (data) DB.eq = data;
+    const id = DB.eq.find(e => e.id.toLowerCase() === code.toLowerCase())?.id || code.toUpperCase();
+    const e = DB.eq.find(x => x.id === id);
+    if (!e) { showToast('Asset "' + code + '" not found in register', 'warn'); return; }
+    if (e.status === 'In Field') { showToast(id + ' is already booked out', 'warn'); return; }
+    if (e.status === 'Maintenance') { showToast(id + ' is under maintenance', 'warn'); return; }
+    stopScan('iss');
+    issAsset = { ...e };
+    document.getElementById('iss-fic').textContent = e.icon || '📦';
+    document.getElementById('iss-fnm').textContent = e.name;
+    document.getElementById('iss-fid').textContent = e.id;
+    document.getElementById('iss-fmt').innerHTML = '✅ Available — ready to book out';
+    document.getElementById('iss-fc').style.display = 'block';
+    document.getElementById('iss-cont').disabled = false;
+    document.getElementById('iss-sst').className = 'sst ok';
+    document.getElementById('iss-sst').textContent = '✅ Found: ' + e.name + ' (' + id + ')';
+  });
+}
+
+function goStep2() {
+  document.getElementById('iss-s1').style.display = 'none';
+  document.getElementById('iss-s2').style.display = 'block';
+  document.getElementById('d1').className = 'sdot dn';
+  document.getElementById('d2').className = 'sdot act';
+  document.getElementById('iss-steplbl').textContent = 'Step 2 of 2 — Patient details';
+  document.getElementById('iss-cic').textContent = issAsset.icon || '📦';
+  document.getElementById('iss-cnm').textContent = issAsset.name;
+  document.getElementById('iss-cid').textContent = issAsset.id;
+}
+
+function goStep1() {
+  document.getElementById('iss-s1').style.display = 'block';
+  document.getElementById('iss-s2').style.display = 'none';
+  document.getElementById('d1').className = 'sdot act';
+  document.getElementById('d2').className = 'sdot';
+  document.getElementById('iss-steplbl').textContent = 'Step 1 of 2 — Scan item';
+}
+
+async function confirmIssue() {
+  const ur = document.getElementById('p-ur').value.trim();
+  const sn = document.getElementById('p-sn').value.trim();
+  const fn = document.getElementById('p-fn').value.trim();
+  const addr = document.getElementById('p-addr').value.trim();
+  if (!ur || !sn || !addr) { showToast('UR number, surname and address required', 'warn'); return; }
+
+  // Read fresh DB before writing
+  DB.eq = await SG(KEYS.eq) || DB.eq;
+  DB.ep = await SG(KEYS.ep) || DB.ep;
+
+  const asset = DB.eq.find(e => e.id === issAsset.id);
+  if (asset && asset.status !== 'Available') { showToast(issAsset.id + ' was just booked out by another nurse', 'warn'); return; }
+
+  // Create episode
+  const ep = {
+    id: 'EP' + Date.now(),
+    ur, surname: sn, firstname: fn, address: addr,
+    equipment: [issAsset.id],
+    issuedDate: new Date().toISOString(),
+    expectedReturn: (() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })(),
+    returnedDate: null, staff: ME.display, returnedBy: null,
+    itemReturns: {}, notes: '', status: 'active'
+  };
+
+  DB.ep.unshift(ep);
+  if (asset) asset.status = 'In Field';
+
+  await SS(KEYS.ep, DB.ep);
+  await SS(KEYS.eq, DB.eq);
+  await addAct(`📤 <strong>${issAsset.name} ${issAsset.id}</strong> issued to <strong>${sn}${fn ? ', ' + fn : ''}</strong> (UR ${ur}) by ${ME.display}`, 'var(--cl)');
+
+  myRecent.unshift({ text: `Booked out <strong>${issAsset.name} ${issAsset.id}</strong> · UR ${ur}`, time: 'Just now', color: 'var(--cl)' });
+  updateMineCount();
+
+  showConfirm('iss', 'Booked Out',
+    `<strong>${issAsset.name} ${issAsset.id}</strong> is now logged with patient <strong>${sn}${fn ? ', ' + fn : ''}</strong> (UR ${ur}).<br>The Admin app is updated automatically.`
+  );
+}
+
+// ── RETURN FLOW ──
+function startReturn() {
+  if (!ME) { openMePicker(); return; }
+  resetRet();
+  showPage('return');
+  setTimeout(() => startScan('ret'), 180);
+}
+
+function resetRet() {
+  retQ = [];
+  document.getElementById('ret-man').value = '';
+  document.getElementById('ret-cfm').disabled = true;
+  document.getElementById('ret-cnt').textContent = '0';
+  document.getElementById('ret-chips').innerHTML = '';
+}
+
+function handleRetScan(code) {
+  SG(KEYS.eq).then(data => {
+    if (data) DB.eq = data;
+    const id = DB.eq.find(e => e.id.toLowerCase() === code.toLowerCase())?.id || code.toUpperCase();
+    const e = DB.eq.find(x => x.id === id);
+    if (!e) { showToast('Asset "' + code + '" not found', 'warn'); return; }
+    if (e.status !== 'In Field') { showToast(id + ' is not currently booked out', 'warn'); return; }
+    if (retQ.find(x => x.id === id)) { showToast(id + ' already queued', 'info'); return; }
+    retQ.push({ ...e });
+    renderRetChips();
+    document.getElementById('ret-sst').className = 'sst ok';
+    document.getElementById('ret-sst').textContent = '✅ Added: ' + id + ' — scan another or confirm';
+    document.getElementById('ret-man').value = '';
+    showToast(id + ' added', 'ok');
+  });
+}
+
+function removeRetItem(id) { retQ = retQ.filter(x => x.id !== id); renderRetChips(); }
+
+function renderRetChips() {
+  document.getElementById('ret-cnt').textContent = retQ.length;
+  document.getElementById('ret-cfm').disabled = retQ.length === 0;
+  document.getElementById('ret-chips').innerHTML = retQ.map(it =>
+    `<div class="chip"><div class="chipic">${it.icon || '📦'}</div><div class="chipinf"><div class="chipnm">${it.name}</div><div class="chipid">${it.id}</div></div><div class="chiprm" onclick="removeRetItem('${it.id}')">✕</div></div>`
+  ).join('');
+}
+
+async function confirmReturn() {
+  if (!retQ.length) return;
+  stopScan('ret');
+
+  DB.eq = await SG(KEYS.eq) || DB.eq;
+  DB.ep = await SG(KEYS.ep) || DB.ep;
+
+  const now = new Date().toISOString();
+  const today = now.split('T')[0];
+
+  retQ.forEach(it => {
+    const asset = DB.eq.find(e => e.id === it.id);
+    if (asset) asset.status = 'Available';
+
+    // find the open episode(s) containing this item and mark per-item return
+    DB.ep.forEach(ep => {
+      if (ep.equipment.includes(it.id) && ep.status !== 'returned') {
+        if (!ep.itemReturns) ep.itemReturns = {};
+        if (!ep.itemReturns[it.id]) {
+          ep.itemReturns[it.id] = { date: today, staff: ME.display };
+          const allBack = ep.equipment.every(id => ep.itemReturns[id]);
+          if (allBack) { ep.status = 'returned'; ep.returnedDate = now; ep.returnedBy = ME.display; }
+        }
+      }
+    });
+  });
+
+  await SS(KEYS.ep, DB.ep);
+  await SS(KEYS.eq, DB.eq);
+  await addAct(`📥 <strong>${retQ.length} item(s)</strong> returned by ${ME.display}: ${retQ.map(x => x.id).join(', ')}`, 'var(--ac3)');
+
+  const names = retQ.map(x => x.id).join(', ');
+  retQ.forEach(it => myRecent.unshift({ text: `Returned <strong>${it.name} ${it.id}</strong>`, time: 'Just now', color: 'var(--ac3)' }));
+  updateMineCount();
+
+  showConfirm('ret', 'Returned',
+    `<strong>${retQ.length > 1 ? retQ.length + ' items' : retQ[0].name} (${names})</strong> logged as returned by <strong>${ME.display}</strong>.<br>The Admin app is updated automatically.`
+  );
+}
+
+function showConfirm(type, title, sub) {
+  document.getElementById('cf-ic').className = 'cfic ' + type;
+  document.getElementById('cf-ic').textContent = type === 'iss' ? '📤' : '✅';
+  document.getElementById('cf-tl').textContent = title;
+  document.getElementById('cf-sb').innerHTML = sub;
+  resetIss(); resetRet();
+  showPage('confirm');
+}
+
+// ── TOAST ──
+let tT;
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = (type === 'ok' ? '✅ ' : type === 'warn' ? '⚠️ ' : 'ℹ️ ') + msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(tT);
+  tT = setTimeout(() => t.className = 'toast', 2800);
+}
+
+document.querySelectorAll('.mback').forEach(el => el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); }));
+document.addEventListener('visibilitychange', () => { if (document.hidden) { stopScan('iss'); stopScan('ret'); } });
+
+// Boot first so DB.sf is loaded before any picker interaction
+boot().then(() => {
+  document.querySelector('.mepill').addEventListener('click', openMePicker);
+  // Auto-open picker on first visit if staff exist but none selected
+  if (!ME && DB.sf.length) openMePicker();
+});
+</script>
+</body>
+</html>

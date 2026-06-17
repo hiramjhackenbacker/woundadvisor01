@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AssetPulse Admin</title>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+const firebaseConfig = {
+  apiKey: "AIzaSyCufzGhXrJEd_o414KUDlsle1GwAgdmnWY",
+  authDomain: "assetpulse-82ee2.firebaseapp.com",
+  projectId: "assetpulse-82ee2",
+  storageBucket: "assetpulse-82ee2.firebasestorage.app",
+  messagingSenderId: "668835873339",
+  appId: "1:668835873339:web:606738af77dda982dc921e",
+  databaseURL: "https://assetpulse-82ee2-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+window.FBget = async (key) => { try { const s = await get(ref(db,'assetpulse/'+key)); return s.exists()?s.val():null; } catch(e){return null;} };
+window.FBset = async (key, val) => { try { await set(ref(db,'assetpulse/'+key), val); return true; } catch(e){return false;} };
+window.FBlisten = (key, cb) => onValue(ref(db,'assetpulse/'+key), s => cb(s.exists()?s.val():null));
+document.dispatchEvent(new Event('fb-ready'));
+<\/script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#070d1a;--sf:#0f1929;--sf2:#162237;--bd:#1c2e47;
+  --ac:#00e5ff;--ac2:#7c3aed;--ac3:#10b981;
+  --wn:#f59e0b;--dg:#ef4444;
+  --cl:#e879f9;--cdim:rgba(232,121,249,.1);--cborder:rgba(232,121,249,.32);
+  --tx:#e2e8f0;--mu:#5a7299;--r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.022) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+#ls{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.llogo{font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--ac);display:flex;align-items:center;gap:10px}
+.ldot{width:9px;height:9px;border-radius:50%;background:var(--ac);animation:pd 1.4s infinite}
+@keyframes pd{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.6)}50%{box-shadow:0 0 0 7px rgba(0,229,255,0)}}
+.lbar{width:160px;height:3px;background:var(--bd);border-radius:2px;overflow:hidden}
+.lfill{height:100%;background:var(--ac);animation:lf 1.4s ease forwards}
+@keyframes lf{from{width:0}to{width:100%}}
+.lmsg{font-size:.72rem;color:var(--mu)}
+header{position:sticky;top:0;z-index:100;background:rgba(7,13,26,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--bd);padding:11px 15px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--ac);display:flex;align-items:center;gap:8px}
+.ldot2{width:7px;height:7px;border-radius:50%;background:var(--ac);animation:pd 2s infinite;flex-shrink:0}
+.lsub{font-size:.54rem;color:var(--mu);font-family:'DM Sans',sans-serif;font-weight:400;margin-top:1px}
+.hsync{display:flex;align-items:center;gap:5px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:4px 10px;font-size:.64rem;font-weight:600;color:var(--ac3);cursor:pointer}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--ac3);animation:pd 2s infinite}
+.ntabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;position:sticky;top:53px;z-index:99}
+.ntabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:56px;padding:9px 3px;text-align:center;font-size:.59rem;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap}
+.tab svg{width:15px;height:15px}
+.tab.active{color:var(--ac);border-bottom-color:var(--ac)}
+.tab.acl{color:var(--cl) !important;border-bottom-color:var(--cl) !important}
+.page{display:none;padding:13px;animation:fi .2s ease}
+.page.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:13px;margin-bottom:10px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sc{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:11px;position:relative;overflow:hidden;cursor:pointer;transition:all .15s}
+.sc:active{transform:scale(.97)}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.s1::before{background:var(--ac)}.s2::before{background:var(--ac3)}.s3::before{background:var(--wn)}.s4::before{background:var(--cl)}
+.sn{font-family:'Space Mono',monospace;font-size:1.45rem;font-weight:700;line-height:1}
+.sl{font-size:.6rem;color:var(--mu);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.st{font-size:.59rem;margin-top:4px}
+.up{color:var(--ac3)}.wnt{color:var(--wn)}.clt{color:var(--cl)}
+.cdb{grid-column:1/-1;background:linear-gradient(135deg,var(--cdim),rgba(124,58,237,.08),rgba(0,229,255,.04));border:1.5px solid var(--cborder);border-radius:var(--r);cursor:pointer;transition:all .18s;overflow:hidden;position:relative}
+.cdb::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--cl),var(--ac2),var(--ac))}
+.cdb:active{transform:scale(.985)}
+.cdbi{display:flex;align-items:center;padding:12px 14px;gap:0}
+.cdbicon{font-size:1.8rem;margin-right:11px;flex-shrink:0}
+.cdbt{flex:1}.cdbl{font-size:.57rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.cdbtt{font-size:.92rem;font-weight:700;color:var(--cl);line-height:1.15}
+.cdbsb{font-size:.66rem;color:var(--mu);margin-top:2px}
+.cdbss{display:flex;gap:13px;margin-right:8px;flex-shrink:0}
+.cdbsn{font-family:'Space Mono',monospace;font-size:1.35rem;font-weight:700;text-align:center}
+.cdbsl{font-size:.54rem;color:var(--mu);text-transform:uppercase;text-align:center;margin-top:1px}
+.cdbar{font-size:1.3rem;color:var(--cl);opacity:.7;flex-shrink:0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.st2{font-family:'Space Mono',monospace;font-size:.61rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.9px}
+.bdg{font-size:.59rem;padding:2px 7px;border-radius:8px;font-weight:600;white-space:nowrap}
+.bbl{background:rgba(0,229,255,.1);color:var(--ac);border:1px solid rgba(0,229,255,.2)}
+.bgr{background:rgba(16,185,129,.1);color:var(--ac3);border:1px solid rgba(16,185,129,.2)}
+.bwn{background:rgba(245,158,11,.1);color:var(--wn);border:1px solid rgba(245,158,11,.2)}
+.brd{background:rgba(239,68,68,.1);color:var(--dg);border:1px solid rgba(239,68,68,.2)}
+.bcl{background:var(--cdim);color:var(--cl);border:1px solid var(--cborder)}
+.ai2{display:flex;align-items:center;gap:10px;padding:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:9px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.ai2:active{border-color:var(--ac);transform:scale(.99)}
+.aiic{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:var(--sf)}
+.aiinf{flex:1;min-width:0}
+.ainm{font-weight:600;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aime{font-size:.65rem;color:var(--mu);margin-top:1px}
+.epitem{background:var(--sf2);border:1px solid var(--cborder);border-radius:9px;padding:10px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.epitem:active{border-color:var(--cl)}
+.epitem.od{animation:oda 2.4s ease-in-out infinite}
+@keyframes oda{0%,100%{border-color:var(--cborder)}55%{border-color:var(--dg);box-shadow:0 0 9px rgba(239,68,68,.18)}}
+.ephdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px}
+.eppt{font-weight:700;font-size:.86rem}
+.epur{font-family:'Space Mono',monospace;font-size:.63rem;color:var(--cl);margin-top:1px}
+.epad{font-size:.66rem;color:var(--mu);margin-top:2px}
+.epeq{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px;padding-top:7px;border-top:1px solid var(--bd)}
+.eqtag{display:inline-flex;align-items:center;gap:2px;border-radius:5px;padding:2px 6px;font-size:.62rem;font-weight:600}
+.eqout{background:var(--cdim);border:1px solid var(--cborder);color:var(--cl)}
+.eqbk{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--ac3);text-decoration:line-through;opacity:.6}
+.epft{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:6px;border-top:1px solid var(--bd)}
+.epst{font-size:.66rem;color:var(--mu)}
+.epdt{font-size:.58rem;color:var(--mu);font-family:'Space Mono',monospace}
+.cstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
+.csi{border-radius:9px;padding:10px;text-align:center}
+.csf{background:var(--cdim);border:1px solid var(--cborder)}
+.cso{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.24)}
+.csr{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.24)}
+.csn{font-family:'Space Mono',monospace;font-size:1.35rem;font-weight:700;line-height:1}
+.csl{font-size:.56rem;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.cpills{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:3px;margin-bottom:10px}
+.cpills::-webkit-scrollbar{display:none}
+.pll{white-space:nowrap;padding:4px 10px;border-radius:16px;font-size:.64rem;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);transition:all .15s}
+.pll.active{background:var(--cdim);border-color:var(--cborder);color:var(--cl)}
+.ritem{display:flex;align-items:center;gap:9px;padding:9px;background:var(--sf);border:1px solid var(--bd);border-radius:7px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.ritem.sel{border-color:var(--ac3);background:rgba(16,185,129,.04)}
+.ritem.done{opacity:.55;background:rgba(16,185,129,.04);border-color:rgba(16,185,129,.2)}
+.rcb{width:20px;height:20px;border-radius:5px;border:2px solid var(--bd);background:var(--sf2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.ritem.sel .rcb,.ritem.done .rcb{background:var(--ac3);border-color:var(--ac3)}
+.fg{margin-bottom:10px}
+.fl{font-size:.65rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block}
+.fi,.fs,.fta{width:100%;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--ac)}
+.ficl:focus{border-color:var(--cl) !important}
+.fs{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%235a7299' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.fta{resize:vertical;min-height:56px}
+.hint{font-size:.62rem;color:var(--mu);margin-top:3px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.eqgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px}
+.eqchk{display:flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:8px 9px;cursor:pointer;transition:all .15s}
+.eqchk.sel{background:var(--cdim);border-color:var(--cborder);color:var(--cl)}
+.eqchn{font-weight:600;font-size:.68rem;line-height:1.2}
+.eqchid{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--mu);margin-top:1px}
+.aichat{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.aihdr{display:flex;align-items:center;gap:7px;padding:9px 12px;background:rgba(124,58,237,.1);border-bottom:1px solid var(--bd)}
+.aiav{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--ac2),var(--ac));display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;color:#fff;flex-shrink:0}
+.aimsgs{padding:10px;max-height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:7px}
+.aimsg{display:flex;gap:7px;align-items:flex-start}.aimsg.user{flex-direction:row-reverse}
+.aibub{padding:7px 10px;border-radius:10px;font-size:.76rem;line-height:1.45;max-width:87%}
+.aimsg.bot .aibub{background:var(--sf);border:1px solid var(--bd)}
+.aimsg.user .aibub{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:var(--ac)}
+.aiir{display:flex;gap:7px;padding:8px;border-top:1px solid var(--bd)}
+.aiin{flex:1;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:.78rem;outline:none}
+.aisend{width:30px;height:30px;border-radius:6px;border:none;background:var(--ac);color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.aisend svg{width:13px;height:13px}
+.tdots span{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--mu);margin:0 1.5px;animation:bop 1s infinite}
+.tdots span:nth-child(2){animation-delay:.15s}.tdots span:nth-child(3){animation-delay:.3s}
+@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.actitem{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bd)}
+.actitem:last-child{border-bottom:none}
+.acdot{width:6px;height:6px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.actxt{font-size:.74rem;line-height:1.4;flex:1}
+.actm{font-size:.59rem;color:var(--mu);margin-top:1px}
+.prog{background:var(--bd);border-radius:4px;height:4px;overflow:hidden;margin-top:3px}
+.pf{height:100%;border-radius:4px;transition:width .5s ease}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 17px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .15s;width:100%;margin-bottom:7px}
+.btnp{background:var(--ac);color:#000}.btnp:active{background:#00c8e0;transform:scale(.98)}
+.btns{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}.btns:active{border-color:var(--ac)}
+.btnc{background:var(--cdim);color:var(--cl);border:1px solid var(--cborder)}.btnc:active{background:rgba(232,121,249,.18)}
+.btng{background:rgba(16,185,129,.12);color:var(--ac3);border:1px solid rgba(16,185,129,.28)}
+.btnd{background:rgba(239,68,68,.1);color:var(--dg);border:1px solid rgba(239,68,68,.22)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.mback{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);align-items:flex-end}
+.mback.open{display:flex}
+.modal{background:var(--sf);border:1px solid var(--bd);border-radius:18px 18px 0 0;padding:17px;width:100%;max-height:91vh;overflow-y:auto;animation:slu .24s ease}
+.modal.cm{border-color:var(--cborder)}
+@keyframes slu{from{transform:translateY(100%)}to{transform:none}}
+.mh{width:36px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 13px}
+.mt{font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;margin-bottom:2px}
+.ms{font-size:.69rem;color:var(--mu);margin-bottom:13px}
+.empty{text-align:center;padding:32px 14px;color:var(--mu)}
+.empty-icon{font-size:2.2rem;margin-bottom:9px}
+.empty-msg{font-size:.8rem;line-height:1.6}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf2);border:1px solid var(--bd);padding:9px 17px;border-radius:26px;font-size:.76rem;font-weight:600;opacity:0;transition:all .3s;z-index:300;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--ac3);color:var(--ac3)}
+.toast.info{border-color:var(--ac);color:var(--ac)}
+.toast.warn{border-color:var(--wn);color:var(--wn)}
+.mono{font-family:'Space Mono',monospace;font-size:.68rem}
+.bs{height:22px}
+.dvd{height:1px;background:var(--bd);margin:9px 0}
+</style>
+</head>
+<body>
+<div id="ls"><div class="llogo"><div class="ldot"></div>AssetPulse Admin</div><div class="lbar"><div class="lfill"></div></div><div class="lmsg" id="lmsg">Loading data…</div></div>
+<header>
+  <div class="logo"><div class="ldot2"></div><div>AssetPulse<div class="lsub">Community Nursing — Admin</div></div></div>
+  <div class="hsync" onclick="syncNow()"><div class="sdot"></div><span id="synclbl">Live</span></div>
+</header>
+<div class="ntabs">
+  <div class="tab active" onclick="SP('dashboard',this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+  <div class="tab acl" onclick="SP('clinical',this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>Clinical</div>
+  <div class="tab" onclick="SP('equipment',this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Equipment</div>
+  <div class="tab" onclick="SP('staff',this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Staff</div>
+  <div class="tab" onclick="SP('ai',this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>AI</div>
+  <div class="tab" onclick="SP('settings',this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</div>
+</div>
+
+<div id="page-dashboard" class="page active">
+  <div class="sgrid">
+    <div class="sc s1" onclick="SP('equipment',document.querySelectorAll('.tab')[2])"><div class="sn" id="st-total">0</div><div class="sl">Total Equipment</div><div class="st up" id="st-tt"></div></div>
+    <div class="sc s2" onclick="SP('equipment',document.querySelectorAll('.tab')[2])"><div class="sn" id="st-avail">0</div><div class="sl">Available</div><div class="st up">Ready to issue</div></div>
+    <div class="sc s3"><div class="sn" id="st-maint">0</div><div class="sl">Maintenance</div><div class="st wnt" id="st-mt"></div></div>
+    <div class="sc s4" onclick="SP('clinical',document.querySelectorAll('.tab')[1])"><div class="sn" id="st-sc">0</div><div class="sl">Transactions Today</div><div class="st clt">Issues &amp; returns</div></div>
+    <div class="cdb" onclick="SP('clinical',document.querySelectorAll('.tab')[1])">
+      <div class="cdbi"><div class="cdbicon">🏥</div><div class="cdbt"><div class="cdbl">Patient Episodes</div><div class="cdbtt">Patient Clinical Equipment</div><div class="cdbsb">Currently issued &amp; off-site</div></div>
+      <div class="cdbss"><div><div class="cdbsn" id="cdb-f" style="color:var(--cl)">0</div><div class="cdbsl">In Field</div></div><div><div class="cdbsn" id="cdb-o" style="color:var(--dg)">0</div><div class="cdbsl">Overdue</div></div></div><div class="cdbar">›</div></div>
+    </div>
+  </div>
+  <div class="card"><div class="sh"><div class="st2">Live Activity</div><div class="bdg bbl">Auto-refresh</div></div><div id="dash-act"></div></div>
+  <div class="card"><div class="st2" style="margin-bottom:9px">Equipment by Category</div><div id="dash-cats"></div></div>
+  <div class="bs"></div>
+</div>
+
+<div id="page-clinical" class="page">
+  <div class="cstrip">
+    <div class="csi csf"><div class="csn" id="cl-f" style="color:var(--cl)">0</div><div class="csl">In Field</div></div>
+    <div class="csi cso"><div class="csn" id="cl-o" style="color:var(--dg)">0</div><div class="csl">Overdue</div></div>
+    <div class="csi csr"><div class="csn" id="cl-r" style="color:var(--ac3)">0</div><div class="csl">Returned</div></div>
+  </div>
+  <button class="btn btnc" onclick="openIssue()" style="margin-bottom:11px"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Issue Equipment to Patient</button>
+  <div class="cpills" id="cl-pills"><div class="pll active" onclick="filterEp('all',this)">All</div></div>
+  <input class="fi" placeholder="🔍 Search UR, surname, address…" id="cl-search" oninput="filterEp(CCF,null)" style="margin-bottom:10px">
+  <div id="ep-list"></div>
+  <div class="bs"></div>
+</div>
+
+<div id="page-equipment" class="page">
+  <div style="display:flex;gap:6px;margin-bottom:10px">
+    <input class="fi" placeholder="🔍 Search…" id="eq-s" oninput="filterEq()" style="flex:1">
+    <select class="fs" id="eq-sf" onchange="filterEq()" style="width:auto;min-width:100px">
+      <option value="">All Status</option><option value="Available">Available</option><option value="In Field">In Field</option><option value="Maintenance">Maintenance</option><option value="In Storage">In Storage</option>
+    </select>
+  </div>
+  <div id="eq-list"></div>
+  <button class="btn btnp" onclick="openAddEq()" style="position:sticky;bottom:14px;margin-top:7px"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Register New Equipment</button>
+  <div class="bs"></div>
+</div>
+
+<div id="page-staff" class="page">
+  <div id="sf-list"></div>
+  <button class="btn btnp" onclick="openAddSf()" style="margin-top:4px"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Add Staff Member</button>
+  <div class="bs"></div>
+</div>
+
+<div id="page-ai" class="page">
+  <div style="background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(0,229,255,.04));border:1px solid rgba(124,58,237,.3);border-radius:var(--r);padding:11px;margin-bottom:11px">
+    <div style="font-size:.78rem;font-weight:600;margin-bottom:3px">🤖 AI Asset Assistant</div>
+    <div style="font-size:.66rem;color:var(--mu)">Powered by Claude · sees your live equipment &amp; patient data</div>
+  </div>
+  <div class="aichat">
+    <div class="aihdr"><div class="aiav">AI</div><div><div style="font-size:.76rem;font-weight:600">AssetPulse AI</div><div style="font-size:.58rem;color:var(--mu)">Ask about episodes, overdue items, reports…</div></div><div class="bdg bgr" style="margin-left:auto">Online</div></div>
+    <div class="aimsgs" id="ai-msgs"><div class="aimsg bot"><div class="aiav">AI</div><div class="aibub">👋 Hi! I can see your live equipment register and patient episodes. Ask me about overdue items, utilisation reports, or maintenance scheduling.</div></div></div>
+    <div class="aiir"><input class="aiin" id="ai-in" placeholder="Ask anything…" onkeydown="if(event.key==='Enter')sendAI()"><button class="aisend" onclick="sendAI()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+  </div>
+  <div class="st2" style="margin-bottom:7px">Quick Prompts</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+    <button class="btn btnc" style="font-size:.68rem;padding:8px" onclick="qAI('Which equipment is overdue for return? List patient names and how many days overdue.')">🏥 Overdue</button>
+    <button class="btn btns" style="font-size:.68rem;padding:8px" onclick="qAI('What equipment is currently in the field and with which patients?')">📤 In field</button>
+    <button class="btn btns" style="font-size:.68rem;padding:8px" onclick="qAI('Generate a weekly utilisation summary by equipment category.')">📊 Report</button>
+    <button class="btn btns" style="font-size:.68rem;padding:8px" onclick="qAI('Which staff have equipment checked out and what do they have?')">👤 By staff</button>
+  </div>
+  <div class="bs"></div>
+</div>
+
+<div id="page-settings" class="page">
+  <div class="card">
+    <div class="st2" style="margin-bottom:9px">Equipment Categories</div>
+    <div id="cat-list"></div>
+    <div style="display:flex;gap:6px;margin-top:9px">
+      <input class="fi" id="nc-icon" placeholder="Emoji" style="width:64px;text-align:center">
+      <input class="fi" id="nc-name" placeholder="Category name" style="flex:1">
+      <button class="btn btnp" style="width:auto;padding:0 13px;margin:0" onclick="addCat()">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="st2" style="margin-bottom:9px">Data Management</div>
+    <button class="btn btns" onclick="exportData()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export All Data (JSON)</button>
+    <button class="btn btnd" onclick="clrData()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Clear All Data</button>
+    <div class="hint">Clearing data is permanent and cannot be undone.</div>
+  </div>
+  <div class="card"><div class="st2" style="margin-bottom:7px">About</div><div style="font-size:.73rem;color:var(--mu);line-height:1.85">AssetPulse Admin v1.0 · Community Nursing Services<br>Data syncs live via Firebase Realtime Database<br><span style="color:var(--ac)">Project: assetpulse-82ee2 · Region: Asia SE</span></div></div>
+  <div class="bs"></div>
+</div>
+
+<!-- Issue Modal -->
+<div class="mback" id="m-issue">
+  <div class="modal cm">
+    <div class="mh"></div><div class="mt" style="color:var(--cl)">🏥 Issue Clinical Equipment</div><div class="ms">Record equipment leaving for a patient episode</div>
+    <div style="background:var(--cdim);border:1px solid var(--cborder);border-radius:7px;padding:9px;margin-bottom:12px;font-size:.72rem;color:var(--cl)">
+      👤 Issuing nurse:<select class="fs" id="iss-stf" style="margin-top:6px;border-color:var(--cborder)"></select>
+    </div>
+    <div class="fg"><label class="fl" style="color:var(--cl)">Patient UR Number *</label><input class="fi ficl" id="iss-ur" placeholder="e.g. 284751" inputmode="numeric"></div>
+    <div class="r2"><div class="fg"><label class="fl" style="color:var(--cl)">Surname *</label><input class="fi ficl" id="iss-sn" placeholder="Smith"></div><div class="fg"><label class="fl">First Name</label><input class="fi" id="iss-fn" placeholder="Jane"></div></div>
+    <div class="fg"><label class="fl" style="color:var(--cl)">Patient Actual Address *</label><input class="fi ficl" id="iss-addr" placeholder="e.g. 42 Karaka St, Papatoetoe, Auckland 2025"><div class="hint">Required to locate equipment if unreturned</div></div>
+    <div class="fg"><label class="fl">Expected Return Date</label><input class="fi" id="iss-ret" type="date"></div>
+    <div class="fg"><label class="fl" style="color:var(--cl)">Select Equipment *</label><div style="font-size:.65rem;color:var(--mu);margin-bottom:6px">Only Available equipment shown</div><div class="eqgrid" id="iss-eq"></div><div id="iss-none" style="display:none;color:var(--wn);font-size:.74rem;padding:7px;text-align:center">⚠️ No equipment available</div></div>
+    <div class="fg"><label class="fl">Clinical Notes</label><textarea class="fta" id="iss-notes" placeholder="Reason, instructions, expected duration…"></textarea></div>
+    <button class="btn btnc" onclick="submitIssue()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Confirm Issue</button>
+    <button class="btn btns" onclick="CM('m-issue')">Cancel</button>
+  </div>
+</div>
+
+<!-- Episode Detail Modal -->
+<div class="mback" id="m-ep"><div class="modal cm"><div class="mh"></div><div class="mt" id="ep-mt" style="color:var(--cl)"></div><div class="ms" id="ep-ms"></div><div id="ep-body"></div><button class="btn btns" style="margin-top:6px" onclick="CM('m-ep')">Close</button></div></div>
+
+<!-- Add Equipment Modal -->
+<div class="mback" id="m-aeq">
+  <div class="modal"><div class="mh"></div><div class="mt">Register New Equipment</div><div class="ms">Add to the equipment register</div>
+    <div class="fg"><label class="fl">Equipment Name *</label><input class="fi" id="ae-nm" placeholder="e.g. IV Pump — Baxter Sigma"></div>
+    <div class="fg"><label class="fl">Asset ID / Barcode *</label><input class="fi" id="ae-id" placeholder="e.g. IVP-007" style="font-family:'Space Mono',monospace;text-transform:uppercase"></div>
+    <div class="r2"><div class="fg"><label class="fl">Category *</label><select class="fs" id="ae-cat"></select></div><div class="fg"><label class="fl">Status</label><select class="fs" id="ae-st"><option value="Available">Available</option><option value="In Storage">In Storage</option><option value="Maintenance">Maintenance</option></select></div></div>
+    <div class="fg"><label class="fl">Storage Location</label><input class="fi" id="ae-loc" placeholder="e.g. Equipment Bay 2, Shelf B"></div>
+    <div class="fg"><label class="fl">Serial Number</label><input class="fi" id="ae-ser" placeholder="Manufacturer serial number"></div>
+    <div class="r2"><div class="fg"><label class="fl">Purchase Date</label><input class="fi" id="ae-pd" type="date"></div><div class="fg"><label class="fl">Next Service Due</label><input class="fi" id="ae-sd" type="date"></div></div>
+    <div class="fg"><label class="fl">Notes</label><input class="fi" id="ae-nt" placeholder="Warranty, calibration…"></div>
+    <button class="btn btnp" onclick="submitAEq()">Register Equipment</button>
+    <button class="btn btns" onclick="CM('m-aeq')">Cancel</button>
+  </div>
+</div>
+
+<!-- Equipment Detail Modal -->
+<div class="mback" id="m-eqd"><div class="modal"><div class="mh"></div><div class="mt" id="eqd-t"></div><div id="eqd-b"></div><button class="btn btns" style="margin-top:6px" onclick="CM('m-eqd')">Close</button></div></div>
+
+<!-- Add Staff Modal -->
+<div class="mback" id="m-sf">
+  <div class="modal"><div class="mh"></div><div class="mt">Add Staff Member</div><div class="ms">Staff appear in the issuing dropdown</div>
+    <div class="r2"><div class="fg"><label class="fl">First Name *</label><input class="fi" id="sf-fn" placeholder="Maria"></div><div class="fg"><label class="fl">Last Name *</label><input class="fi" id="sf-ln" placeholder="Tane"></div></div>
+    <div class="fg"><label class="fl">Role / Title</label><input class="fi" id="sf-rl" placeholder="Community Nurse RN"></div>
+    <div class="fg"><label class="fl">Email / Teams Login</label><input class="fi" id="sf-em" placeholder="m.tane@health.nz" type="email"></div>
+    <button class="btn btnp" onclick="submitSf()">Add Staff Member</button>
+    <button class="btn btns" onclick="CM('m-sf')">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DCATS=[{icon:'💉',name:'IV Pump'},{icon:'🔬',name:'Bladder Scanner'},{icon:'👁',name:'Visual Acuity Kit'},{icon:'🌡',name:'Thermometer'},{icon:'🩹',name:'Wound Care Kit'},{icon:'💨',name:'Oxygen Saturation Monitor'},{icon:'🫀',name:'Blood Pressure Monitor'},{icon:'💊',name:'Medication Infuser'},{icon:'🩺',name:'Stethoscope'},{icon:'📱',name:'Mobile Device'},{icon:'💻',name:'IT Equipment'},{icon:'📦',name:'Other'}];
+const KEYS={eq:'assetpulse_v1_equipment',ep:'assetpulse_v1_episodes',sf:'assetpulse_v1_staff',ct:'assetpulse_v1_categories',ac:'assetpulse_v1_activity'};
+let DB={eq:[],ep:[],sf:[],ct:DCATS,ac:[]};
+let CCF='all';
+const AIH=[];
+let txToday=0;
+
+// ── Firebase storage adapters ──
+async function SG(k){ return await window.FBget(k); }
+async function SS(k,v){ return await window.FBset(k,v); }
+async function addAct(msg,color='var(--ac)'){
+  try{
+    const l=await SG(KEYS.ac)||[];
+    l.unshift({msg,color,ts:new Date().toISOString()});
+    if(l.length>100)l.pop();
+    await SS(KEYS.ac,l);
+    DB.ac=l;
+  }catch(e){console.warn('addAct error',e);}
+}
+
+async function boot(){
+  // Wait for Firebase module to be ready
+  await new Promise(resolve => {
+    if(window.FBget) return resolve();
+    document.addEventListener('fb-ready', resolve, {once:true});
+    setTimeout(resolve, 4000); // fallback timeout
+  });
+  document.getElementById('lmsg').textContent='Loading equipment register…';
+  DB.eq=await SG(KEYS.eq)||[];
+  DB.ep=await SG(KEYS.ep)||[];
+  DB.sf=await SG(KEYS.sf)||[];
+  DB.ct=await SG(KEYS.ct)||DCATS;
+  DB.ac=await SG(KEYS.ac)||[];
+  document.getElementById('ls').style.display='none';
+  RA();
+  // Live Firebase listeners — update DB and re-render instantly when Field app writes
+  window.FBlisten(KEYS.eq, data=>{ if(data){DB.eq=data;RS();renderDC();if(document.getElementById('page-equipment').classList.contains('active'))filterEq();} });
+  window.FBlisten(KEYS.ep, data=>{ if(data){DB.ep=data;RS();if(document.getElementById('page-clinical').classList.contains('active'))filterEp(CCF,null);document.getElementById('synclbl').textContent='Synced ✓';setTimeout(()=>document.getElementById('synclbl').textContent='Live',1800);} });
+  window.FBlisten(KEYS.ac, data=>{ if(data){DB.ac=data;renderDA();} });
+  window.FBlisten(KEYS.sf, data=>{ if(data){DB.sf=data;renderSF();popSfDd();} });
+}
+
+async function syncNow(){DB.eq=await SG(KEYS.eq)||DB.eq;DB.ep=await SG(KEYS.ep)||DB.ep;DB.ac=await SG(KEYS.ac)||DB.ac;DB.sf=await SG(KEYS.sf)||DB.sf;RA();showToast('Synced with Firebase','info');}
+
+function RA(){RS();renderDA();renderDC();renderCPills();filterEp('all',null);filterEq();renderSF();renderCatS();popSfDd();popCatDd();}
+
+function RS(){
+  const tot=DB.eq.length,av=DB.eq.filter(e=>e.status==='Available').length,mt=DB.eq.filter(e=>e.status==='Maintenance').length;
+  const td=new Date().toISOString().split('T')[0];
+  DB.ep.forEach(e=>{if(e.status==='active'&&e.expectedReturn&&e.expectedReturn<td)e.status='overdue';});
+  const act=DB.ep.filter(e=>e.status==='active'||e.status==='overdue'),ov=DB.ep.filter(e=>e.status==='overdue').length,ret=DB.ep.filter(e=>e.status==='returned').length;
+  S('st-total',tot);S('st-avail',av);S('st-maint',mt);S('st-sc',txToday);S('st-tt',tot+' items registered');S('st-mt',mt>0?mt+' need attention':'All clear');
+  S('cdb-f',act.length);S('cdb-o',ov);S('cl-f',act.length);S('cl-o',ov);S('cl-r',ret);
+}
+
+function renderDA(){
+  const list=DB.ac.slice(0,8);
+  if(!list.length){document.getElementById('dash-act').innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-msg">No activity yet. Issue equipment or register items to see a live feed here.</div></div>';return;}
+  document.getElementById('dash-act').innerHTML=list.map(a=>`<div class="actitem"><div class="acdot" style="background:${a.color}"></div><div class="actxt">${a.msg}<div class="actm">${relT(a.ts)}</div></div></div>`).join('');
+}
+function renderDC(){
+  if(!DB.eq.length){document.getElementById('dash-cats').innerHTML='<div style="font-size:.73rem;color:var(--mu)">No equipment registered yet. Go to Equipment tab to add items.</div>';return;}
+  const cnt={};DB.eq.forEach(e=>{cnt[e.cat]=(cnt[e.cat]||0)+1;});
+  const tot=DB.eq.length,colors=['var(--cl)','var(--ac)','var(--wn)','var(--ac3)','#f472b6','#60a5fa','var(--ac2)','#fb923c'];
+  document.getElementById('dash-cats').innerHTML=Object.entries(cnt).map(([cat,c],i)=>{
+    const f=DB.ct.find(x=>x.name===cat)||{icon:'📦'};
+    return `<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:.75rem">${f.icon} ${cat}</span><span class="mono">${c}</span></div><div class="prog"><div class="pf" style="width:${(c/tot*100).toFixed(0)}%;background:${colors[i%colors.length]}"></div></div></div>`;
+  }).join('');
+}
+
+function renderCPills(){
+  const used=new Set();
+  DB.ep.forEach(e=>e.equipment.forEach(id=>{const eq=DB.eq.find(x=>x.id===id);if(eq)used.add(eq.cat);}));
+  const el=document.getElementById('cl-pills');
+  [...el.querySelectorAll('.pll')].slice(1).forEach(p=>p.remove());
+  used.forEach(cat=>{const c=DB.ct.find(x=>x.name===cat)||{icon:'📦'};const d=document.createElement('div');d.className='pll';d.textContent=`${c.icon} ${cat}`;d.onclick=function(){filterEp(cat,this);};el.appendChild(d);});
+}
+
+function filterEp(cat,pel){
+  CCF=cat;
+  if(pel){document.querySelectorAll('#cl-pills .pll').forEach(p=>p.classList.remove('active'));pel.classList.add('active');}
+  const q=(document.getElementById('cl-search').value||'').toLowerCase();
+  const td=new Date().toISOString().split('T')[0];
+  DB.ep.forEach(e=>{if(e.status==='active'&&e.expectedReturn&&e.expectedReturn<td)e.status='overdue';});
+  const list=DB.ep.filter(e=>{
+    const mq=!q||e.ur.includes(q)||e.surname.toLowerCase().includes(q)||e.address.toLowerCase().includes(q)||(e.firstname||'').toLowerCase().includes(q);
+    const mc=cat==='all'||e.equipment.some(id=>{const eq=DB.eq.find(x=>x.id===id);return eq&&eq.cat===cat;});
+    return mq&&mc;
+  });
+  const act=list.filter(e=>e.status!=='returned'),ret=list.filter(e=>e.status==='returned');
+  let h='';
+  if(act.length)h+=`<div class="st2" style="margin-bottom:7px">In Field (${act.length})</div>`+act.map(epH).join('');
+  if(ret.length)h+=`<div class="st2" style="margin:13px 0 7px">Returned (${ret.length})</div>`+ret.map(epH).join('');
+  if(!act.length&&!ret.length)h='<div class="empty"><div class="empty-icon">🏥</div><div class="empty-msg">No patient episodes yet. Tap "Issue Equipment to Patient" to create the first record.</div></div>';
+  document.getElementById('ep-list').innerHTML=h;
+}
+function epH(ep){
+  const ov=ep.status==='overdue',ret=ep.status==='returned';
+  const days=Math.round((Date.now()-new Date(ep.issuedDate))/86400000);
+  const tags=ep.equipment.map(id=>{const e=DB.eq.find(x=>x.id===id),ir=ep.itemReturns&&ep.itemReturns[id];return e?`<span class="eqtag ${ir?'eqbk':'eqout'}">${e.icon||'📦'} ${e.id}${ir?' ✓':''}</span>`:''}).join('');
+  const allBk=ep.equipment.every(id=>ep.itemReturns&&ep.itemReturns[id]);
+  return `<div class="epitem ${ov&&!ret?'od':''}" onclick="openEp('${ep.id}')">
+    <div class="ephdr"><div style="flex:1;min-width:0"><div class="eppt">${ep.surname}${ep.firstname?', '+ep.firstname:''}</div><div class="epur">UR: ${ep.ur}</div><div class="epad">📍 ${ep.address}</div></div>
+    <div style="text-align:right;flex-shrink:0;margin-left:8px">${ret||allBk?'<span class="bdg bgr">Returned</span>':ov?'<span class="bdg brd">⚠ Overdue</span>':'<span class="bdg bcl">In Field</span>'}<div style="font-size:.57rem;color:var(--mu);margin-top:3px">${days}d</div></div></div>
+    <div class="epeq">${tags}</div><div class="epft"><div class="epst">👤 ${ep.staff}</div><div class="epdt">Due: ${ep.expectedReturn||'—'}</div></div></div>`;
+}
+
+const SB={'Available':'bgr','In Field':'bcl','Maintenance':'bwn','In Storage':'bbl'};
+function filterEq(){
+  const q=(document.getElementById('eq-s').value||'').toLowerCase(),s=document.getElementById('eq-sf').value;
+  const list=DB.eq.filter(e=>(e.name.toLowerCase().includes(q)||e.id.toLowerCase().includes(q)||e.cat.toLowerCase().includes(q))&&(!s||e.status===s));
+  if(!list.length){document.getElementById('eq-list').innerHTML='<div class="empty"><div class="empty-icon">🔧</div><div class="empty-msg">No equipment registered. Tap "Register New Equipment" below.</div></div>';return;}
+  document.getElementById('eq-list').innerHTML=list.map(e=>`<div class="ai2" onclick="openEqD('${e.id}')"><div class="aiic">${e.icon||'📦'}</div><div class="aiinf"><div class="ainm">${e.name}</div><div class="aime">${e.id} · ${e.cat} · ${e.location||'No location'}</div></div><span class="bdg ${SB[e.status]||''}">${e.status}</span></div>`).join('');
+}
+
+function renderSF(){
+  if(!DB.sf.length){document.getElementById('sf-list').innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-msg">No staff added yet. Add staff members so they appear in the issue dropdown.</div></div>';return;}
+  document.getElementById('sf-list').innerHTML=DB.sf.map(s=>{
+    const out=DB.ep.filter(e=>(e.status==='active'||e.status==='overdue')&&e.staff===s.display).length;
+    return `<div class="ai2"><div class="aiic" style="background:linear-gradient(135deg,#7c3aed,var(--ac));color:#fff;font-size:.76rem;font-weight:700">${ini(s.display)}</div><div class="aiinf"><div class="ainm">${s.display}</div><div class="aime">${s.role||'Staff'} · ${s.email||'No email'}</div></div><span class="bdg ${out?'bcl':'bgr'}">${out?out+' out':'Clear'}</span></div>`;
+  }).join('');
+}
+
+function renderCatS(){
+  document.getElementById('cat-list').innerHTML=DB.ct.map((c,i)=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd)"><span style="font-size:1rem">${c.icon}</span><span style="flex:1;font-size:.8rem">${c.name}</span><span style="font-size:.66rem;color:var(--mu)">${DB.eq.filter(e=>e.cat===c.name).length} items</span><span style="color:var(--dg);cursor:pointer;font-size:.78rem" onclick="rmCat(${i})">✕</span></div>`).join('');
+}
+
+async function addCat(){const icon=document.getElementById('nc-icon').value.trim(),name=document.getElementById('nc-name').value.trim();if(!icon||!name){showToast('Icon and name required','warn');return;}if(DB.ct.find(c=>c.name===name)){showToast('Category exists','warn');return;}DB.ct.push({icon,name});await SS(KEYS.ct,DB.ct);document.getElementById('nc-icon').value='';document.getElementById('nc-name').value='';renderCatS();popCatDd();showToast('Category added','ok');}
+async function rmCat(i){DB.ct.splice(i,1);await SS(KEYS.ct,DB.ct);renderCatS();popCatDd();showToast('Category removed','ok');}
+
+function popSfDd(id='iss-stf'){const el=document.getElementById(id);if(!el)return;el.innerHTML='<option value="">— Select staff member —</option>'+DB.sf.map(s=>`<option value="${s.display}">${s.display}${s.role?' — '+s.role:''}</option>`).join('');}
+function popCatDd(){const el=document.getElementById('ae-cat');if(!el)return;el.innerHTML=DB.ct.map(c=>`<option value="${c.name}">${c.icon} ${c.name}</option>`).join('');}
+
+function openIssue(){
+  const d=new Date();d.setDate(d.getDate()+1);document.getElementById('iss-ret').value=d.toISOString().split('T')[0];
+  ['iss-ur','iss-sn','iss-fn','iss-addr','iss-notes'].forEach(id=>document.getElementById(id).value='');
+  const av=DB.eq.filter(e=>e.status==='Available'),grid=document.getElementById('iss-eq'),none=document.getElementById('iss-none');
+  if(!av.length){grid.innerHTML='';none.style.display='block';}
+  else{none.style.display='none';grid.innerHTML=av.map(e=>`<div class="eqchk" onclick="this.classList.toggle('sel')" data-id="${e.id}"><span style="font-size:.9rem">${e.icon||'📦'}</span><div><div class="eqchn">${e.name}</div><div class="eqchid">${e.id}</div></div></div>`).join('');}
+  popSfDd();OM('m-issue');
+}
+async function submitIssue(){
+  const ur=document.getElementById('iss-ur').value.trim(),sn=document.getElementById('iss-sn').value.trim(),fn=document.getElementById('iss-fn').value.trim(),addr=document.getElementById('iss-addr').value.trim(),staff=document.getElementById('iss-stf').value;
+  const eq=[...document.querySelectorAll('#iss-eq .eqchk.sel')].map(el=>el.dataset.id);
+  if(!ur||!sn||!addr){showToast('UR, surname and address required','warn');return;}
+  if(!staff){showToast('Select a staff member','warn');return;}
+  if(!eq.length){showToast('Select at least one piece of equipment','warn');return;}
+  const ep={id:'EP'+Date.now(),ur,surname:sn,firstname:fn,address:addr,equipment:eq,issuedDate:new Date().toISOString(),expectedReturn:document.getElementById('iss-ret').value,returnedDate:null,staff,itemReturns:{},notes:document.getElementById('iss-notes').value,status:'active'};
+  DB.ep.unshift(ep);eq.forEach(id=>{const e=DB.eq.find(x=>x.id===id);if(e)e.status='In Field';});
+  await SS(KEYS.ep,DB.ep);await SS(KEYS.eq,DB.eq);
+  await addAct(`📤 <strong>${eq.length} item(s)</strong> issued to <strong>${sn}${fn?', '+fn:''}</strong> (UR ${ur}) by ${staff}`,'var(--cl)');
+  txToday++;RA();renderCPills();CM('m-issue');showToast('Equipment issued to '+sn,'ok');
+}
+
+function openEp(id){
+  const ep=DB.ep.find(x=>x.id===id);if(!ep)return;
+  const allBk=ep.equipment.every(id=>ep.itemReturns&&ep.itemReturns[id]),ret=ep.status==='returned'||allBk;
+  document.getElementById('ep-mt').textContent=`${ep.surname}${ep.firstname?', '+ep.firstname:''}`;
+  document.getElementById('ep-ms').textContent=`UR: ${ep.ur}`;
+  const eqRows=ep.equipment.map(id=>{
+    const e=DB.eq.find(x=>x.id===id),ir=ep.itemReturns&&ep.itemReturns[id];if(!e)return'';
+    return `<div class="ritem ${ir?'done sel':''}" id="ri-${id}" data-id="${id}"><div style="font-size:1.1rem;flex-shrink:0">${e.icon||'📦'}</div><div style="flex:1"><div style="font-weight:600;font-size:.8rem">${e.name}</div><div class="mono" style="color:var(--ac);margin-top:1px">${e.id}</div><div style="font-size:.66rem;margin-top:2px;color:${ir?'var(--ac3)':'var(--cl)'}">${ir?`✅ Returned ${shortD(ir.date)} · ${ir.staff}`:'⬤ Currently in field'}</div></div><div class="rcb" id="rcb-${id}">${ir?`<svg fill="none" viewBox="0 0 24 24" stroke="#10b981" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>`:''}</div></div>`;
+  }).join('');
+  const ov=ep.status==='overdue';
+  document.getElementById('ep-body').innerHTML=`
+    ${ov&&!ret?`<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:7px;padding:8px;margin-bottom:10px;font-size:.74rem;color:var(--dg)">⚠️ <strong>Overdue.</strong> Expected: ${ep.expectedReturn}</div>`:''}
+    <div class="card" style="background:var(--sf2);padding:11px;margin-bottom:10px"><table style="width:100%;font-size:.73rem;border-collapse:collapse">
+      ${[['UR',`<span style="font-family:'Space Mono',monospace;color:var(--cl)">${ep.ur}</span>`],['Patient',`<strong>${ep.surname}${ep.firstname?', '+ep.firstname:''}</strong>`],['Address',ep.address],['Issued',shortD(ep.issuedDate)],['Expected return',`<span style="color:${ov&&!ret?'var(--dg)':'inherit'}">${ep.expectedReturn||'—'}</span>`],['Staff',`<span style="color:var(--ac)">${ep.staff}</span>`],['Notes',ep.notes||'—']].map(([k,v])=>`<tr><td style="color:var(--mu);padding:4px 0;width:36%;vertical-align:top">${k}</td><td style="padding:4px 0">${v}</td></tr>`).join('')}
+    </table></div>
+    ${!ret?`<div class="st2" style="margin-bottom:7px">Record Returns — tap to select</div>${eqRows}
+    <div class="fg" style="margin-top:10px"><label class="fl">Returned By *</label><select class="fs" id="ret-sf"></select></div>
+    <div class="fg"><label class="fl">Return Notes</label><input class="fi" id="ret-nt" placeholder="Condition, damage notes…"></div>
+    <div style="display:flex;gap:6px;margin-top:3px"><button class="btn btng" style="flex:1;margin:0" onclick="retSel('${ep.id}')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Return Selected</button><button class="btn btnp" style="flex:1;margin:0" onclick="retAll('${ep.id}')">Return All</button></div>`
+    :`${eqRows}<div class="bdg bgr" style="display:inline-block;padding:5px 12px;font-size:.74rem;margin-top:9px">✅ All returned${ep.returnedDate?' '+shortD(ep.returnedDate):''}${ep.returnedBy?' · '+ep.returnedBy:''}</div>`}`;
+  if(!ret){ep.equipment.forEach(id=>{const ir=ep.itemReturns&&ep.itemReturns[id];if(!ir){const el=document.getElementById('ri-'+id);if(el)el.addEventListener('click',()=>{el.classList.toggle('sel');const cb=document.getElementById('rcb-'+id);if(el.classList.contains('sel')){cb.innerHTML='<svg fill="none" viewBox="0 0 24 24" stroke="var(--ac)" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>';cb.style.background='rgba(0,229,255,.15)';cb.style.borderColor='var(--ac)';}else{cb.innerHTML='';cb.style.background='';cb.style.borderColor='';}});}});popSfDd('ret-sf');}
+  OM('m-ep');
+}
+async function retSel(epId){const ep=DB.ep.find(x=>x.id===epId);if(!ep)return;const sf=document.getElementById('ret-sf')?.value;if(!sf){showToast('Select returning staff member','warn');return;}const sel=[...document.querySelectorAll('.ritem.sel:not(.done)')].map(el=>el.dataset.id);if(!sel.length){showToast('Tap items above to select','warn');return;}await doRet(ep,sel,sf);}
+async function retAll(epId){const ep=DB.ep.find(x=>x.id===epId);if(!ep)return;const sf=document.getElementById('ret-sf')?.value;if(!sf){showToast('Select returning staff member','warn');return;}const toRet=ep.equipment.filter(id=>!(ep.itemReturns&&ep.itemReturns[id]));await doRet(ep,toRet,sf);}
+async function doRet(ep,ids,staff){
+  const now=new Date().toISOString();if(!ep.itemReturns)ep.itemReturns={};
+  ids.forEach(id=>{ep.itemReturns[id]={date:now,staff};const e=DB.eq.find(x=>x.id===id);if(e)e.status='Available';});
+  const allBk=ep.equipment.every(id=>ep.itemReturns[id]);
+  if(allBk){ep.status='returned';ep.returnedDate=now;ep.returnedBy=staff;}
+  await SS(KEYS.ep,DB.ep);await SS(KEYS.eq,DB.eq);
+  await addAct(`📥 <strong>${ids.length} item(s)</strong> returned from <strong>${ep.surname}</strong> (UR ${ep.ur}) by ${staff}`,'var(--ac3)');
+  txToday++;RA();filterEp(CCF,null);CM('m-ep');showToast(`${ids.length} item(s) returned · ${staff}`,'ok');
+}
+
+function openAddEq(){['ae-nm','ae-id','ae-loc','ae-ser','ae-nt'].forEach(id=>document.getElementById(id).value='');document.getElementById('ae-pd').value='';document.getElementById('ae-sd').value='';document.getElementById('ae-st').value='Available';popCatDd();OM('m-aeq');}
+async function submitAEq(){
+  const nm=document.getElementById('ae-nm').value.trim(),id=document.getElementById('ae-id').value.trim().toUpperCase(),cat=document.getElementById('ae-cat').value;
+  if(!nm||!id||!cat){showToast('Name, ID and category required','warn');return;}
+  if(DB.eq.find(e=>e.id===id)){showToast('Asset ID '+id+' already exists','warn');return;}
+  const co=DB.ct.find(c=>c.name===cat)||{icon:'📦'};
+  DB.eq.unshift({id,name:nm,cat,icon:co.icon,status:document.getElementById('ae-st').value,location:document.getElementById('ae-loc').value,serial:document.getElementById('ae-ser').value,purchaseDate:document.getElementById('ae-pd').value,serviceDate:document.getElementById('ae-sd').value,notes:document.getElementById('ae-nt').value,registeredDate:new Date().toISOString()});
+  await SS(KEYS.eq,DB.eq);await addAct(`🔧 <strong>${nm} ${id}</strong> registered · ${cat}`,'var(--ac)');
+  RA();CM('m-aeq');showToast(nm+' registered','ok');
+}
+
+function openEqD(id){
+  const e=DB.eq.find(x=>x.id===id);if(!e)return;
+  const ep=e.status==='In Field'?DB.ep.find(ep=>ep.equipment.includes(id)&&ep.status!=='returned'):null;
+  document.getElementById('eqd-t').textContent=e.name;
+  document.getElementById('eqd-b').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+      <div class="card" style="margin:0;padding:9px;background:var(--sf2)"><div style="font-size:.63rem;color:var(--mu)">Asset ID</div><div class="mono" style="color:var(--ac);margin-top:2px">${e.id}</div></div>
+      <div class="card" style="margin:0;padding:9px;background:var(--sf2)"><div style="font-size:.63rem;color:var(--mu)">Status</div><div style="margin-top:3px"><span class="bdg ${SB[e.status]||''}">${e.status}</span></div></div>
+    </div>
+    ${ep?`<div style="background:var(--cdim);border:1px solid var(--cborder);border-radius:7px;padding:8px;margin-bottom:9px;font-size:.73rem;color:var(--cl)">🏥 With <strong>${ep.surname}${ep.firstname?', '+ep.firstname:''}</strong> (UR ${ep.ur})<br>📍 ${ep.address}<br>👤 ${ep.staff}</div>`:''}
+    <div class="card" style="background:var(--sf2);padding:11px;margin-bottom:9px"><table style="width:100%;font-size:.72rem;border-collapse:collapse">
+      ${[['Category',e.cat],['Location',e.location||'—'],['Serial',e.serial||'—'],['Purchase Date',shortD(e.purchaseDate)||'—'],['Next Service',shortD(e.serviceDate)||'—'],['Notes',e.notes||'—']].map(([k,v])=>`<tr><td style="color:var(--mu);padding:4px 0;width:38%">${k}</td><td style="padding:4px 0">${v}</td></tr>`).join('')}
+    </table></div>
+    <div style="display:flex;gap:6px"><button class="btn btnc" style="flex:1;margin:0" onclick="CM('m-eqd');openIssueForEq('${e.id}')">Issue to Patient</button><button class="btn btnd" style="flex:1;margin:0" onclick="CM('m-eqd');togMaint('${e.id}')">${e.status==='Maintenance'?'Mark Available':'Flag Maintenance'}</button></div>
+    <button class="btn btnd" style="margin-top:6px" onclick="delEq('${e.id}')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Delete Equipment Record</button>`;
+  OM('m-eqd');
+}
+function openIssueForEq(id){openIssue();setTimeout(()=>{const el=document.querySelector(`#iss-eq [data-id="${id}"]`);if(el)el.classList.add('sel');},100);}
+async function togMaint(id){const e=DB.eq.find(x=>x.id===id);if(!e)return;e.status=e.status==='Maintenance'?'Available':'Maintenance';await SS(KEYS.eq,DB.eq);await addAct(`🔧 <strong>${e.name} ${e.id}</strong> → ${e.status}`,e.status==='Maintenance'?'var(--wn)':'var(--ac3)');RA();showToast(e.id+' marked '+e.status,'ok');}
+async function delEq(id){if(!confirm('Delete '+id+'? Cannot be undone.'))return;DB.eq=DB.eq.filter(e=>e.id!==id);await SS(KEYS.eq,DB.eq);CM('m-eqd');RA();showToast('Equipment deleted','ok');}
+
+function openAddSf(){['sf-fn','sf-ln','sf-rl','sf-em'].forEach(id=>document.getElementById(id).value='');OM('m-sf');}
+async function submitSf(){
+  const fn=document.getElementById('sf-fn').value.trim(),ln=document.getElementById('sf-ln').value.trim();
+  if(!fn||!ln){showToast('First and last name required','warn');return;}
+  const disp=fn.charAt(0)+'. '+ln;
+  if(DB.sf.find(s=>s.display===disp)){showToast('Staff member exists','warn');return;}
+  DB.sf.push({display:disp,firstname:fn,lastname:ln,role:document.getElementById('sf-rl').value,email:document.getElementById('sf-em').value});
+  await SS(KEYS.sf,DB.sf);CM('m-sf');renderSF();popSfDd();showToast(disp+' added','ok');
+}
+
+async function sendAI(){
+  const inp=document.getElementById('ai-in');const msg=inp.value.trim();if(!msg)return;inp.value='';
+  addAIM('user',msg);AIH.push({role:'user',content:msg});
+  const tid='t'+Date.now();document.getElementById('ai-msgs').insertAdjacentHTML('beforeend',`<div class="aimsg bot" id="${tid}"><div class="aiav">AI</div><div class="aibub"><div class="tdots"><span></span><span></span><span></span></div></div></div>`);scAI();
+  const ctx=`Equipment (${DB.eq.length}): ${DB.eq.slice(0,30).map(e=>`[${e.id}] ${e.name} ${e.cat} ${e.status}`).join('; ')}. Episodes (${DB.ep.length}): ${DB.ep.slice(0,20).map(e=>`UR:${e.ur} ${e.surname} ${e.status} equip:${e.equipment.join(',')} staff:${e.staff} due:${e.expectedReturn}`).join('; ')}. Staff: ${DB.sf.map(s=>s.display).join(', ')}. Today: ${new Date().toISOString().split('T')[0]}.`;
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are AssetPulse AI for a Community Nursing Service. Be concise (2-4 sentences), clinically practical. Reference specific IDs, UR numbers, staff. Today: ${new Date().toISOString().split('T')[0]}. Data: ${ctx}`,messages:AIH})});
+    const d=await res.json();document.getElementById(tid)?.remove();
+    const r=d.content?.map(b=>b.text||'').join('')||'No response.';addAIM('bot',r);AIH.push({role:'assistant',content:r});
+  }catch{document.getElementById(tid)?.remove();addAIM('bot','⚠️ Connection error.');}
+}
+function addAIM(role,text){document.getElementById('ai-msgs').insertAdjacentHTML('beforeend',`<div class="aimsg ${role}">${role==='bot'?'<div class="aiav">AI</div>':''}<div class="aibub">${text}</div></div>`);scAI();}
+function scAI(){const el=document.getElementById('ai-msgs');el.scrollTop=el.scrollHeight;}
+function qAI(p){document.getElementById('ai-in').value=p;sendAI();SP('ai',document.querySelectorAll('.tab')[4]);}
+
+async function exportData(){const d={equipment:DB.eq,episodes:DB.ep,staff:DB.sf,categories:DB.ct,exportedAt:new Date().toISOString()};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='assetpulse-'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(u);showToast('Data exported','ok');}
+async function clrData(){if(!confirm('Permanently delete ALL data?'))return;DB={eq:[],ep:[],sf:[],ct:DCATS,ac:[]};await SS(KEYS.eq,[]);await SS(KEYS.ep,[]);await SS(KEYS.sf,[]);await SS(KEYS.ct,DCATS);await SS(KEYS.ac,[]);RA();showToast('All data cleared','warn');}
+
+function SP(id,tabEl){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');t.classList.remove('acl');});document.getElementById('page-'+id).classList.add('active');if(tabEl){tabEl.classList.add('active');if(id==='clinical')tabEl.classList.add('acl');}if(id==='clinical'){renderCPills();filterEp(CCF,null);RS();}if(id==='equipment')filterEq();if(id==='staff')renderSF();if(id==='settings')renderCatS();}
+function OM(id){document.getElementById(id).classList.add('open');}
+function CM(id){document.getElementById(id).classList.remove('open');}
+function S(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
+function ini(n){return(n||'').split(' ').map(p=>p.replace('.','').charAt(0)).join('').toUpperCase().slice(0,2);}
+function shortD(s){if(!s)return'';try{return new Date(s).toLocaleDateString('en-NZ',{day:'2-digit',month:'short',year:'numeric'});}catch{return s;}}
+function relT(ts){try{const d=(Date.now()-new Date(ts))/1000;if(d<60)return'Just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}catch{return'';}}
+let tT;
+function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=(type==='ok'?'✅ ':type==='warn'?'⚠️ ':'ℹ️ ')+msg;t.className='toast show '+type;clearTimeout(tT);tT=setTimeout(()=>t.className='toast',3000);}
+document.querySelectorAll('.mback').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+boot();
+</script>
+</body>
+</html>
