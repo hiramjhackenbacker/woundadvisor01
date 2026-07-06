@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to St Vincent's HITH</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #f5f5f3; color: #1a1a1a; padding: 2rem 1rem; }
+  .email-wrap { max-width: 640px; margin: 0 auto; }
+  .email-header { background: #f0eeeb; border-radius: 12px; border: 0.5px solid #d8d6cf; padding: 1.75rem 2rem 1.5rem; margin-bottom: 1rem; }
+  .email-header h1 { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 0.4rem; }
+  .email-header p { font-size: 14px; color: #555; line-height: 1.65; }
+  .card { background: #fff; border-radius: 12px; border: 0.5px solid #d8d6cf; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .card h2 { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 1rem; }
+  .card p { font-size: 13px; color: #555; line-height: 1.6; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 0.75rem; }
+  .compare-table th { font-size: 13px; font-weight: 500; color: #1a1a1a; text-align: left; padding: 6px 10px 8px; border-bottom: 0.5px solid #d8d6cf; }
+  .compare-table td { padding: 7px 10px; color: #555; vertical-align: top; line-height: 1.5; border-bottom: 0.5px solid #d8d6cf; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .col-hith { border-right: 0.5px solid #d8d6cf; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 20px; }
+  .pill-teal { background: #E1F5EE; color: #0F6E56; }
+  .pill-purple { background: #EEEDFE; color: #3C3489; }
+  .link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 0.25rem; }
+  .link-item { display: flex; align-items: center; gap: 8px; background: #f5f5f3; border-radius: 8px; padding: 9px 12px; text-decoration: none; color: #1a1a1a; font-size: 13px; border: 0.5px solid #d8d6cf; }
+  .link-item:hover { border-color: #aaa; }
+  .link-icon { font-size: 15px; flex-shrink: 0; color: #888; }
+  .note { font-size: 12px; color: #888; margin-top: 10px; line-height: 1.6; }
+  .note strong { font-weight: 500; color: #555; }
+  .section-label { font-size: 12px; font-weight: 500; color: #1a1a1a; margin: 1.25rem 0 0.5rem; }
+  .section-label span { font-weight: 400; color: #888; }
+  .sub-note { font-size: 13px; color: #555; margin-bottom: 10px; }
+  .sub-note a { color: #1a6fb5; }
+  .training-list { list-style: none; }
+  .training-list li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid #ebebeb; font-size: 14px; color: #1a1a1a; line-height: 1.5; }
+  .training-list li:last-child { border-bottom: none; }
+  .t-icon { font-size: 16px; color: #aaa; margin-top: 1px; flex-shrink: 0; }
+  .t-label { flex: 1; }
+  .tag-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+  a.tag { font-size: 12px; padding: 2px 9px; border-radius: 20px; background: #f5f5f3; border: 0.5px solid #d8d6cf; color: #555; text-decoration: none; }
+  a.tag:hover { color: #1a1a1a; border-color: #aaa; }
+  .warn { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: #FAEEDA; color: #854F0B; padding: 2px 9px; border-radius: 20px; }
+  .sign-off { font-size: 14px; color: #555; line-height: 1.7; padding: 0.5rem 0 1rem; }
+</style>
+</head>
+<body>
+<div class="email-wrap">
+
+  <div class="email-header">
+    <h1>Welcome to St Vincent's HITH</h1>
+    <p>We look forward to meeting you in person. Keep this email handy as a reference for your first few months &mdash; it covers system access, mandatory training, and credentialing milestones.</p>
+  </div>
+
+  <div class="card">
+    <h2>About our service</h2>
+    <p>HITH is part of <strong style="font-weight:500;color:#1a1a1a;">SVVH (St Vincent's Virtual Home)</strong>, which also includes District Nursing. Your office space and many resources are shared between both teams.</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th class="col-hith"><span class="pill pill-teal">HITH</span></th>
+          <th><span class="pill pill-purple">District Nursing</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="col-hith">Medically-led</td><td>Nursing-led</td></tr>
+        <tr><td class="col-hith">Acute-level care</td><td>Acute &amp; sub-acute care</td></tr>
+        <tr><td class="col-hith">Bed substitution model</td><td>Promotes patient independence</td></tr>
+        <tr><td class="col-hith">ED diversion / hospital &amp; community referrals</td><td>Hospital / community referrals (CHSP / PYP criteria)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>System access &amp; logins</h2>
+    <p style="font-size:12px;color:#888;margin-bottom:12px;">Items marked * require line manager sign-off before access is granted.</p>
+    <div class="link-grid">
+      <a class="link-item" href="https://outlook.office365.com/" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+        Outlook email
+      </a>
+      <a class="link-item" href="http://pas.intra.svhm.org.au/" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        PAS
+      </a>
+      <a class="link-item" href="https://teams.microsoft.com/_?form=MY01SV&OCID=MY01SV" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7a4 4 0 1 0 8 0 4 4 0 0 0-8 0M3 21v-2a4 4 0 0 1 4-4h8"/><circle cx="19" cy="8" r="2"/><path d="M19 14v6m-3-3h6"/></svg>
+        Teams
+      </a>
+      <a class="link-item" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWJiYjkxZmEtN2MyMC00OWJmLTk1ZDQtYWM4MTg3MDQzZDJi%40thread.v2/0?context=%7b%22Tid%22%3a%220efe9a78-ee2f-44a1-aa0f-83011f5d244d%22%2c%22Oid%22%3a%2292b1bb8e-6975-4da3-b470-1de7fc9da19c%22%7d" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M9 4v5"/></svg>
+        HITH Handovers *
+      </a>
+      <a class="link-item" href="https://teams.microsoft.com/l/channel/19%3ad0d28296673c41c4a6f205dbdc34e3b6%40thread.tacv2/Education?groupId=e64fcb71-34e9-43bf-9177-d2971b77ab42&tenantId=0efe9a78-ee2f-44a1-aa0f-83011f5d244d" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13.4A.6.6 0 0 1 20 3.6V17"/><path d="M8 7h8M8 11h6M6 21h14a2 2 0 0 0 0-4H6a2 2 0 0 0 0 4z"/></svg>
+        Education channel *
+      </a>
+      <a class="link-item" href="https://mro-svhm-prod.svha.org.au/udr/index.htm" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>
+        MRO
+      </a>
+      <a class="link-item" href="https://svhaorg.sharepoint.com/:b:/r/teams/SVVHAcuteProgram/Shared%20Documents/Education/FAQ%20+%20Cheat%20Sheets/_MRO%20PhotoUpload%201.6.pdf?csf=1&web=1&e=5PIcVA" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        MRO photo upload
+      </a>
+      <a class="link-item" href="https://svhaorg.sharepoint.com/:w:/r/teams/SVVHAcuteProgram/Shared%20Documents/Education/FAQ%20+%20Cheat%20Sheets/PRINT%20Follow%20Me%20Print%20installation.docx?d=wd8055d28b718463eb3cbc99b95fbfa33&csf=1&web=1&e=DIU5Yi" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2"/><path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Follow Me printing
+      </a>
+      <a class="link-item" href="https://svha-prd-ause-as-epjb-client.azurewebsites.net/" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Electronic Journey Board
+      </a>
+      <a class="link-item" href="https://rds.svha.org.au/RDWeb/Pages/en-US/login.aspx?ReturnUrl=/RDWeb/Pages/en-US/Default.aspx" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Remote access *
+      </a>
+      <a class="link-item" href="http://beatbox.cloud/" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 8 6 10 18 12 10 14 14 16 12 22 12"/></svg>
+        BeatBox (ECG)
+      </a>
+      <a class="link-item" href="https://servicedesk.svha.org.au/CherwellPortal/SVHA?_=76089283" target="_blank" rel="noopener">
+        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        IT service desk
+      </a>
+    </div>
+    <p class="note" style="margin-top:12px;">IT helpline: <strong>1300 518 001</strong> &nbsp;|&nbsp; Uniti &amp; Uniti Remote Access &mdash; speak to your line manager for setup.</p>
+  </div>
+
+  <div class="card">
+    <h2>New starters pathway</h2>
+    <p style="font-size:13px;color:#555;margin-bottom:1rem;line-height:1.6;">Completed as a mix of online, workshop, and supervised activities. Mandatory training is due during your initial orientation; credentialing milestones are to be completed within your first 26 weeks.</p>
+
+    <p class="section-label">Mandatory training <span>&mdash; initial orientation</span></p>
+    <ul class="training-list" style="margin-bottom:1.25rem;">
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="t-label">Local Orientation <span style="color:#888;">(see attachment)</span></span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="t-label">SVHM Nursing Orientation <span style="color:#888;">(see attachment)</span></span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <span class="t-label">
+          Basic Life Support
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/d/inst/1$17816/17816$464.htmld?type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">online</a>
+            <a class="tag" href="mailto:ben.stone@svha.org.au">contact educator</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+        <span class="t-label">
+          Care of Deteriorating Patient &mdash; ABCDE
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/5bb519774771013006ae1b0e80015971/lesson/5bb51977477101a730a7170e80015671?record=faa8c5c548621000d7d0ecbd76c30000&type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">online</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="t-label">
+          PPE training
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/7cfe0c87dda501e25273025fce0025e4?record=8b55267f1789100030c458e0ffd60000&type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">one-off online</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v8m-4 4c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>
+        <span class="t-label">
+          SVHM MoveSmart
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/d/inst/1$17815/17815$57.htmld?record=8b55267f1789100030c458e0ffd60000&type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">core</a>
+            <a class="tag" href="https://wd3.myworkday.com/svha/d/inst/1$17815/17815$60.htmld?record=8b55267f1789100030c458e0ffd60000&type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">refresher</a>
+          </div>
+        </span>
+      </li>
+    </ul>
+
+    <p class="section-label">Credentialing <span>&mdash; within 26 weeks</span></p>
+    <p class="sub-note">See also: <a href="https://svhaorg.sharepoint.com/sites/Melbourne-Public-Education-Learning/SitePages/Continuing-Development-for-Nurses.aspx" target="_blank" rel="noopener">Continuing Development for Nurses</a></p>
+    <ul class="training-list">
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9"/><path d="M12 8v4l3 1m6 1-3 1-1 3"/></svg>
+        <span class="t-label">
+          IV Cannulation
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/9f043cffaf0a01826d916b22ca01d1f9?record=c32599de2047010211af32232e370001&type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">online</a>
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/offering/09f1b8671ee30100e073e03672e80000?record=38b2fb5271f60100e0bbd4dca0cf0001&type=7c48590b5257100009485b7a25ae0068" target="_blank" rel="noopener">workshop</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
+        <span class="t-label">
+          Venepuncture
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/97fef583e83401095eca88cea3384620?record=f374173e760d01004b529e37b1670000&type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">online</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5"/><path d="M12 2v4M8 21h8M12 17v4M4 15h16"/></svg>
+        <span class="t-label">
+          Hand Hygiene
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/71d601afa9c40101e390c6687b37b972?record=e0e4f59dae4a1000728eca572afc0000&type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">online</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v3l4-4-4-4v3H7z"/><path d="M17 17H7v-3l-4 4 4 4v-3h10z"/></svg>
+        <span class="t-label">
+          CVAD Dressing &mdash; ANTT
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/b7cdef99edab01012fb7d0cea4090000?type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">online</a>
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/b7c8f7ae80511000ceebeb11615d0000?type=9882927d138b100019b6a2df1a46018b" target="_blank" rel="noopener">workshop</a>
+            <a class="tag" href="https://www.eviq.org.au/clinical-resources/central-venous-access-devices-cvads/900-central-venous-access-device-dressing-and-n" target="_blank" rel="noopener">video</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v3l4-4-4-4v3H7z"/><path d="M17 17H7v-3l-4 4 4 4v-3h10z"/></svg>
+        <span class="t-label">
+          CVAD Access
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/8156f72ffc4f01e8ecb92c4d5700a249?type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">additional online</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>
+        <span class="t-label">
+          CVAD Removal
+          <div class="tag-links">
+            <a class="tag" href="mailto:ben.stone@svha.org.au">contact educator</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v3l4-4-4-4v3H7z"/><path d="M17 17H7v-3l-4 4 4 4v-3h10z"/></svg>
+        <span class="t-label">
+          TIVAD Access / De-access
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/8156f72ffc4f01e8ecb92c4d5700a249?type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">additional online</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="t-label">
+          Visual Acuity testing
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/program/b439c2415591100177db9dfaa8030000?type=2d29754fdb8e100008b50ff6bc94003b" target="_blank" rel="noopener">online</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9"/><path d="M12 8v4l3 1m6 1-3 1-1 3"/></svg>
+        <span class="t-label">
+          Male IDC insertion
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/97fef583e83401eca0361bcea338d61f?type=9882927d138b100019b928e75843018d" target="_blank" rel="noopener">online</a>
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/97fef583e8340149299ccb5cee38e1b2?type=9882927d138b100019b6a2df1a46018b" target="_blank" rel="noopener">workshop</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="t-label">
+          VAC Dressings
+          <div class="tag-links">
+            <a class="tag" href="https://wd3.myworkday.com/svha/learning/course/d820549fe00910017179b05be54e0000?type=9882927d138b100019b6a2df1a46018b" target="_blank" rel="noopener">workshop</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+        <span class="t-label">
+          Chemo disconnect
+          <div class="tag-links">
+            <a class="tag" href="https://svhaorg.sharepoint.com/sites/Melbourne-Public-Policies/Published/Forms/AllItems.aspx?id=%2Fsites%2FMelbourne%2DPublic%2DPolicies%2FPublished%2FCytotoxic%20Medication%20Administration%20and%20Safe%20Handling%2Epdf&parent=%2Fsites%2FMelbourne%2DPublic%2DPolicies%2FPublished%27;" target="_blank" rel="noopener">policy</a>
+            <a class="tag" href="https://www.eviq.org.au/clinical-resources/administration-of-anti-cancer-drugs/188-safe-handling-and-waste-management-of-hazardou" target="_blank" rel="noopener">online (eviQ)</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+        <span class="t-label">
+          Alteplase for CVAD clearance
+          <div class="tag-links">
+            <a class="tag" href="https://svhaorg.sharepoint.com/sites/Melbourne-Public-Policies/Published/Forms/AllItems.aspx?id=%2Fsites%2FMelbourne%2DPublic%2DPolicies%2FPublished%2FAlteplase%20%28intraluminal%29for%20CVAD%20Clearance%2Epdf&parent=%2Fsites%2FMelbourne%2DPublic%2DPolicies%2FPublished" target="_blank" rel="noopener">policy</a>
+            <a class="tag" href="https://www.eviq.org.au/clinical-resources/central-venous-access-devices-cvads/771-central-venous-access-device-cvad-restoring" target="_blank" rel="noopener">overview (eviQ)</a>
+          </div>
+        </span>
+      </li>
+      <li>
+        <svg class="t-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <span class="t-label">
+          Anti-cancer drug safety IV
+          <div class="tag-links">
+            <a class="tag" href="https://videos-cloudfront.jwpsrv.com/6760d5cd_18207b3de80dcc1e6644d0324c3b5bceb711637e/content/conversions/Q8iWyjEz/videos/2Gkk193x-31866729.mp4" target="_blank" rel="noopener">video</a>
+          </div>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <p class="sign-off">Please reach out to me or any of your colleagues if you have questions &mdash; we're happy to help. Welcome aboard!</p>
+
+</div>
+</body>
+</html>
