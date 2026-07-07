@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alteplase SbS Guide · HITH CVAD</title>
+<style>
+:root{
+  --navy:#0D2D5E;--navy-mid:#164080;--blue:#1A6FAF;--blue-lt:#E5F0FA;
+  --bg:#EEF2F7;--surface:#FFFFFF;
+  --amber:#C97A00;--amber-bg:#FFFBEB;--amber-bd:#FDE68A;
+  --red:#C91B1B;--red-bg:#FEF2F2;--red-bd:#FEB4B4;
+  --green:#14803D;--green-bg:#F0FDF4;--green-bd:#A7F3C3;
+  --muted:#6B7280;--border:#DDE3EC;--text:#1B2333;
+  --r:13px;--r-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px;padding-bottom:82px;}
+
+/* HEADER */
+.app-header{position:sticky;top:0;z-index:100;background:var(--navy);padding:12px 16px 0;}
+.header-row1{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:10px;}
+.header-left .eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);}
+.header-left .title{font-size:19px;font-weight:800;color:#fff;line-height:1.2;}
+.header-left .sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px;}
+.sop-pill{background:rgba(255,255,255,.15);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;display:inline-block;}
+.progress-track{height:4px;background:rgba(255,255,255,.15);border-radius:2px;}
+.progress-fill{height:100%;background:#4ADE80;border-radius:2px;transition:width .5s ease;}
+.phase-row{display:flex;justify-content:space-between;padding:5px 0 8px;font-size:11px;color:rgba(255,255,255,.45);}
+
+/* SCREENS */
+.screen{display:none;padding:16px;}
+.screen.active{display:block;}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 5px rgba(0,0,0,.07);margin-bottom:12px;overflow:hidden;}
+.card-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.si-b{background:#DBEAFE;}.si-a{background:#FEF3C7;}.si-g{background:#DCFCE7;}
+.si-r{background:#FEE2E2;}.si-p{background:#EDE9FE;}.si-n{background:#E0ECF8;}
+.card-title{font-size:15px;font-weight:700;color:var(--navy);}
+.card-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+.card-body{padding:0 16px 16px;}
+
+/* INFO BOXES */
+.ib{border-left:3px solid;border-radius:11px;padding:10px 13px;margin-bottom:10px;font-size:13px;line-height:1.55;}
+.ib.b{background:var(--blue-lt);border-color:var(--blue);}
+.ib.a{background:var(--amber-bg);border-color:var(--amber);}
+.ib.r{background:var(--red-bg);border-color:var(--red);}
+.ib.g{background:var(--green-bg);border-color:var(--green);}
+.ib strong{display:block;font-weight:700;margin-bottom:2px;}
+
+/* STEP LIST */
+.step-list{list-style:none;}
+.step-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.step-item:last-child{border-bottom:none;}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:14px;line-height:1.55;flex:1;}
+.step-text small{display:block;font-size:12px;color:var(--muted);margin-top:2px;font-style:italic;}
+
+/* CHECKLIST */
+.check-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer;user-select:none;}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:23px;height:23px;border-radius:6px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .2s;}
+.check-item.checked .check-box{background:var(--green);border-color:var(--green);}
+.check-item.checked .check-box::after{content:'✓';color:#fff;font-size:13px;font-weight:700;}
+.check-item.checked .check-label{text-decoration:line-through;color:var(--muted);}
+.check-label{font-size:14px;line-height:1.5;flex:1;}
+.check-label small{display:block;font-size:12px;color:var(--muted);font-style:italic;margin-top:2px;}
+.check-item.warn .check-box{border-color:var(--amber);}
+.check-item.crit .check-box{border-color:var(--red);}
+
+/* EQUIPMENT */
+.equip-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.equip-item{background:var(--blue-lt);border-radius:var(--r-sm);padding:10px 11px;font-size:13px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:7px;}
+.equip-item .ei{font-size:16px;}
+.equip-extra{background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:10px 12px;}
+.equip-extra-title{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+
+/* PATHWAY BUTTONS */
+.pathway-btn{display:block;width:100%;padding:16px;border-radius:var(--r);border:2px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;margin-bottom:10px;transition:all .2s;}
+.pathway-btn:hover{border-color:var(--blue);background:var(--blue-lt);}
+.pathway-title{font-size:16px;font-weight:700;color:var(--navy);}
+.pathway-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:6px;}
+.pill-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd);}
+.pill-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
+.pill-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
+.pill-blue{background:var(--blue-lt);color:var(--blue);border:1px solid var(--blue);}
+.pill-navy{background:var(--navy);color:#fff;}
+
+/* NAV BAR */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:10px;z-index:100;}
+.btn{border:none;border-radius:var(--r-sm);padding:13px 20px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;line-height:1;}
+.btn-back{background:var(--bg);color:var(--text);border:1px solid var(--border);flex:0 0 auto;min-width:72px;}
+.btn-primary{background:var(--navy);color:#fff;flex:1;}
+.btn-primary:hover{background:var(--navy-mid);}
+.btn-green{background:var(--green);color:#fff;flex:1;}
+.btn-amber{background:var(--amber);color:#fff;flex:1;}
+.btn-red{background:var(--red);color:#fff;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-full{width:100%;margin-bottom:8px;}
+
+/* DECISION */
+.decision-btn{display:flex;align-items:flex-start;gap:12px;width:100%;padding:14px;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;margin-bottom:8px;transition:all .2s;font-size:14px;font-weight:600;color:var(--text);}
+.decision-btn:hover{border-color:var(--blue);background:var(--blue-lt);}
+.decision-icon{font-size:20px;flex-shrink:0;}
+
+/* TIMER */
+.timer-card{background:var(--navy);border-radius:var(--r);padding:24px;text-align:center;margin-bottom:12px;}
+.timer-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.timer-display{font-size:56px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.03em;}
+.timer-sub{font-size:13px;color:rgba(255,255,255,.5);margin-top:8px;}
+.timer-milestones{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
+.milestone{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);}
+.milestone.reached{background:#4ADE80;color:#0D2D5E;border-color:#4ADE80;}
+.timer-btns{display:flex;gap:10px;justify-content:center;margin-top:16px;}
+.t-btn{padding:10px 22px;border-radius:var(--r-sm);border:none;font-size:14px;font-weight:700;cursor:pointer;}
+.t-start{background:#4ADE80;color:#0D2D5E;}
+.t-pause{background:#FDE68A;color:#0D2D5E;}
+.t-reset{background:rgba(255,255,255,.15);color:#fff;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+.pulse-glow{animation:pulse 1.2s ease-in-out infinite;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}
+th{background:var(--navy);color:#fff;padding:8px 10px;text-align:left;font-size:12px;font-weight:700;}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:nth-child(even) td{background:#FAFCFF;}
+tr:last-child td{border-bottom:none;}
+
+/* COMPLETION */
+.complete-icon{width:72px;height:72px;border-radius:50%;background:var(--green-bg);border:3px solid var(--green-bd);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px;}
+.complete-title{font-size:22px;font-weight:800;color:var(--navy);text-align:center;margin-bottom:6px;}
+.complete-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.5;}
+
+/* HUB STEPS */
+.hub-step{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:flex-start;}
+.hub-step:last-child{border-bottom:none;}
+.hub-letter{width:22px;height:22px;border-radius:4px;background:var(--blue-lt);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* ANIM CARD */
+.anim-wrap{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 5px rgba(0,0,0,.07);padding:16px;margin-bottom:12px;}
+.anim-heading{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.anim-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+
+/* SVG ANIMATION KEYFRAMES */
+@keyframes plunger-pull{0%{transform:translateY(0)}100%{transform:translateY(-38px)}}
+@keyframes flow-down{0%{opacity:0;transform:translateY(-5px)}20%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translateY(18px)}}
+@keyframes tap-glow{0%,100%{filter:drop-shadow(0 0 3px rgba(26,111,175,.4))}50%{filter:drop-shadow(0 0 7px rgba(26,111,175,.9))}}
+@keyframes vacuum-expand{0%{r:4;opacity:.7}100%{r:14;opacity:0}}
+@keyframes med-flow{0%{stroke-dashoffset:60}100%{stroke-dashoffset:0}}
+@keyframes rotate-indicator{0%{transform:rotate(0deg)}100%{transform:rotate(90deg)}}
+@keyframes droplet{0%{cy:130;opacity:1}100%{cy:200;opacity:0}}
+
+.source-note{font-size:11px;color:var(--muted);text-align:center;margin-top:6px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-row1">
+    <div class="header-left">
+      <div class="eyebrow">HITH &amp; Community Nursing · SVHM</div>
+      <div class="title">Alteplase SbS Guide</div>
+      <div class="sub">CVAD Patency Restoration · eviQ 771 v.6</div>
+    </div>
+    <div><span class="sop-pill">Standard-ANTT®</span></div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="phase-row"><span id="phaseLabel">Step 1 of 8</span><span id="phaseRight"></span></div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 1 · ENTRY / OCCLUSION TYPE
+════════════════════════════════════════════ -->
+<div class="screen active" id="screen-entry">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-r">💉</div>
+      <div><div class="card-title">Alteplase Indicated</div><div class="card-sub">Select occlusion type to begin</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib a"><strong>⚡ Prompt action required</strong>Do not delay — a comprehensive patient assessment should already be complete (CNSA CVAD Patency Algorithm). Alteplase has been selected for a thrombotic occlusion.</div>
+
+      <p style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Occlusion Type</p>
+
+      <button class="pathway-btn" onclick="selectPathway('partial')">
+        <div class="pill pill-amber">Partial Occlusion</div>
+        <div class="pathway-title">⚠️ Partial Occlusion</div>
+        <div class="pathway-sub">Can flush with resistance OR aspiration only — direct injection through needleless connector possible</div>
+      </button>
+
+      <button class="pathway-btn" onclick="selectPathway('complete')">
+        <div class="pill pill-red">Complete Occlusion</div>
+        <div class="pathway-title">🚫 Complete Occlusion</div>
+        <div class="pathway-sub">No flush or aspiration possible — requires 3-way tap negative pressure technique</div>
+      </button>
+    </div>
+  </div>
+  <p class="source-note">Source: eviQ #771 v.6 · Cancer Institute NSW · Last reviewed Nov 2023</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 2 · EQUIPMENT
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-equipment">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-b">🧰</div>
+      <div><div class="card-title">Equipment Checklist</div><div class="card-sub">Gather all items before proceeding</div></div>
+    </div>
+    <div class="card-body">
+      <div class="equip-grid">
+        <div class="equip-item"><span class="ei">🗂️</span>Procedure tray</div>
+        <div class="equip-item"><span class="ei">🧤</span>Non-sterile gloves</div>
+        <div class="equip-item"><span class="ei">🧴</span>CHG/IPA 2%/70% swabs</div>
+        <div class="equip-item"><span class="ei">💊</span>PPE as required</div>
+        <div class="equip-item"><span class="ei">💉</span>10 mL syringe + med</div>
+        <div class="equip-item"><span class="ei">💉</span>10 mL luer lock syringes</div>
+        <div class="equip-item"><span class="ei">🧂</span>Sodium chloride 0.9%</div>
+        <div class="equip-item"><span class="ei">🪡</span>Blunt drawing-up needle</div>
+        <div class="equip-item"><span class="ei">🏷️</span>IV medication label</div>
+        <div class="equip-item"><span class="ei">🧹</span>Tray cleaning agent</div>
+      </div>
+      <div class="equip-extra" id="complete-equip-extra">
+        <div class="equip-extra-title">Complete Occlusion: Add</div>
+        <div class="equip-grid" style="margin-bottom:0;">
+          <div class="equip-item"><span class="ei">🔀</span>3-way tap</div>
+          <div class="equip-item"><span class="ei">🔗</span>Needleless connector/s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-p">💊</div>
+      <div><div class="card-title">Alteplase Preparation</div><div class="card-sub">Before drawing up</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib b"><strong>Adult dose (standard)</strong>2 mg in 2 mL (i.e. 1 mg/mL reconstituted solution) per lumen. Check local drug chart and policy.</div>
+      <div class="ib a"><strong>Paediatric dose</strong>110% of catheter lumen volume (max 2 mg). Check patient weight and catheter priming volume.</div>
+      <ul class="step-list">
+        <li class="step-item"><div class="step-num">1</div><div class="step-text">Verify prescription — dose, patient identity, expiry<small>Right patient · Right drug · Right dose · Right route · Right time</small></div></li>
+        <li class="step-item"><div class="step-num">2</div><div class="step-text">Reconstitute alteplase per manufacturer instructions if not pre-prepared pharmacy supply</div></li>
+        <li class="step-item"><div class="step-num">3</div><div class="step-text">Draw up into 10 mL luer lock syringe using blunt drawing-up needle. Label immediately.</div></li>
+        <li class="step-item"><div class="step-num">4</div><div class="step-text">Draw up 10 mL sodium chloride 0.9% into separate syringe/s (for post-alteplase flush)</div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 3 · PREPARATION (Steps 1–12)
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-prep">
+  <div class="ib r" style="margin-bottom:12px;"><strong>⚕️ Standard-ANTT® applies throughout</strong>Maintain asepsis of all Key-Parts. Non-touch technique for all Key-Parts and critical sites.</div>
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-n">🙌</div>
+      <div><div class="card-title">Preparation</div><div class="card-sub">Steps 1–12 · Tap each to check off</div></div>
+    </div>
+    <div class="card-body">
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Decontaminate and disinfect tray as per local policy</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Gather all equipment</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Prepare equipment on tray using non-touch technique</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Proceed to patient — perform hand hygiene on arrival</div></div>
+      <div onclick="toggleCheck(this)" class="check-item warn"><div class="check-box"></div><div class="check-label">Check patient identification and verify medication/solutions<small>As per local policy — three-point check</small></div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Explain procedure — obtain verbal consent<small>Confirm patient understands dwell time and expected outcome</small></div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Ensure patient is in a comfortable position</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Don PPE including non-sterile gloves</div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Set up equipment in tray — maintain Micro Critical Aseptic Fields to protect all Key-Parts<small>Sterile caps on syringe tips, inside of sterile packaging</small></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 4A · PARTIAL OCCLUSION PROCEDURE
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-partial">
+  <div class="ib amber" style="margin-bottom:12px;background:var(--amber-bg);border-color:var(--amber);border-left:3px solid var(--amber);border-radius:11px;padding:10px 13px;font-size:13px;"><strong>Partial Occlusion Pathway</strong>Medication can be directly injected through the disinfected needleless connector.</div>
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-a">🔌</div>
+      <div><div class="card-title">Steps 13–17 · Partial Occlusion</div><div class="card-sub">Direct injection technique</div></div>
+    </div>
+    <div class="card-body">
+      <ul class="step-list">
+        <li class="step-item">
+          <div class="step-num">13</div>
+          <div class="step-text">
+            <strong>Disinfect needleless connector (NC) — Key-Part</strong><br>
+            Using non-touch technique: vigorous friction with 2% CHG / 70% IPA swab for <strong>≥15 seconds</strong>. Allow to fully air dry. <em>Do not blot, fan or blow dry.</em>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-num">14</div>
+          <div class="step-text">
+            Using non-touch technique — connect syringe with alteplase and <strong>slowly administer</strong> into affected lumen.<br><br>
+            Complete with correct clamp–disconnection sequence:
+            <table style="margin-top:8px;">
+              <tr><th>NC Type</th><th>Clamp sequence</th></tr>
+              <tr><td>Negative</td><td>Clamp <strong>BEFORE</strong> finishing flush &amp; disconnecting</td></tr>
+              <tr><td>Positive</td><td>Clamp <strong>AFTER</strong> finishing flush &amp; disconnecting</td></tr>
+              <tr><td>Neutral</td><td>No specific clamping required</td></tr>
+              <tr><td>Anti-reflux</td><td>No specific clamping required</td></tr>
+            </table>
+            <div class="ib r" style="margin-top:10px;"><strong>⛔ STOP</strong>If excessive resistance is evident — do not force. Stop and reassess.</div>
+          </div>
+        </li>
+        <li class="step-item"><div class="step-num">15</div><div class="step-text">Repeat step 14 for all affected lumens</div></li>
+        <li class="step-item"><div class="step-num">16</div><div class="step-text">Label the lumen(s) as per local policy<small>Include: medication name · dose · time of administration</small></div></li>
+        <li class="step-item"><div class="step-num">17</div><div class="step-text">Discuss dwell time and expected outcome with patient/carer<small>Thrombotic occlusion: 45-minute initial dwell for alteplase</small></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 4B · COMPLETE OCCLUSION — 3-WAY TAP SETUP
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-complete-setup">
+  <div class="ib r" style="margin-bottom:12px;"><strong>Complete Occlusion — 3-Way Tap Technique</strong>Injection not possible — negative pressure technique required to draw medication into blocked lumen.</div>
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-r">🔀</div>
+      <div><div class="card-title">Step 19 · Configure 3-Way Tap</div><div class="card-sub">Set up before connecting to patient</div></div>
+    </div>
+    <div class="card-body">
+      <ul class="step-list">
+        <li class="step-item"><div class="step-num">19</div><div class="step-text"><strong>Turn the tap OFF to the patient</strong> on the 3-way tap<small>Patient port must be closed before attaching syringes</small></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-p">💉</div>
+      <div><div class="card-title">Step 20 · Attach Syringes to Tap</div><div class="card-sub">Non-touch technique</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib b" style="margin-bottom:12px;"><strong>Syringe arrangement</strong>Empty 10 mL syringe on one port · Alteplase-filled 10 mL syringe on other port</div>
+      <!-- 3-way tap setup diagram -->
+      <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:400px;display:block;margin:0 auto 12px;">
+        <!-- tap body -->
+        <rect x="120" y="90" width="80" height="28" rx="8" fill="#164080"/>
+        <!-- left port (empty syringe) -->
+        <rect x="30" y="98" width="90" height="12" rx="4" fill="#94A3B8"/>
+        <!-- right port (alteplase) -->
+        <rect x="200" y="98" width="90" height="12" rx="4" fill="#93C5FD"/>
+        <!-- bottom port (catheter) -->
+        <rect x="153" y="118" width="14" height="50" rx="4" fill="#94A3B8"/>
+        <!-- empty syringe barrel -->
+        <rect x="10" y="90" width="30" height="28" rx="4" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.5"/>
+        <rect x="18" y="94" width="14" height="20" rx="2" fill="#CBD5E1"/>
+        <!-- EMPTY label -->
+        <rect x="4" y="84" width="40" height="14" rx="4" fill="white" stroke="#DDE3EC" stroke-width="1"/>
+        <text x="24" y="94" font-size="8" font-weight="700" text-anchor="middle" fill="#6B7280">EMPTY</text>
+        <!-- alteplase syringe barrel -->
+        <rect x="278" y="90" width="32" height="28" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1.5"/>
+        <rect x="286" y="94" width="16" height="20" rx="2" fill="#3B82F6" opacity=".6"/>
+        <!-- ALTEPLASE label -->
+        <rect x="272" y="78" width="48" height="14" rx="4" fill="white" stroke="#DDE3EC" stroke-width="1"/>
+        <text x="296" y="88" font-size="7" font-weight="700" text-anchor="middle" fill="#1A6FAF">ALTEPLASE</text>
+        <!-- tap indicator (off to patient) -->
+        <line x1="160" y1="100" x2="200" y2="104" stroke="white" stroke-width="3" stroke-linecap="round" opacity=".4"/>
+        <!-- closed to bottom indicator -->
+        <line x1="160" y1="104" x2="160" y2="115" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="3,2" opacity=".7"/>
+        <!-- catheter -->
+        <rect x="148" y="168" width="24" height="28" rx="10" fill="#FCA5A5" stroke="#F87171" stroke-width="1.5"/>
+        <text x="160" y="181" font-size="7" text-anchor="middle" fill="#7F1D1D" font-weight="700">CVAD</text>
+        <!-- closed X badge -->
+        <circle cx="160" cy="145" r="10" fill="#FEF2F2" stroke="#FEB4B4" stroke-width="1.5"/>
+        <text x="160" y="149" font-size="11" text-anchor="middle" fill="#C91B1B">✕</text>
+        <!-- labels -->
+        <text x="55" y="155" font-size="8" fill="#6B7280" text-anchor="middle">10 mL empty</text>
+        <text x="296" y="140" font-size="8" fill="#1A6FAF" text-anchor="middle">10 mL</text>
+        <text x="296" y="150" font-size="8" fill="#1A6FAF" text-anchor="middle">alteplase</text>
+      </svg>
+      <ul class="step-list">
+        <li class="step-item"><div class="step-num">20</div><div class="step-text">Attach an <strong>empty 10 mL syringe</strong> to one port of the 3-way tap. Attach the <strong>alteplase-filled 10 mL syringe</strong> to the second port. Use non-touch technique throughout.</div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-r">🔌</div>
+      <div><div class="card-title">Step 21 · Attach Tap to CVAD Hub</div><div class="card-sub">Hub cleaning before disconnecting NC</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib a" style="margin-bottom:10px;"><strong>Before disconnecting NC</strong>Clean the catheter-NC junction, then disinfect the hub. Both require full air-dry — do not rush.</div>
+      <div class="hub-step"><div class="hub-letter">a</div><div>Using non-touch technique, hold catheter with unfolded CHG/IPA swab (non-dominant hand). Vigorously scrub connection of catheter and NC with second swab for <strong>30 seconds</strong></div></div>
+      <div class="hub-step"><div class="hub-letter">b</div><div>Allow to <strong>fully air dry</strong></div></div>
+      <div class="hub-step"><div class="hub-letter">c</div><div>Ensure clamp is <strong>closed</strong> (non-valved catheter)</div></div>
+      <div class="hub-step"><div class="hub-letter">d</div><div><strong>Remove NC</strong></div></div>
+      <div class="hub-step"><div class="hub-letter">e</div><div>Disinfect catheter hub (Key-Part) with a <strong>new</strong> unfolded CHG/IPA swab for <strong>30 seconds</strong></div></div>
+      <div class="hub-step"><div class="hub-letter">f</div><div>Allow to <strong>fully air dry</strong> — do not blot, fan or blow dry</div></div>
+      <div class="hub-step"><div class="hub-letter">g</div><div>Using non-touch technique, remove cap (Micro Critical Aseptic Field) on 3-way tap and <strong>attach to catheter hub</strong> / TIVAD extension tubing (Key-Part)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 5 · STEP 22 ANIMATED — NEGATIVE PRESSURE
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-anim-22">
+  <div class="anim-wrap">
+    <div class="anim-heading">Step 22 · Create Negative Pressure</div>
+    <div class="anim-desc">Unclamp CVAD lumen. Open 3-way tap. Aspirate the <strong>empty syringe</strong> back to 8–9 mL — hold position to create a vacuum/negative pressure in the catheter lumen.</div>
+    <!-- ANIMATED SVG — STEP 22 -->
+    <svg id="svg-22" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:400px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#1A6FAF"/>
+        </marker>
+        <marker id="arr-r" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#14803D"/>
+        </marker>
+      </defs>
+
+      <!-- ── 3-WAY TAP BODY ── -->
+      <rect x="110" y="108" width="100" height="30" rx="9" fill="#164080"/>
+      <!-- tap label -->
+      <text x="160" y="128" font-size="9" font-weight="700" text-anchor="middle" fill="white" opacity=".8">3-WAY TAP</text>
+
+      <!-- LEFT PORT → EMPTY SYRINGE -->
+      <rect x="30" y="116" width="80" height="12" rx="4" fill="#94A3B8"/>
+
+      <!-- EMPTY SYRINGE BARREL -->
+      <rect x="4" y="108" width="36" height="30" rx="5" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+      <!-- Plunger (will animate) -->
+      <g id="plunger22">
+        <rect x="14" y="128" width="16" height="26" rx="2" fill="#CBD5E1"/>
+        <!-- plunger handle -->
+        <rect x="6" y="150" width="32" height="6" rx="3" fill="#94A3B8"/>
+      </g>
+      <!-- syringe markings -->
+      <line x1="38" y1="116" x2="38" y2="138" stroke="#94A3B8" stroke-width=".5"/>
+      <text x="40" y="132" font-size="7" fill="#94A3B8">9</text>
+      <text x="40" y="120" font-size="7" fill="#94A3B8">10</text>
+      <!-- EMPTY label -->
+      <rect x="2" y="98" width="42" height="13" rx="4" fill="white" stroke="#DDE3EC" stroke-width="1"/>
+      <text x="23" y="108" font-size="8" font-weight="700" text-anchor="middle" fill="#6B7280">EMPTY</text>
+
+      <!-- Pull arrow on empty syringe -->
+      <g opacity=".7">
+        <line x1="22" y1="165" x2="22" y2="180" stroke="#1A6FAF" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="22" y="192" font-size="7" text-anchor="middle" fill="#1A6FAF" font-weight="700">PULL</text>
+        <text x="22" y="201" font-size="7" text-anchor="middle" fill="#1A6FAF" font-weight="700">8–9 mL</text>
+      </g>
+
+      <!-- RIGHT PORT → ALTEPLASE SYRINGE (closed) -->
+      <rect x="210" y="116" width="80" height="12" rx="4" fill="#94A3B8" opacity=".4"/>
+      <!-- ALTEPLASE barrel -->
+      <rect x="280" y="108" width="36" height="30" rx="5" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1.5" opacity=".6"/>
+      <rect x="288" y="112" width="20" height="22" rx="2" fill="#3B82F6" opacity=".35"/>
+      <!-- ALTEPLASE label -->
+      <rect x="276" y="96" width="48" height="14" rx="4" fill="white" stroke="#DDE3EC" stroke-width="1"/>
+      <text x="300" y="106" font-size="7.5" font-weight="700" text-anchor="middle" fill="#1A6FAF">ALTEPLASE</text>
+      <!-- Closed X on right port -->
+      <circle cx="250" cy="122" r="8" fill="#FEF2F2" stroke="#FEB4B4" stroke-width="1.5"/>
+      <text x="250" y="126" font-size="10" text-anchor="middle" fill="#C91B1B">✕</text>
+
+      <!-- BOTTOM PORT → CATHETER -->
+      <rect x="150" y="138" width="20" height="48" rx="4" fill="#94A3B8"/>
+      <!-- CATHETER/blood vessel -->
+      <ellipse cx="160" cy="200" rx="38" ry="11" fill="#FECACA" stroke="#F87171" stroke-width="1.5"/>
+      <rect x="122" y="197" width="76" height="20" rx="5" fill="#FCA5A5" stroke="#F87171" stroke-width="1.5"/>
+      <ellipse cx="160" cy="217" rx="38" ry="10" fill="#FCA5A5" stroke="#F87171" stroke-width="1.5"/>
+      <text x="160" y="210" font-size="8" text-anchor="middle" fill="#7F1D1D" font-weight="700">CATHETER LUMEN</text>
+
+      <!-- Vacuum / negative pressure animation circles -->
+      <circle class="vac-ring" cx="160" cy="190" r="4" fill="none" stroke="#1A6FAF" stroke-width="1.5" stroke-dasharray="3,3" opacity=".8">
+        <animate attributeName="r" values="4;18" dur="1.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".8;0" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle class="vac-ring" cx="160" cy="190" r="4" fill="none" stroke="#1A6FAF" stroke-width="1.5" stroke-dasharray="3,3" opacity=".5">
+        <animate attributeName="r" values="4;18" dur="1.5s" begin=".5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".5;0" dur="1.5s" begin=".5s" repeatCount="indefinite"/>
+      </circle>
+      <text x="160" y="194" font-size="7" text-anchor="middle" fill="#1A6FAF" font-weight="700">VACUUM</text>
+
+      <!-- Animated plunger pull for empty syringe -->
+      <g>
+        <rect id="p22" x="14" y="128" width="16" height="22" rx="2" fill="#CBD5E1">
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-22" dur="2s" repeatCount="indefinite" calcMode="spline" keySplines=".4,0,.6,1"/>
+        </rect>
+        <rect id="ph22" x="6" y="148" width="32" height="5" rx="2.5" fill="#94A3B8">
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-22" dur="2s" repeatCount="indefinite" calcMode="spline" keySplines=".4,0,.6,1"/>
+        </rect>
+      </g>
+
+      <!-- Arrows showing "hold" -->
+      <text x="160" y="245" font-size="8.5" text-anchor="middle" fill="#14803D" font-weight="700">← HOLD PLUNGER IN POSITION →</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-b">📋</div>
+      <div><div class="card-title">Step 22 · Instructions</div></div>
+    </div>
+    <div class="card-body">
+      <ul class="step-list">
+        <li class="step-item"><div class="step-num">a</div><div class="step-text"><strong>Unclamp CVAD lumen</strong> (if clamp present) or unclamp TIVAD non-coring needle extension tubing</div></li>
+        <li class="step-item"><div class="step-num">b</div><div class="step-text"><strong>Open 3-way tap</strong> — ensuring it is open to the empty syringe and the patient (catheter)</div></li>
+        <li class="step-item"><div class="step-num">c</div><div class="step-text"><strong>Aspirate empty syringe</strong> back to 8–9 mL</div></li>
+        <li class="step-item"><div class="step-num">d</div><div class="step-text"><strong>Hold the syringe in this position</strong> — this creates a negative pressure (vacuum) in the catheter lumen</div></li>
+      </ul>
+      <div class="ib a" style="margin-top:8px;"><strong>Keep holding</strong>Do not release the empty syringe — maintain the vacuum while proceeding to Step 23.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 6 · STEP 23 ANIMATED — TURN TAP TO MED
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-anim-23">
+  <div class="anim-wrap">
+    <div class="anim-heading">Step 23 · Open Alteplase to Catheter</div>
+    <div class="anim-desc"><strong>While still holding the empty syringe</strong>, turn the 3-way tap <em>off</em> to the empty syringe and open to the alteplase syringe and patient.</div>
+    <!-- ANIMATED SVG — STEP 23 -->
+    <svg id="svg-23" viewBox="0 0 320 270" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:400px;display:block;margin:0 auto;">
+
+      <!-- ── 3-WAY TAP BODY ── -->
+      <rect x="110" y="108" width="100" height="30" rx="9" fill="#14803D"/>
+      <text x="160" y="128" font-size="9" font-weight="700" text-anchor="middle" fill="white" opacity=".9">3-WAY TAP</text>
+
+      <!-- LEFT PORT → EMPTY SYRINGE (now CLOSED) -->
+      <rect x="30" y="116" width="80" height="12" rx="4" fill="#94A3B8" opacity=".35"/>
+      <!-- EMPTY SYRINGE BARREL (held) -->
+      <rect x="4" y="108" width="36" height="30" rx="5" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5" opacity=".6"/>
+      <rect x="14" y="112" width="16" height="18" rx="2" fill="#CBD5E1" opacity=".6"/>
+      <rect x="6" y="127" width="32" height="5" rx="2.5" fill="#94A3B8" opacity=".6"/>
+      <rect x="2" y="98" width="42" height="13" rx="4" fill="white" stroke="#DDE3EC" stroke-width="1"/>
+      <text x="23" y="108" font-size="8" font-weight="700" text-anchor="middle" fill="#6B7280">EMPTY</text>
+      <!-- CLOSED X badge on left port -->
+      <circle cx="80" cy="122" r="9" fill="#FEF2F2" stroke="#FEB4B4" stroke-width="1.5"/>
+      <text x="80" y="126.5" font-size="11" text-anchor="middle" fill="#C91B1B">✕</text>
+      <!-- Hand icon holding empty syringe -->
+      <text x="22" y="172" font-size="16" text-anchor="middle">✋</text>
+      <text x="22" y="185" font-size="7" text-anchor="middle" fill="#14803D" font-weight="700">HOLD</text>
+
+      <!-- TAP ROTATION INDICATOR -->
+      <circle cx="160" cy="123" r="10" fill="rgba(255,255,255,.15)"/>
+      <line x1="160" y1="123" x2="168" y2="115" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="0 160 123;90 160 123" dur="1s" fill="freeze" begin="0s"/>
+      </line>
+
+      <!-- RIGHT PORT → ALTEPLASE SYRINGE (OPEN, flowing) -->
+      <rect x="210" y="116" width="80" height="12" rx="4" fill="#3B82F6"/>
+      <!-- flow animation in right port -->
+      <rect x="210" y="116" width="80" height="12" rx="4" fill="#93C5FD" opacity=".6">
+        <animate attributeName="x" values="290;210" dur="1s" repeatCount="indefinite" calcMode="linear"/>
+        <animate attributeName="width" values="0;80" dur="1s" repeatCount="indefinite" calcMode="linear"/>
+      </rect>
+      <!-- ALTEPLASE barrel -->
+      <rect x="280" y="108" width="36" height="30" rx="5" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+      <rect x="288" y="112" width="20" height="22" rx="2" fill="#3B82F6" opacity=".6">
+        <!-- plunger pressing in slightly -->
+        <animate attributeName="height" values="22;18;22" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="112;116;112" dur="3s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="276" y="96" width="48" height="14" rx="4" fill="white" stroke="#93C5FD" stroke-width="1.5"/>
+      <text x="300" y="106" font-size="7.5" font-weight="700" text-anchor="middle" fill="#1A6FAF">ALTEPLASE</text>
+      <!-- Open tick on right port -->
+      <circle cx="250" cy="122" r="9" fill="#F0FDF4" stroke="#A7F3C3" stroke-width="1.5"/>
+      <text x="250" y="126.5" font-size="12" text-anchor="middle" fill="#14803D">✓</text>
+
+      <!-- BOTTOM PORT → CATHETER (open, med flowing in) -->
+      <rect x="150" y="138" width="20" height="50" rx="4" fill="#3B82F6"/>
+      <!-- animated med drops flowing down -->
+      <circle cx="160" cy="155" r="4" fill="#93C5FD" opacity=".9">
+        <animate attributeName="cy" values="145;195" dur="1s" repeatCount="indefinite" calcMode="linear"/>
+        <animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="160" cy="155" r="3" fill="#60A5FA" opacity=".8">
+        <animate attributeName="cy" values="145;195" dur="1s" begin=".3s" repeatCount="indefinite" calcMode="linear"/>
+        <animate attributeName="opacity" values="1;0" dur="1s" begin=".3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="160" cy="155" r="4" fill="#BFDBFE" opacity=".7">
+        <animate attributeName="cy" values="145;195" dur="1s" begin=".6s" repeatCount="indefinite" calcMode="linear"/>
+        <animate attributeName="opacity" values="1;0" dur="1s" begin=".6s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- CATHETER / blood vessel -->
+      <ellipse cx="160" cy="202" rx="38" ry="10" fill="#FECACA" stroke="#F87171" stroke-width="1.5"/>
+      <rect x="122" y="200" width="76" height="22" rx="5" fill="#FCA5A5" stroke="#F87171" stroke-width="1.5"/>
+      <ellipse cx="160" cy="222" rx="38" ry="10" fill="#FCA5A5" stroke="#F87171" stroke-width="1.5"/>
+      <text x="160" y="213" font-size="8" text-anchor="middle" fill="#7F1D1D" font-weight="700">CATHETER LUMEN</text>
+      <!-- Med entering catheter glow -->
+      <ellipse cx="160" cy="202" rx="38" ry="10" fill="#93C5FD" opacity=".25">
+        <animate attributeName="opacity" values=".1;.4;.1" dur="1.5s" repeatCount="indefinite"/>
+      </ellipse>
+
+      <!-- Open tick on bottom port -->
+      <circle cx="210" cy="145" r="8" fill="#F0FDF4" stroke="#A7F3C3" stroke-width="1.5"/>
+      <text x="210" y="149.5" font-size="10" text-anchor="middle" fill="#14803D">✓</text>
+
+      <text x="160" y="250" font-size="8" text-anchor="middle" fill="#14803D" font-weight="700">Alteplase drawing into lumen via negative pressure</text>
+      <text x="160" y="262" font-size="8" text-anchor="middle" fill="#1A6FAF">Observe for medication movement →</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-g">📋</div>
+      <div><div class="card-title">Step 23 · Instructions</div></div>
+    </div>
+    <div class="card-body">
+      <ul class="step-list">
+        <li class="step-item"><div class="step-num">a</div><div class="step-text"><strong>While still holding the empty syringe</strong> — turn the 3-way tap <em>off</em> to the empty syringe</div></li>
+        <li class="step-item"><div class="step-num">b</div><div class="step-text">Open the tap to the <strong>alteplase syringe</strong> and the patient (catheter)</div></li>
+        <li class="step-item"><div class="step-num">c</div><div class="step-text">Observe for one of three outcomes (Step 24 ↓)</div></li>
+      </ul>
+      <div class="ib g" style="margin-top:8px;"><strong>Expected</strong>The negative pressure created in Step 22 should draw the alteplase passively into the catheter lumen.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 7 · STEP 24 — RESULT BRANCHING
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-result-24">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-p">🔍</div>
+      <div><div class="card-title">Step 24 · Assess Result</div><div class="card-sub">What happened after turning the tap?</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib b" style="margin-bottom:14px;"><strong>Three possible outcomes</strong>Select what you observed:</div>
+      <button class="decision-btn" onclick="handleResult('no-movement')">
+        <div class="decision-icon">⛔</div>
+        <div><div style="font-size:14px;font-weight:700;color:var(--red);">A · No medication movement</div><div style="font-size:13px;color:var(--muted);margin-top:2px;">Alteplase did not enter the lumen</div></div>
+      </button>
+      <button class="decision-btn" onclick="handleResult('drawn-in')">
+        <div class="decision-icon">✅</div>
+        <div><div style="font-size:14px;font-weight:700;color:var(--green);">B · Medication drawn in by negative pressure</div><div style="font-size:13px;color:var(--muted);margin-top:2px;">Alteplase visibly drawn into CVAD lumen</div></div>
+      </button>
+      <button class="decision-btn" onclick="handleResult('gentle-push')">
+        <div class="decision-icon">💉</div>
+        <div><div style="font-size:14px;font-weight:700;color:var(--blue);">C · Can be given with gentle pressure</div><div style="font-size:13px;color:var(--muted);margin-top:2px;">Gentle plunger application allows administration</div></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 7B · UNSUCCESSFUL — REPEAT/INSITU
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-retry">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-a">🔄</div>
+      <div><div class="card-title">Step 25 · No Movement — Retry</div><div class="card-sub">Continue attempts over 30-minute period</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib a"><strong>Administration unsuccessful</strong>Three options — choose based on clinical context:</div>
+      <ul class="step-list" style="margin-top:8px;">
+        <li class="step-item"><div class="step-num">a</div><div class="step-text"><strong>Repeat steps 22–24</strong> until administration is successful, or</div></li>
+        <li class="step-item"><div class="step-num">b</div><div class="step-text">Leave the 3-way tap set-up in situ and <strong>regularly repeat steps 22–24 over a 30-minute period</strong>. Secure the set-up to the patient's clothing with tape.<br><br><em style="font-size:13px;color:var(--muted);">Continuous contact of the medication on the surface of the occlusion will slowly dissolve the blockage.</em></div></li>
+        <li class="step-item"><div class="step-num">c</div><div class="step-text">Perform hand hygiene <strong>prior to and after</strong> touching the CVAD</div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-icon si-b">⏱️</div><div><div class="card-title">30-Minute Retry Timer</div><div class="card-sub">Tap start when beginning retry period</div></div></div>
+    <div class="card-body">
+      <div class="timer-card">
+        <div class="timer-label">Retry Window</div>
+        <div class="timer-display" id="retry-display">30:00</div>
+        <div class="timer-sub">Repeat negative pressure attempts regularly</div>
+        <div class="timer-btns">
+          <button class="t-btn t-start" onclick="startRetryTimer()">▶ Start</button>
+          <button class="t-btn t-reset" onclick="resetRetryTimer()">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 0 8px;">
+    <button class="btn btn-primary btn-full" onclick="handleResult('drawn-in')">✅ Administration now successful — continue to Dwell Timer</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 8 · DWELL TIMER
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-dwell">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-g">⏰</div>
+      <div><div class="card-title">Step 26 · Alteplase Dwell Time</div><div class="card-sub">Leave alteplase in situ — do not flush yet</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib g"><strong>Alteplase dwell time</strong>Thrombotic occlusion: minimum <strong>45 minutes</strong> before first blood withdrawal attempt. Maximum total dwell of <strong>120 minutes</strong> before declaring unsuccessful.</div>
+      <div style="margin-top:10px;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span style="font-size:13px;font-weight:700;color:var(--muted);">Milestones:</span>
+        <span style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd);">⏱ 45 min → First check</span>
+        <span style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);">⏱ 120 min → Final check</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="timer-card">
+    <div class="timer-label">Alteplase Dwell Timer</div>
+    <div class="timer-display" id="dwell-display">00:00</div>
+    <div class="timer-milestones">
+      <div class="milestone" id="m-45">45:00 — 1st Check</div>
+      <div class="milestone" id="m-120">2:00:00 — 2nd Check</div>
+    </div>
+    <div class="timer-btns">
+      <button class="t-btn t-start" id="dwell-start-btn" onclick="startDwellTimer()">▶ Start Timer</button>
+      <button class="t-btn t-reset" onclick="resetDwellTimer()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div class="card-icon si-a">🩹</div><div><div class="card-title">While Waiting</div></div></div>
+    <div class="card-body">
+      <ul class="step-list">
+        <li class="step-item"><div class="step-num">✓</div><div class="step-text">Label the lumen(s) clearly — medication · dose · time<small>Advise patient not to use labelled lumen during dwell</small></div></li>
+        <li class="step-item"><div class="step-num">✓</div><div class="step-text">Inform patient, family/carer of expected timeline and process</div></li>
+        <li class="step-item"><div class="step-num">✓</div><div class="step-text">Secure 3-way tap set-up comfortably if still insitu</div></li>
+        <li class="step-item"><div class="step-num">✓</div><div class="step-text">Perform hand hygiene if re-touching the CVAD during dwell</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="btn btn-amber btn-full" onclick="goToAssess(1)">⏱ 45 Minutes Reached — Assess Now</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 9 · ASSESSMENT — 45 MINUTES
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-assess-45">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-a">🩸</div>
+      <div><div class="card-title">Step 27 · 45-Minute Assessment</div><div class="card-sub">Attempt blood withdrawal</div></div>
+    </div>
+    <div class="card-body">
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Attempt to withdraw blood from CVAD<small>Use a 10 mL syringe — aspirate gently</small></div></div>
+      <div class="ib b" style="margin-top:10px;"><strong>Result?</strong></div>
+      <button class="decision-btn" onclick="goToAssess(0)">
+        <div class="decision-icon">⛔</div><div><div style="font-size:14px;font-weight:700;color:var(--red);">Blood unable to be withdrawn</div><div style="font-size:13px;color:var(--muted);">Leave in situ — continue to 120 minutes</div></div>
+      </button>
+      <button class="decision-btn" onclick="goToFlush()">
+        <div class="decision-icon">✅</div><div><div style="font-size:14px;font-weight:700;color:var(--green);">Blood successfully withdrawn</div><div style="font-size:13px;color:var(--muted);">Withdraw 5 mL blood, discard — proceed to flush</div></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 10 · CONTINUE TO 120 MIN
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-continue-120">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-a">⏱️</div>
+      <div><div class="card-title">Continue Dwell to 120 Minutes</div><div class="card-sub">No blood at 45 min — full dwell required</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib a"><strong>Not yet successful at 45 minutes</strong>Leave alteplase in situ for the full <strong>120-minute</strong> dwell. Reassess at 120 minutes.</div>
+      <div class="timer-card" style="margin-top:12px;">
+        <div class="timer-label">Additional Wait</div>
+        <div class="timer-display" id="extra-display">01:15:00</div>
+        <div class="timer-sub">75 minutes remaining from first check</div>
+        <div class="timer-btns">
+          <button class="t-btn t-start" onclick="startExtraTimer()">▶ Continue Timer</button>
+          <button class="t-btn t-reset" onclick="resetExtraTimer()">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-amber btn-full" style="margin-top:4px;" onclick="goToAssess(2)">⏱ 120 Minutes Reached — Assess Now</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 11 · ASSESSMENT — 120 MINUTES
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-assess-120">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-r">🩸</div>
+      <div><div class="card-title">Step 28 · 120-Minute Assessment</div><div class="card-sub">Final standard dwell assessment</div></div>
+    </div>
+    <div class="card-body">
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Attempt to withdraw blood from CVAD</div></div>
+      <div class="ib b" style="margin-top:10px;"><strong>Result?</strong></div>
+      <button class="decision-btn" onclick="goToSecondDose()">
+        <div class="decision-icon">⛔</div><div><div style="font-size:14px;font-weight:700;color:var(--red);">Still no blood at 120 minutes</div><div style="font-size:13px;color:var(--muted);">Consider second alteplase dose</div></div>
+      </button>
+      <button class="decision-btn" onclick="goToFlush()">
+        <div class="decision-icon">✅</div><div><div style="font-size:14px;font-weight:700;color:var(--green);">Blood successfully withdrawn</div><div style="font-size:13px;color:var(--muted);">Withdraw 5 mL blood, discard — proceed to flush</div></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 12 · SECOND DOSE / ESCALATION
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-second-dose">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-r">⚠️</div>
+      <div><div class="card-title">Step 28–29 · Failed at 120 Minutes</div><div class="card-sub">Second dose or extended dwell decision</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib r"><strong>Occlusion not cleared after 120 minutes</strong>Consider the following options — consult team as appropriate:</div>
+      <ul class="step-list" style="margin-top:8px;">
+        <li class="step-item"><div class="step-num">a</div><div class="step-text"><strong>Second alteplase dose</strong> — repeat steps 22–24 with a fresh alteplase dose. Assess again after a further 120 minutes (Step 29).</div></li>
+        <li class="step-item"><div class="step-num">b</div><div class="step-text"><strong>Extended dwell</strong> — consider extending dwell time to 24–72 hours (requires medical review)</div></li>
+        <li class="step-item"><div class="step-num">c</div><div class="step-text"><strong>Low-dose continuous infusion</strong> of thrombolytic medication (requires medical order and specialist input)</div></li>
+      </ul>
+      <div class="ib a" style="margin-top:10px;"><strong>Escalate</strong>Discuss with vascular access expert, nurse practitioner / CNC, and medical team before proceeding.</div>
+    </div>
+  </div>
+
+  <button class="decision-btn" onclick="goToScreen('screen-anim-22');setPhase(5)">
+    <div class="decision-icon">🔁</div><div><div style="font-size:14px;font-weight:700;">Second dose — repeat from Step 22</div><div style="font-size:13px;color:var(--muted);">Repeat negative pressure technique with fresh dose</div></div>
+  </button>
+  <button class="decision-btn" onclick="goToFlush()">
+    <div class="decision-icon">✅</div><div><div style="font-size:14px;font-weight:700;color:var(--green);">Blood now withdrawn after second dose</div><div style="font-size:13px;color:var(--muted);">Proceed to flush</div></div>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 13 · FLUSH
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-flush">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-g">🚿</div>
+      <div><div class="card-title">Steps 30–33 · Flush CVAD</div><div class="card-sub">Remove 3-way tap · replace NC · flush</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib g" style="margin-bottom:10px;"><strong>Blood successfully withdrawn</strong>Withdraw 5 mL blood and discard before flushing.</div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+
+      <p style="font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.05em;">Step 31 · Remove 3-Way Tap</p>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Using non-touch technique: hold catheter with unfolded CHG/IPA swab, vigorously scrub catheter hub/tap junction with another swab for <strong>30 seconds</strong></div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Allow to <strong>fully air dry</strong></div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Ensure clamp is <strong>closed</strong> (non-valved catheter)</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Remove 3-way tap set-up and <strong>discard</strong></div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Using non-touch technique: attach <strong>new needleless connector (NC)</strong> — Key-Part</div></div>
+
+      <p style="font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.05em;">Step 32 · Pulsatile Flush — NaCl 0.9%</p>
+      <div class="ib b">
+        <strong>Adults:</strong> 20 mL using 2 × 10 mL syringes or 1 × 20 mL syringe — pulsatile (push–pause) technique<br>
+        <strong>Paediatrics:</strong> Clinically appropriate — at minimum double the CVAD volume or as per adult doses
+      </div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Flush using pulsatile (push–pause) technique</div></div>
+      <div onclick="toggleCheck(this)" class="check-item warn"><div class="check-box"></div><div class="check-label">Complete with correct clamp–disconnection technique for NC type:
+        <small>Negative NC → clamp BEFORE finishing flush / Positive NC → clamp AFTER / Neutral &amp; Anti-reflux → no specific sequence</small>
+      </div></div>
+
+      <p style="font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.05em;">Step 33 · Continue / Lock</p>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Commence prescribed IV fluids or medications, OR lock with 20 mL NaCl 0.9% or locking solution as per local policy</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 14 · PARTIAL FLUSH (after partial occlusion)
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-partial-flush">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-icon si-g">🚿</div>
+      <div><div class="card-title">Dwell · Then Flush</div><div class="card-sub">Partial occlusion pathway</div></div>
+    </div>
+    <div class="card-body">
+      <div class="ib g" style="margin-bottom:12px;"><strong>Alteplase successfully administered</strong>Thrombotic occlusion — allow a minimum dwell of <strong>45 minutes</strong> before attempting flush.</div>
+      <div class="timer-card">
+        <div class="timer-label">Dwell Timer — Partial Occlusion</div>
+        <div class="timer-display" id="partial-dwell-display">00:00</div>
+        <div class="timer-milestones">
+          <div class="milestone" id="pm-45">45:00 — Assess patency</div>
+        </div>
+        <div class="timer-btns">
+          <button class="t-btn t-start" onclick="startPartialDwellTimer()">▶ Start</button>
+          <button class="t-btn t-reset" onclick="resetPartialDwellTimer()">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-icon si-g">🩸</div><div><div class="card-title">After Dwell — Assess &amp; Flush</div></div></div>
+    <div class="card-body">
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Attempt to aspirate blood — if successful, withdraw 5 mL and discard</div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Flush with 20 mL NaCl 0.9% using pulsatile technique and correct clamp sequence for NC type</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Commence IV fluids/medications or lock lumen as per local policy</div></div>
+    </div>
+  </div>
+  <button class="btn btn-primary btn-full" onclick="goToCompletion()">Proceed to Documentation ➜</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 15 · COMPLETION
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-complete">
+  <div class="card" style="padding:24px 16px;">
+    <div class="complete-icon">✅</div>
+    <div class="complete-title">Procedure Complete</div>
+    <div class="complete-sub">Document and close out</div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-icon si-g">📋</div><div><div class="card-title">Steps 34–37 · Completion</div></div></div>
+    <div class="card-body">
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Discard all waste and clean tray</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Remove PPE and discard appropriately</div></div>
+      <div onclick="toggleCheck(this)" class="check-item"><div class="check-box"></div><div class="check-label">Perform hand hygiene</div></div>
+      <div onclick="toggleCheck(this)" class="check-item crit"><div class="check-box"></div><div class="check-label">Document in the patient's medical records<small>Record: date/time · dose · dwell time · result · lumens treated · ongoing care plan</small></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-icon si-b">ℹ️</div><div><div class="card-title">If Occlusion Remains Unresolved</div></div></div>
+    <div class="card-body">
+      <div class="ib r"><strong>Escalation pathway</strong>If CVAD remains occluded after two alteplase doses at maximum dwell — escalate to vascular access expert / CNC / medical officer. Consider: extended dwell 24–72 h, low-dose thrombolytic infusion, or radiological assessment.</div>
+      <div class="ib b" style="margin-top:8px;"><strong>Source</strong>eviQ Clinical Procedure #771 v.6 · CNSA CVAD Patency Algorithm · Cancer Institute NSW · Last reviewed November 2023</div>
+    </div>
+  </div>
+  <button class="btn btn-primary btn-full" onclick="restart()" style="margin-top:4px;">↺ Start New Procedure</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav-bar" id="navBar">
+  <button class="btn btn-back" id="btnBack" onclick="goBack()">← Back</button>
+  <button class="btn btn-primary" id="btnNext" onclick="goNext()">Next →</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let pathway = null; // 'partial' | 'complete'
+let screenHistory = [];
+let currentScreen = 'screen-entry';
+
+// Timer state
+let dwellInterval = null;
+let dwellSeconds = 0;
+let dwellRunning = false;
+
+let retryInterval = null;
+let retrySeconds = 30 * 60;
+let retryRunning = false;
+
+let extraInterval = null;
+let extraSeconds = 75 * 60;
+let extraRunning = false;
+
+let partialDwellInterval = null;
+let partialDwellSeconds = 0;
+let partialDwellRunning = false;
+
+// Screen flow definitions
+const SCREEN_FLOW = {
+  'screen-entry': null, // determined by pathway selection
+  'screen-equipment': 'screen-prep',
+  'screen-prep': null, // determined by pathway
+  'screen-partial': 'screen-partial-flush',
+  'screen-partial-flush': 'screen-complete',
+  'screen-complete-setup': 'screen-anim-22',
+  'screen-anim-22': 'screen-anim-23',
+  'screen-anim-23': 'screen-result-24',
+  'screen-result-24': null,
+  'screen-retry': null,
+  'screen-dwell': null,
+  'screen-assess-45': null,
+  'screen-continue-120': null,
+  'screen-assess-120': null,
+  'screen-second-dose': null,
+  'screen-flush': 'screen-complete',
+  'screen-complete': null,
+};
+
+// Phase progress mapping
+const PHASE_MAP = {
+  'screen-entry': { label: 'Pathway Selection', step: 1, total: 8, pct: 5 },
+  'screen-equipment': { label: 'Equipment', step: 2, total: 8, pct: 15 },
+  'screen-prep': { label: 'Preparation', step: 3, total: 8, pct: 28 },
+  'screen-partial': { label: 'Partial Occlusion', step: 4, total: 8, pct: 50 },
+  'screen-partial-flush': { label: 'Dwell & Flush', step: 5, total: 8, pct: 75 },
+  'screen-complete-setup': { label: '3-Way Tap Setup', step: 4, total: 8, pct: 42 },
+  'screen-anim-22': { label: 'Step 22 — Negative Pressure', step: 5, total: 8, pct: 55 },
+  'screen-anim-23': { label: 'Step 23 — Open to Medication', step: 6, total: 8, pct: 62 },
+  'screen-result-24': { label: 'Step 24 — Result', step: 7, total: 8, pct: 68 },
+  'screen-retry': { label: 'Step 25 — Retry', step: 7, total: 8, pct: 68 },
+  'screen-dwell': { label: 'Dwell Timer', step: 7, total: 8, pct: 72 },
+  'screen-assess-45': { label: '45-Min Assessment', step: 7, total: 8, pct: 78 },
+  'screen-continue-120': { label: 'Continue to 120 Min', step: 7, total: 8, pct: 82 },
+  'screen-assess-120': { label: '120-Min Assessment', step: 7, total: 8, pct: 86 },
+  'screen-second-dose': { label: 'Second Dose Decision', step: 7, total: 8, pct: 88 },
+  'screen-flush': { label: 'Flush', step: 8, total: 8, pct: 92 },
+  'screen-complete': { label: 'Complete', step: 8, total: 8, pct: 100 },
+};
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function goToScreen(id) {
+  const current = document.querySelector('.screen.active');
+  if (current) current.classList.remove('active');
+  const next = document.getElementById(id);
+  if (next) {
+    next.classList.add('active');
+    next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.scrollTo(0, 0);
+  }
+  screenHistory.push(currentScreen);
+  currentScreen = id;
+  updateHeader();
+  updateNav();
+}
+
+function goNext() {
+  const next = SCREEN_FLOW[currentScreen];
+  if (next) goToScreen(next);
+  else if (currentScreen === 'screen-prep') {
+    if (pathway === 'partial') goToScreen('screen-partial');
+    else goToScreen('screen-complete-setup');
+  }
+}
+
+function goBack() {
+  if (screenHistory.length > 0) {
+    const prev = screenHistory.pop();
+    const current = document.querySelector('.screen.active');
+    if (current) current.classList.remove('active');
+    const p = document.getElementById(prev);
+    if (p) p.classList.add('active');
+    currentScreen = prev;
+    updateHeader();
+    updateNav();
+    window.scrollTo(0, 0);
+  }
+}
+
+function updateHeader() {
+  const info = PHASE_MAP[currentScreen] || { label: '', step: 1, total: 8, pct: 0 };
+  document.getElementById('progressFill').style.width = info.pct + '%';
+  document.getElementById('phaseLabel').textContent = info.label;
+  document.getElementById('phaseRight').textContent = 'Step ' + info.step + ' of ' + info.total;
+}
+
+function updateNav() {
+  const backBtn = document.getElementById('btnBack');
+  const nextBtn = document.getElementById('btnNext');
+  const noNext = ['screen-entry','screen-result-24','screen-assess-45','screen-assess-120',
+                   'screen-second-dose','screen-flush','screen-complete','screen-partial-flush','screen-dwell','screen-retry','screen-continue-120'];
+  backBtn.style.display = screenHistory.length === 0 ? 'none' : '';
+  nextBtn.style.display = noNext.includes(currentScreen) ? 'none' : '';
+  if (currentScreen === 'screen-complete') {
+    document.getElementById('navBar').style.display = 'none';
+  } else {
+    document.getElementById('navBar').style.display = 'flex';
+  }
+}
+
+function selectPathway(p) {
+  pathway = p;
+  const extra = document.getElementById('complete-equip-extra');
+  if (extra) extra.style.display = p === 'complete' ? '' : 'none';
+  goToScreen('screen-equipment');
+}
+
+function handleResult(result) {
+  if (result === 'no-movement') goToScreen('screen-retry');
+  else if (result === 'drawn-in' || result === 'gentle-push') goToScreen('screen-dwell');
+}
+
+function goToAssess(type) {
+  if (type === 1) goToScreen('screen-assess-45');
+  else if (type === 0) goToScreen('screen-continue-120');
+  else if (type === 2) goToScreen('screen-assess-120');
+}
+
+function goToSecondDose() { goToScreen('screen-second-dose'); }
+function goToFlush() { goToScreen('screen-flush'); }
+function goToCompletion() { goToScreen('screen-complete'); }
+function setPhase(n) {}
+
+function restart() {
+  pathway = null;
+  screenHistory = [];
+  stopAllTimers();
+  goToScreen('screen-entry');
+  document.querySelectorAll('.check-item.checked').forEach(el => el.classList.remove('checked'));
+  resetDwellTimer();
+  resetRetryTimer();
+  resetExtraTimer();
+  document.getElementById('navBar').style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════
+// CHECKLIST
+// ═══════════════════════════════════════════
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+}
+
+// ═══════════════════════════════════════════
+// TIMERS
+// ═══════════════════════════════════════════
+function fmtTime(s) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (h > 0) return h + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+  return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+// Dwell timer (main)
+function startDwellTimer() {
+  if (dwellRunning) {
+    dwellRunning = false;
+    clearInterval(dwellInterval);
+    document.getElementById('dwell-start-btn').textContent = '▶ Resume';
+    return;
+  }
+  dwellRunning = true;
+  document.getElementById('dwell-start-btn').textContent = '⏸ Pause';
+  dwellInterval = setInterval(() => {
+    dwellSeconds++;
+    document.getElementById('dwell-display').textContent = fmtTime(dwellSeconds);
+    if (dwellSeconds >= 45 * 60) document.getElementById('m-45').classList.add('reached');
+    if (dwellSeconds >= 120 * 60) {
+      document.getElementById('m-120').classList.add('reached');
+      clearInterval(dwellInterval);
+      dwellRunning = false;
+      document.getElementById('dwell-start-btn').textContent = '✓ Done';
+      if (navigator.vibrate) navigator.vibrate([400, 200, 400]);
+    }
+  }, 1000);
+}
+
+function resetDwellTimer() {
+  clearInterval(dwellInterval);
+  dwellRunning = false;
+  dwellSeconds = 0;
+  const d = document.getElementById('dwell-display');
+  if (d) d.textContent = '00:00';
+  const b = document.getElementById('dwell-start-btn');
+  if (b) b.textContent = '▶ Start Timer';
+  const m45 = document.getElementById('m-45');
+  const m120 = document.getElementById('m-120');
+  if (m45) m45.classList.remove('reached');
+  if (m120) m120.classList.remove('reached');
+}
+
+// Retry timer (30 min)
+function startRetryTimer() {
+  if (retryRunning) {
+    retryRunning = false;
+    clearInterval(retryInterval);
+    return;
+  }
+  retryRunning = true;
+  retryInterval = setInterval(() => {
+    retrySeconds--;
+    document.getElementById('retry-display').textContent = fmtTime(retrySeconds);
+    if (retrySeconds <= 0) {
+      clearInterval(retryInterval);
+      retryRunning = false;
+      document.getElementById('retry-display').textContent = '00:00';
+      if (navigator.vibrate) navigator.vibrate([400, 200, 400]);
+    }
+  }, 1000);
+}
+
+function resetRetryTimer() {
+  clearInterval(retryInterval);
+  retryRunning = false;
+  retrySeconds = 30 * 60;
+  const d = document.getElementById('retry-display');
+  if (d) d.textContent = '30:00';
+}
+
+// Extra timer (75 min from 45 to 120)
+function startExtraTimer() {
+  if (extraRunning) {
+    extraRunning = false;
+    clearInterval(extraInterval);
+    return;
+  }
+  extraRunning = true;
+  extraInterval = setInterval(() => {
+    extraSeconds--;
+    document.getElementById('extra-display').textContent = fmtTime(extraSeconds);
+    if (extraSeconds <= 0) {
+      clearInterval(extraInterval);
+      extraRunning = false;
+      if (navigator.vibrate) navigator.vibrate([400, 200, 400]);
+    }
+  }, 1000);
+}
+
+function resetExtraTimer() {
+  clearInterval(extraInterval);
+  extraRunning = false;
+  extraSeconds = 75 * 60;
+  const d = document.getElementById('extra-display');
+  if (d) d.textContent = '01:15:00';
+}
+
+// Partial dwell timer (45 min)
+function startPartialDwellTimer() {
+  if (partialDwellRunning) {
+    partialDwellRunning = false;
+    clearInterval(partialDwellInterval);
+    return;
+  }
+  partialDwellRunning = true;
+  partialDwellInterval = setInterval(() => {
+    partialDwellSeconds++;
+    document.getElementById('partial-dwell-display').textContent = fmtTime(partialDwellSeconds);
+    if (partialDwellSeconds >= 45 * 60) {
+      document.getElementById('pm-45').classList.add('reached');
+      clearInterval(partialDwellInterval);
+      partialDwellRunning = false;
+      if (navigator.vibrate) navigator.vibrate([400, 200, 400]);
+    }
+  }, 1000);
+}
+
+function resetPartialDwellTimer() {
+  clearInterval(partialDwellInterval);
+  partialDwellRunning = false;
+  partialDwellSeconds = 0;
+  const d = document.getElementById('partial-dwell-display');
+  if (d) d.textContent = '00:00';
+  const pm = document.getElementById('pm-45');
+  if (pm) pm.classList.remove('reached');
+}
+
+function stopAllTimers() {
+  clearInterval(dwellInterval);
+  clearInterval(retryInterval);
+  clearInterval(extraInterval);
+  clearInterval(partialDwellInterval);
+  dwellRunning = retryRunning = extraRunning = partialDwellRunning = false;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+updateHeader();
+updateNav();
+</script>
+</body>
+</html>
