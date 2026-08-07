@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mini-Cog© Assessment</title>
+<style>
+  :root {
+    --navy:#0D2D5E; --navy-mid:#164080; --blue:#1A6FAF; --blue-lt:#E5F0FA;
+    --bg:#EEF2F7; --surface:#FFFFFF;
+    --amber:#C97A00; --amber-bg:#FFFBEB; --amber-bd:#FDE68A;
+    --red:#C91B1B; --red-bg:#FEF2F2; --red-bd:#FEB4B4;
+    --green:#14803D; --green-bg:#F0FDF4; --green-bd:#A7F3C3;
+    --muted:#6B7280; --border:#DDE3EC; --text:#1B2333;
+    --r:13px; --r-sm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;}
+
+  /* HEADER */
+  .hdr{position:sticky;top:0;z-index:100;background:var(--navy);padding:12px 16px 10px;}
+  .hdr-eye{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);}
+  .hdr-title{font-size:19px;font-weight:800;color:#fff;line-height:1.2;}
+  .hdr-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:1px;}
+  .hdr-badge{display:inline-block;margin-top:6px;background:rgba(255,255,255,.15);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em;}
+
+  /* PROGRESS */
+  .prog-bar{display:flex;gap:0;padding:10px 16px 0;}
+  .prog-step{flex:1;height:4px;background:rgba(13,45,94,.15);border-radius:2px;margin:0 2px;transition:background .3s;}
+  .prog-step.done{background:var(--green);}
+  .prog-step.active{background:var(--blue);}
+
+  /* MAIN */
+  .main{padding:16px;}
+
+  /* CARDS */
+  .card{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden;}
+  .card-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+  .icon-circle{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .ic-b{background:#DBEAFE;} .ic-a{background:#FEF3C7;} .ic-g{background:#DCFCE7;} .ic-n{background:#E0ECF8;} .ic-p{background:#EDE9FE;}
+  .card-title{font-size:15px;font-weight:700;color:var(--text);}
+  .card-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+  .step-pill{margin-left:auto;background:var(--blue-lt);color:var(--blue);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+  .step-pill.done{background:var(--green-bg);color:var(--green);}
+  .card-body{padding:0 16px 16px;border-top:1px solid var(--border);}
+
+  /* INFO BOXES */
+  .ib{padding:10px 13px;border-radius:11px;border-left:3px solid;margin:12px 0;font-size:13px;line-height:1.5;}
+  .ib.b{background:var(--blue-lt);border-color:var(--blue);color:#0c4a6e;}
+  .ib.a{background:var(--amber-bg);border-color:var(--amber);color:#78350f;}
+  .ib.r{background:var(--red-bg);border-color:var(--red);color:#7f1d1d;}
+  .ib.g{background:var(--green-bg);border-color:var(--green);color:#14532d;}
+  .ib strong{display:block;font-weight:700;margin-bottom:2px;}
+
+  /* FORM ELEMENTS */
+  label{font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;}
+  input[type=text], input[type=date], select{
+    width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;
+    font-size:14px;font-family:inherit;color:var(--text);background:#fff;
+    -webkit-appearance:none;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,111,175,.12);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .form-group{margin-bottom:12px;}
+
+  /* WORD LIST SELECTOR */
+  .wl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+  .wl-btn{border:2px solid var(--border);border-radius:var(--r-sm);padding:8px 6px;text-align:center;cursor:pointer;background:#fff;transition:all .2s;}
+  .wl-btn:hover{border-color:var(--blue);background:var(--blue-lt);}
+  .wl-btn.selected{border-color:var(--blue);background:var(--blue-lt);}
+  .wl-btn .wl-num{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.05em;}
+  .wl-btn .wl-words{font-size:12px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.4;}
+
+  /* WORD DISPLAY */
+  .word-display{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
+  .word-card{background:var(--blue-lt);border:2px solid var(--blue);border-radius:var(--r-sm);padding:14px 18px;display:flex;align-items:center;gap:12px;}
+  .word-num{width:28px;height:28px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .word-text{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:.01em;}
+
+  /* ATTEMPTS */
+  .attempts-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+  .att-btn{border:2px solid var(--border);border-radius:var(--r-sm);padding:7px 16px;font-size:13px;font-weight:600;background:#fff;cursor:pointer;color:var(--text);transition:all .15s;}
+  .att-btn.active{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+  .att-label{font-size:12px;color:var(--muted);font-weight:500;}
+
+  /* TIMER */
+  .timer-card{background:var(--navy);border-radius:var(--r);padding:20px;text-align:center;margin:14px 0;}
+  .timer-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:4px;}
+  .timer-display{font-size:52px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1;}
+  .timer-display.warn{color:#FCD34D;}
+  .timer-display.done{color:#6EE7B7;}
+  .timer-btns{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .t-btn{padding:9px 20px;border-radius:var(--r-sm);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .15s;}
+  .t-start{background:#fff;color:var(--navy);}
+  .t-pause{background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);}
+  .t-reset{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1.5px solid rgba(255,255,255,.2);}
+
+  /* CLOCK SCORE */
+  .clock-score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+  .cs-btn{border:2px solid var(--border);border-radius:var(--r-sm);padding:14px 12px;text-align:center;cursor:pointer;background:#fff;transition:all .2s;}
+  .cs-btn:hover{border-color:var(--blue);}
+  .cs-btn.sel-normal{border-color:var(--green);background:var(--green-bg);}
+  .cs-btn.sel-abnormal{border-color:var(--red);background:var(--red-bg);}
+  .cs-icon{font-size:28px;margin-bottom:6px;}
+  .cs-label{font-size:13px;font-weight:700;}
+  .cs-pts{font-size:11px;font-weight:600;margin-top:2px;color:var(--muted);}
+  .sel-normal .cs-label{color:var(--green);}
+  .sel-normal .cs-pts{color:var(--green);}
+  .sel-abnormal .cs-label{color:var(--red);}
+  .sel-abnormal .cs-pts{color:var(--red);}
+
+  /* RECALL ITEMS */
+  .recall-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:2px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;cursor:pointer;transition:all .2s;}
+  .recall-item.recalled{border-color:var(--green);background:var(--green-bg);}
+  .recall-item.not-recalled{border-color:var(--red-bd);background:var(--red-bg);}
+  .recall-cb{width:24px;height:24px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;background:#fff;}
+  .recall-item.recalled .recall-cb{background:var(--green);border-color:var(--green);color:#fff;}
+  .recall-item.not-recalled .recall-cb{border-color:var(--red-bd);}
+  .recall-word{font-size:16px;font-weight:700;color:var(--text);}
+  .recall-status{margin-left:auto;font-size:11px;font-weight:700;}
+  .recall-item.recalled .recall-status{color:var(--green);}
+  .recall-item.not-recalled .recall-status{color:var(--red);}
+
+  /* SCORES */
+  .score-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0;}
+  .score-box{background:var(--bg);border-radius:var(--r-sm);padding:14px 10px;text-align:center;}
+  .score-num{font-size:34px;font-weight:800;color:var(--navy);}
+  .score-denom{font-size:14px;font-weight:600;color:var(--muted);}
+  .score-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+  .total-box{grid-column:span 3;display:flex;align-items:center;justify-content:center;gap:10px;padding:18px;border-radius:var(--r-sm);}
+  .total-num{font-size:48px;font-weight:800;}
+  .total-info{text-align:left;}
+  .total-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.75;}
+  .total-interp{font-size:15px;font-weight:700;margin-top:3px;}
+  .total-detail{font-size:12px;margin-top:2px;opacity:.85;}
+
+  .result-positive{background:var(--red-bg);color:var(--red);}
+  .result-positive .total-num{color:var(--red);}
+  .result-borderline{background:var(--amber-bg);color:var(--amber);}
+  .result-borderline .total-num{color:var(--amber);}
+  .result-negative{background:var(--green-bg);color:var(--green);}
+  .result-negative .total-num{color:var(--green);}
+
+  /* BUTTONS */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 24px;border-radius:var(--r-sm);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .15s;width:100%;font-family:inherit;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:var(--navy-mid);}
+  .btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--blue);border:2px solid var(--blue);}
+  .btn-ghost:hover{background:var(--blue-lt);}
+  .btn-sm{padding:8px 16px;font-size:13px;width:auto;}
+  .btn-nav{display:flex;gap:10px;margin-top:16px;}
+  .btn-nav .btn{flex:1;}
+
+  /* SECTIONS hidden/show */
+  .step-section{display:none;}
+  .step-section.active{display:block;}
+
+  /* DIVIDER */
+  .divider{height:1px;background:var(--border);margin:14px 0;}
+
+  /* PRINT */
+  .print-section{display:none;}
+  @media print{
+    .hdr,.no-print{display:none!important;}
+    .print-section{display:block;}
+    body{background:#fff;padding:0;}
+    .card{box-shadow:none;border:1px solid #ddd;}
+  }
+
+  /* CLOCK INSTRUCTIONS */
+  .clock-inst-box{background:var(--blue-lt);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:14px;}
+  .clock-inst-box p{font-size:14px;line-height:1.6;color:#0c4a6e;font-weight:600;}
+  .clock-inst-box .quote{font-size:15px;font-style:italic;border-left:3px solid var(--blue);padding-left:12px;margin-top:8px;color:var(--navy);}
+
+  /* HISTORY */
+  .hist-card{background:var(--bg);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+  .hist-id{font-size:13px;font-weight:700;}
+  .hist-date{font-size:11px;color:var(--muted);}
+  .hist-score{font-size:14px;font-weight:800;padding:4px 12px;border-radius:20px;}
+
+  /* FOOTER STRIP */
+  .footer-strip{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:90;}
+  .footer-strip .copy{font-size:10px;color:var(--muted);line-height:1.3;}
+  .footer-print{background:var(--navy);color:#fff;font-size:12px;font-weight:700;padding:8px 16px;border-radius:var(--r-sm);border:none;cursor:pointer;}
+
+  /* Nav dots */
+  .nav-dots{display:flex;gap:6px;justify-content:center;padding:10px 0 4px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+  .dot.active{background:var(--blue);}
+  .dot.done{background:var(--green);}
+
+  input[type=text]:read-only{background:var(--bg);color:var(--muted);}
+
+  .ref-text{font-size:10px;color:var(--muted);line-height:1.5;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);}
+
+  .checklist-note{font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;}
+
+  /* Recall toggle buttons row */
+  .recall-toggle-row{display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-eye">Cognitive Assessment Tool</div>
+  <div class="hdr-title">Mini-Cog©</div>
+  <div class="hdr-sub">Dementia Screening Assessment</div>
+  <span class="hdr-badge">© S. Borson — Clinical &amp; Educational Use</span>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="prog-bar" id="progBar">
+  <div class="prog-step" id="p0"></div>
+  <div class="prog-step" id="p1"></div>
+  <div class="prog-step" id="p2"></div>
+  <div class="prog-step" id="p3"></div>
+  <div class="prog-step" id="p4"></div>
+</div>
+
+<!-- NAV DOTS -->
+<div class="nav-dots" id="navDots">
+  <div class="dot" id="d0"></div>
+  <div class="dot" id="d1"></div>
+  <div class="dot" id="d2"></div>
+  <div class="dot" id="d3"></div>
+  <div class="dot" id="d4"></div>
+</div>
+
+<div class="main">
+
+  <!-- ===== STEP 0: PATIENT INFO ===== -->
+  <div class="step-section active" id="step0">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="icon-circle ic-n">📋</div>
+        <div>
+          <div class="card-title">Patient Details</div>
+          <div class="card-sub">Enter information before starting</div>
+        </div>
+        <span class="step-pill">Setup</span>
+      </div>
+      <div class="card-body">
+        <div class="form-row" style="margin-top:14px;">
+          <div class="form-group" style="margin:0;">
+            <label for="patientId">Patient ID / UR Number</label>
+            <input type="text" id="patientId" placeholder="e.g. 123456">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label for="assessDate">Assessment Date</label>
+            <input type="date" id="assessDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="clinician">Clinician</label>
+          <input type="text" id="clinician" placeholder="Name / role">
+        </div>
+        <div class="form-group">
+          <label for="location">Location / Setting</label>
+          <input type="text" id="location" placeholder="e.g. Home visit, HITH, Community">
+        </div>
+
+        <div class="divider"></div>
+
+        <label style="margin-bottom:8px;">Select Word List Version</label>
+        <div class="wl-grid" id="wlGrid"></div>
+        <p class="checklist-note" style="margin-top:8px;">For repeated assessments, use a different version from the previous one.</p>
+
+        <div class="btn-nav">
+          <button class="btn btn-primary" onclick="goStep(1)" id="startBtn">Begin Assessment →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STEP 1: WORD REGISTRATION ===== -->
+  <div class="step-section" id="step1">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="icon-circle ic-b">🔤</div>
+        <div>
+          <div class="card-title">Step 1 — Word Registration</div>
+          <div class="card-sub">Three word presentation</div>
+        </div>
+        <span class="step-pill" id="s1pill">1 of 3</span>
+      </div>
+      <div class="card-body">
+        <div class="ib b" style="margin-top:14px;">
+          <strong>Say to patient:</strong>
+          "Please listen carefully. I am going to say three words that I want you to repeat back to me now and try to remember. The words are … Please say them for me now."
+        </div>
+
+        <div class="word-display" id="wordDisplay"></div>
+
+        <div class="divider"></div>
+        <label>Patient repeated words — attempts used</label>
+        <div class="attempts-row">
+          <span class="att-label">Attempts:</span>
+          <button class="att-btn" id="att1" onclick="setAttempts(1)">1</button>
+          <button class="att-btn" id="att2" onclick="setAttempts(2)">2</button>
+          <button class="att-btn" id="att3" onclick="setAttempts(3)">3</button>
+          <button class="att-btn" id="attX" onclick="setAttempts(0)">Unable</button>
+        </div>
+        <div class="ib a" style="display:none;" id="unableNote">
+          <strong>Note:</strong> If unable to repeat words after 3 attempts, proceed to Step 2 (clock drawing) and document this.
+        </div>
+
+        <div class="btn-nav">
+          <button class="btn btn-ghost" onclick="goStep(0)">← Back</button>
+          <button class="btn btn-primary" onclick="goStep(2)" id="nextStep1" disabled>Next: Clock →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STEP 2: CLOCK DRAWING ===== -->
+  <div class="step-section" id="step2">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="icon-circle ic-a">🕐</div>
+        <div>
+          <div class="card-title">Step 2 — Clock Drawing</div>
+          <div class="card-sub">Present pre-printed circle to patient</div>
+        </div>
+        <span class="step-pill">2 of 3</span>
+      </div>
+      <div class="card-body" style="padding-top:14px;">
+        <div class="clock-inst-box">
+          <p>Hand the patient a pre-printed circle. Say:</p>
+          <p class="quote">"Next, I want you to draw a clock for me. First, put in all of the numbers where they go."</p>
+          <p style="margin-top:8px;">When complete, say:</p>
+          <p class="quote">"Now, set the hands to 10 past 11."</p>
+        </div>
+
+        <div class="ib b">
+          <strong>Note:</strong> You may repeat the instructions — this is not a memory test. If the clock is not complete within 3 minutes, proceed to Step 3.
+        </div>
+
+        <!-- TIMER -->
+        <div class="timer-card">
+          <div class="timer-label">⏱ Time Allowed</div>
+          <div class="timer-display" id="timerDisplay">3:00</div>
+          <div class="timer-btns">
+            <button class="t-btn t-start" id="tStartBtn" onclick="timerStart()">▶ Start</button>
+            <button class="t-btn t-pause" id="tPauseBtn" onclick="timerPause()" style="display:none;">⏸ Pause</button>
+            <button class="t-btn t-reset" onclick="timerReset()">↺ Reset</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <label style="margin-bottom:10px;">Score the completed clock:</label>
+        <div class="clock-score-grid">
+          <button class="cs-btn" id="csNormal" onclick="setClockScore('normal')">
+            <div class="cs-icon">✅</div>
+            <div class="cs-label">Normal</div>
+            <div class="cs-pts">2 points</div>
+          </button>
+          <button class="cs-btn" id="csAbnormal" onclick="setClockScore('abnormal')">
+            <div class="cs-icon">❌</div>
+            <div class="cs-label">Abnormal</div>
+            <div class="cs-pts">0 points</div>
+          </button>
+        </div>
+
+        <div class="ib b" style="margin-top:12px;">
+          <strong>Normal clock criteria:</strong>
+          All numbers in correct sequence and approximately correct position (12, 3, 6, 9 in anchor positions). No missing or duplicate numbers. Hands point to 11 and 2 (representing 11:10). Hand length not scored.
+        </div>
+
+        <div class="btn-nav">
+          <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+          <button class="btn btn-primary" onclick="goStep(3)" id="nextStep2" disabled>Next: Recall →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STEP 3: WORD RECALL ===== -->
+  <div class="step-section" id="step3">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="icon-circle ic-g">🧠</div>
+        <div>
+          <div class="card-title">Step 3 — Word Recall</div>
+          <div class="card-sub">Spontaneous recall, no cueing</div>
+        </div>
+        <span class="step-pill">3 of 3</span>
+      </div>
+      <div class="card-body" style="padding-top:14px;">
+        <div class="ib b">
+          <strong>Say to patient:</strong>
+          "What were the three words I asked you to remember?"
+          <br><span style="margin-top:4px;display:block;font-size:12px;">Do not cue or prompt. Record words spontaneously recalled only.</span>
+        </div>
+
+        <label style="margin:12px 0 6px;">Tap words the patient recalled correctly:</label>
+
+        <div id="recallItems"></div>
+
+        <div class="ib a" id="recallNote" style="display:none;">
+          <strong>Reminder:</strong> Only count words recalled spontaneously without any cueing from you.
+        </div>
+
+        <div class="btn-nav">
+          <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+          <button class="btn btn-primary" onclick="goStep(4)">View Results →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STEP 4: RESULTS ===== -->
+  <div class="step-section" id="step4">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="icon-circle ic-p">📊</div>
+        <div>
+          <div class="card-title">Assessment Results</div>
+          <div class="card-sub" id="resultPatientInfo">—</div>
+        </div>
+        <span class="step-pill done">Complete</span>
+      </div>
+      <div class="card-body" style="padding-top:14px;">
+
+        <!-- Score boxes -->
+        <div class="score-grid">
+          <div class="score-box">
+            <div class="score-num" id="resRecall">—</div>
+            <div class="score-denom">/ 3</div>
+            <div class="score-lbl">Word Recall</div>
+          </div>
+          <div class="score-box">
+            <div class="score-num" id="resClock">—</div>
+            <div class="score-denom">/ 2</div>
+            <div class="score-lbl">Clock Draw</div>
+          </div>
+          <div class="score-box">
+            <div class="score-num" id="resVersion">—</div>
+            <div class="score-denom"></div>
+            <div class="score-lbl">Word List</div>
+          </div>
+          <div class="total-box" id="totalBox">
+            <div class="total-num" id="resTotal">—</div>
+            <div class="total-info">
+              <div class="total-lbl">Total Score (0–5)</div>
+              <div class="total-interp" id="resInterp">—</div>
+              <div class="total-detail" id="resDetail">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clinical interpretation -->
+        <div class="ib" id="interpBox" style="margin-top:4px;">
+          <strong id="interpTitle">—</strong>
+          <span id="interpBody">—</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ib a">
+          <strong>Important:</strong> The Mini-Cog is a screening tool only. A positive screen does not diagnose dementia. Further clinical evaluation is required. A score of ≥3 does not rule out clinically meaningful cognitive impairment.
+        </div>
+
+        <!-- Summary table -->
+        <div style="margin-top:14px;">
+          <label style="margin-bottom:8px;">Assessment Summary</label>
+          <div class="hist-card" style="flex-direction:column;align-items:flex-start;gap:6px;">
+            <div style="display:flex;width:100%;justify-content:space-between;">
+              <span class="hist-id" id="sumId">—</span>
+              <span class="hist-date" id="sumDate">—</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);" id="sumClinician">—</div>
+            <div style="font-size:12px;color:var(--muted);" id="sumWords">—</div>
+          </div>
+        </div>
+
+        <div class="btn-nav" style="flex-direction:column;gap:8px;">
+          <button class="btn btn-primary no-print" onclick="window.print()">🖨 Print / Save PDF</button>
+          <button class="btn btn-ghost no-print" onclick="resetAssessment()">↺ New Assessment</button>
+        </div>
+
+        <p class="ref-text">
+          Mini-Cog © S. Borson. Reprinted for clinical and educational purposes only. Not for commercial or research use without permission (soob@uw.edu).<br>
+          References: Borson et al. J Am Geriatr Soc 2003;51:1451–1454 · Borson et al. Int J Geriatr Psychiatry 2006;21:349–355 · Tsoi et al. JAMA Intern Med 2015.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- FOOTER STRIP -->
+<div class="footer-strip no-print">
+  <div class="copy">Mini-Cog© — Clinical Use Only<br>Not for commercial or research purposes</div>
+  <button class="footer-print" onclick="window.print()" id="footerPrintBtn" style="display:none;">🖨 Print</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const WORD_LISTS = [
+  { v:'1', words:['Banana','Sunrise','Chair'] },
+  { v:'2', words:['Leader','Season','Table'] },
+  { v:'3', words:['Village','Kitchen','Baby'] },
+  { v:'4', words:['River','Nation','Finger'] },
+  { v:'5', words:['Captain','Garden','Picture'] },
+  { v:'6', words:['Daughter','Heaven','Mountain'] },
+];
+
+const state = {
+  step: 0,
+  wordListIdx: 0,
+  attempts: null,       // 1|2|3|0 (0=unable)
+  clockScore: null,     // 'normal'|'abnormal'
+  recalled: [false, false, false],
+};
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Set today's date
+  document.getElementById('assessDate').value = new Date().toISOString().split('T')[0];
+  buildWordListGrid();
+  renderWordDisplay();
+  renderRecallItems();
+  updateProgress();
+  updateNavDots();
+});
+
+// ═══════════════════════════════════════════════════════
+// WORD LIST GRID
+// ═══════════════════════════════════════════════════════
+function buildWordListGrid() {
+  const grid = document.getElementById('wlGrid');
+  grid.innerHTML = '';
+  WORD_LISTS.forEach((wl, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'wl-btn' + (i === state.wordListIdx ? ' selected' : '');
+    btn.innerHTML = `<div class="wl-num">Version ${wl.v}</div><div class="wl-words">${wl.words.join('<br>')}</div>`;
+    btn.onclick = () => {
+      state.wordListIdx = i;
+      document.querySelectorAll('.wl-btn').forEach((b,j) => {
+        b.classList.toggle('selected', j===i);
+      });
+      renderWordDisplay();
+      renderRecallItems();
+    };
+    grid.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// WORD DISPLAY (Step 1)
+// ═══════════════════════════════════════════════════════
+function renderWordDisplay() {
+  const wl = WORD_LISTS[state.wordListIdx];
+  const div = document.getElementById('wordDisplay');
+  div.innerHTML = wl.words.map((w, i) => `
+    <div class="word-card">
+      <div class="word-num">${i+1}</div>
+      <div class="word-text">${w}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// ATTEMPTS (Step 1)
+// ═══════════════════════════════════════════════════════
+function setAttempts(n) {
+  state.attempts = n;
+  ['att1','att2','att3','attX'].forEach((id, i) => {
+    const vals = [1,2,3,0];
+    document.getElementById(id).classList.toggle('active', vals[i] === n);
+  });
+  document.getElementById('unableNote').style.display = n===0 ? 'block' : 'none';
+  document.getElementById('nextStep1').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════════
+// CLOCK SCORE (Step 2)
+// ═══════════════════════════════════════════════════════
+function setClockScore(v) {
+  state.clockScore = v;
+  document.getElementById('csNormal').className = 'cs-btn' + (v==='normal'?' sel-normal':'');
+  document.getElementById('csAbnormal').className = 'cs-btn' + (v==='abnormal'?' sel-abnormal':'');
+  document.getElementById('nextStep2').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════════
+// RECALL ITEMS (Step 3)
+// ═══════════════════════════════════════════════════════
+function renderRecallItems() {
+  const wl = WORD_LISTS[state.wordListIdx];
+  const div = document.getElementById('recallItems');
+  div.innerHTML = '';
+  wl.words.forEach((w, i) => {
+    const item = document.createElement('div');
+    const r = state.recalled[i];
+    item.className = 'recall-item' + (r===true?' recalled':(r===false&&state.recalled[i]!==undefined&&false?' not-recalled':''));
+    item.innerHTML = `
+      <div class="recall-cb">${r?'✓':''}</div>
+      <div class="recall-word">${w}</div>
+      <div class="recall-status">${r?'✔ Recalled':''}</div>`;
+    item.onclick = () => toggleRecall(i);
+    div.appendChild(item);
+  });
+}
+
+function toggleRecall(i) {
+  state.recalled[i] = !state.recalled[i];
+  renderRecallItems();
+  const anyFalse = state.recalled.some(r => !r);
+  document.getElementById('recallNote').style.display = anyFalse && state.recalled.some(r=>r) ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function goStep(n) {
+  if(n===4) buildResults();
+  document.querySelectorAll('.step-section').forEach((s,i) => {
+    s.classList.toggle('active', i===n);
+  });
+  state.step = n;
+  updateProgress();
+  updateNavDots();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.getElementById('footerPrintBtn').style.display = n===4 ? 'block' : 'none';
+}
+
+function updateProgress() {
+  ['p0','p1','p2','p3','p4'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'prog-step' + (i<state.step?' done':(i===state.step?' active':''));
+  });
+}
+
+function updateNavDots() {
+  ['d0','d1','d2','d3','d4'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'dot' + (i<state.step?' done':(i===state.step?' active':''));
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════
+function buildResults() {
+  const wl = WORD_LISTS[state.wordListIdx];
+  const recallScore = state.recalled.filter(Boolean).length;
+  const clockScore = state.clockScore === 'normal' ? 2 : 0;
+  const total = recallScore + clockScore;
+
+  // Header info
+  const pid = document.getElementById('patientId').value || 'Unknown';
+  const dt = document.getElementById('assessDate').value;
+  const clinician = document.getElementById('clinician').value;
+  const location = document.getElementById('location').value;
+  document.getElementById('resultPatientInfo').textContent = `ID: ${pid} · ${dt}`;
+
+  // Scores
+  document.getElementById('resRecall').textContent = recallScore;
+  document.getElementById('resClock').textContent = clockScore;
+  document.getElementById('resVersion').textContent = `V${wl.v}`;
+  document.getElementById('resTotal').textContent = total;
+
+  // Interpretation
+  const totalBox = document.getElementById('totalBox');
+  const interpBox = document.getElementById('interpBox');
+  let interpClass, interp, detail, ibClass, ibTitle, ibBody;
+
+  if(total <= 2) {
+    interpClass = 'result-positive';
+    interp = '⚠️ Positive Screen';
+    detail = 'Score < 3 — validated cut point for dementia screening';
+    ibClass = 'r';
+    ibTitle = 'Positive Screen (Score ≤ 2)';
+    ibBody = 'This score is below the validated cut point of 3. The patient has screened positive for possible cognitive impairment. Refer for comprehensive cognitive evaluation and document findings. Inform the treating team.';
+  } else if(total === 3) {
+    interpClass = 'result-borderline';
+    interp = '⚡ Borderline — Review Recommended';
+    detail = 'Score = 3 — positive at sensitive cut point (< 4)';
+    ibClass = 'a';
+    ibTitle = 'Borderline Result (Score = 3)';
+    ibBody = 'When greater sensitivity is desired, a cut point of < 4 is recommended as it may indicate a need for further evaluation. Consider clinical context, functional status, and baseline. Discuss with treating clinician.';
+  } else {
+    interpClass = 'result-negative';
+    interp = '✅ Negative Screen';
+    detail = 'Score ≥ 4 — below threshold for positive screen';
+    ibClass = 'g';
+    ibTitle = 'Negative Screen (Score ≥ 4)';
+    ibBody = 'The patient has screened negative for dementia at this time. Note: a negative screen does not rule out clinically meaningful cognitive impairment. Reassess if clinical concerns arise.';
+  }
+
+  totalBox.className = 'total-box ' + interpClass;
+  document.getElementById('resInterp').textContent = interp;
+  document.getElementById('resDetail').textContent = detail;
+
+  interpBox.className = 'ib ' + ibClass;
+  document.getElementById('interpTitle').textContent = ibTitle;
+  document.getElementById('interpBody').textContent = ' ' + ibBody;
+
+  // Summary
+  document.getElementById('sumId').textContent = `Patient: ${pid}`;
+  document.getElementById('sumDate').textContent = dt;
+  document.getElementById('sumClinician').textContent = clinician ? `Clinician: ${clinician}${location?(' · '+location):''}` : (location||'—');
+
+  const recalledWords = wl.words.filter((_,i)=>state.recalled[i]).join(', ') || 'None';
+  const attStr = state.attempts===0 ? 'Unable to register' : `${state.attempts} attempt(s)`;
+  document.getElementById('sumWords').textContent =
+    `Words: ${wl.words.join(', ')} (${attStr}) · Recalled: ${recalledWords} · Clock: ${state.clockScore==='normal'?'Normal (2pt)':'Abnormal (0pt)'}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════
+function resetAssessment() {
+  state.step=0; state.attempts=null; state.clockScore=null; state.recalled=[false,false,false]; state.wordListIdx=0;
+  ['att1','att2','att3','attX'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('nextStep1').disabled = true;
+  document.getElementById('nextStep2').disabled = true;
+  document.getElementById('unableNote').style.display='none';
+  document.getElementById('csNormal').className='cs-btn';
+  document.getElementById('csAbnormal').className='cs-btn';
+  buildWordListGrid();
+  renderWordDisplay();
+  renderRecallItems();
+  timerReset();
+  document.getElementById('patientId').value='';
+  document.getElementById('clinician').value='';
+  document.getElementById('location').value='';
+  document.getElementById('assessDate').value=new Date().toISOString().split('T')[0];
+  goStep(0);
+}
+
+// ═══════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════
+let timerTotal = 180;
+let timerRemaining = 180;
+let timerInterval = null;
+let timerRunning = false;
+
+function timerStart() {
+  if(timerRunning) return;
+  timerRunning = true;
+  document.getElementById('tStartBtn').style.display='none';
+  document.getElementById('tPauseBtn').style.display='inline-block';
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    updateTimerDisplay();
+    if(timerRemaining <= 0) {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      document.getElementById('tPauseBtn').style.display='none';
+      document.getElementById('tStartBtn').textContent='▶ Restart';
+      document.getElementById('tStartBtn').style.display='inline-block';
+      if(navigator.vibrate) navigator.vibrate([300,100,300]);
+    }
+  }, 1000);
+}
+
+function timerPause() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  document.getElementById('tPauseBtn').style.display='none';
+  document.getElementById('tStartBtn').textContent='▶ Resume';
+  document.getElementById('tStartBtn').style.display='inline-block';
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerRemaining = timerTotal;
+  document.getElementById('tStartBtn').textContent='▶ Start';
+  document.getElementById('tStartBtn').style.display='inline-block';
+  document.getElementById('tPauseBtn').style.display='none';
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerRemaining/60);
+  const s = timerRemaining%60;
+  const disp = document.getElementById('timerDisplay');
+  disp.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  disp.className = 'timer-display' +
+    (timerRemaining <= 0 ? ' done' : (timerRemaining <= 30 ? ' warn' : ''));
+}
+</script>
+</body>
+</html>
