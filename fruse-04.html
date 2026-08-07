@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>HITH Furosemide Infusion — Visit Guide</title>
+<style>
+  :root{
+    --teal-900:#002b5c;
+    --teal-700:#00408a;
+    --teal-600:#1a5fa8;
+    --teal-100:#dce8f5;
+    --sand-50:#f7f9fc;
+    --sand-100:#edf2f8;
+    --ink:#1a1f2e;
+    --ink-soft:#5a6070;
+    --line:#d6dde8;
+    --amber:#c9842f;
+    --amber-bg:#fbecd6;
+    --red:#b1493f;
+    --red-bg:#f9e0dc;
+    --green:#3f7a52;
+    --green-bg:#e2efe2;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(0,43,92,0.09);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--sand-50);
+    color:var(--ink);
+    line-height:1.45;
+    -webkit-text-size-adjust:100%;
+    padding-bottom:60px;
+  }
+  /* ---------- Header ---------- */
+  header.app-header{
+    background:var(--teal-900);
+    color:#fff;
+    padding:14px 16px 10px;
+    position:sticky;
+    top:0;
+    z-index:50;
+    box-shadow:var(--shadow);
+  }
+  .app-title{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .app-title h1{
+    margin:0;
+    font-size:1.15rem;
+    font-weight:700;
+    letter-spacing:0.2px;
+  }
+  .app-title .eyebrow{
+    display:block;
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:#9fc9c2;
+    margin-bottom:2px;
+    font-weight:600;
+  }
+  .visit-meta{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .visit-meta select, .visit-meta input{
+    background:#1f4f4d;
+    color:#fff;
+    border:1px solid #2f6663;
+    border-radius:8px;
+    padding:7px 9px;
+    font-size:0.82rem;
+    font-family:inherit;
+  }
+  .visit-meta input::placeholder{color:#a9c9c6;}
+  .visit-meta select{min-width:0;}
+  .reset-btn{
+    background:transparent;
+    border:1px solid #3a6f6c;
+    color:#cfe7e4;
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:0.78rem;
+    cursor:pointer;
+    margin-left:auto;
+  }
+  .reset-btn:active{background:#1f4f4d;}
+
+  /* ---------- Tab nav ---------- */
+  nav.tabs{
+    display:flex;
+    overflow-x:auto;
+    gap:6px;
+    padding:10px 12px;
+    background:var(--teal-700);
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    flex:0 0 auto;
+    background:rgba(255,255,255,0.08);
+    color:#eaf4f2;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:0.78rem;
+    font-weight:600;
+    white-space:nowrap;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  nav.tabs button .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:18px;height:18px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.18);
+    font-size:0.68rem;
+  }
+  nav.tabs button.active{
+    background:var(--sand-50);
+    color:var(--teal-900);
+    border-color:var(--sand-50);
+  }
+  nav.tabs button.active .num{
+    background:var(--teal-700);
+    color:#fff;
+  }
+  nav.tabs button .tick{
+    color:#9fe0b0;
+    font-weight:900;
+  }
+  nav.tabs button.active .tick{color:var(--green);}
+
+  /* ---------- Layout ---------- */
+  main{
+    max-width:760px;
+    margin:0 auto;
+    padding:14px 12px 40px;
+  }
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadein .15s ease-in;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  h2.section-title{
+    font-size:1.05rem;
+    margin:22px 0 10px;
+    color:var(--teal-900);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  h2.section-title:first-child{margin-top:4px;}
+  .section-title .pill{
+    font-size:0.62rem;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    background:var(--teal-100);
+    color:var(--teal-700);
+    border-radius:999px;
+    padding:3px 9px;
+    font-weight:700;
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 14px;
+    margin-bottom:12px;
+    box-shadow:var(--shadow);
+  }
+  .card h3{
+    margin:0 0 8px;
+    font-size:0.95rem;
+    color:var(--teal-900);
+  }
+  .card p{margin:6px 0;font-size:0.9rem;}
+  .muted{color:var(--ink-soft);font-size:0.82rem;}
+
+  /* checklist items */
+  .check-item{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:9px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .check-item:last-child{border-bottom:none;}
+  .check-item input[type=checkbox]{
+    appearance:none;
+    -webkit-appearance:none;
+    width:24px;height:24px;
+    min-width:24px;
+    border:2px solid var(--teal-600);
+    border-radius:7px;
+    margin-top:1px;
+    cursor:pointer;
+    position:relative;
+    background:#fff;
+  }
+  .check-item input[type=checkbox]:checked{
+    background:var(--teal-600);
+  }
+  .check-item input[type=checkbox]:checked::after{
+    content:"";
+    position:absolute;
+    left:6px;top:2px;
+    width:7px;height:12px;
+    border:solid #fff;
+    border-width:0 3px 3px 0;
+    transform:rotate(45deg);
+  }
+  .check-item label{font-size:0.92rem;flex:1;}
+  .check-item.checked label{color:var(--ink-soft);text-decoration:line-through;}
+  .check-item .sub{display:block;font-size:0.78rem;color:var(--ink-soft);font-weight:400;text-decoration:none;margin-top:2px;}
+
+  /* alert boxes */
+  .alert{
+    border-radius:var(--radius);
+    padding:12px 14px;
+    margin:10px 0;
+    font-size:0.88rem;
+    border:1px solid transparent;
+  }
+  .alert.red{background:var(--red-bg);border-color:#e7c3bd;color:#7a2e26;}
+  .alert.amber{background:var(--amber-bg);border-color:#efd3a6;color:#7a4f15;}
+  .alert.green{background:var(--green-bg);border-color:#bfdcc4;color:#244e34;}
+  .alert.teal{background:var(--teal-100);border-color:#bfdbd7;color:var(--teal-900);}
+  .alert strong{display:block;margin-bottom:3px;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;}
+
+  /* button grids */
+  .btn-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+  .opt-btn{
+    flex:1 1 auto;
+    min-width:64px;
+    background:var(--sand-100);
+    border:1.5px solid var(--line);
+    color:var(--teal-900);
+    border-radius:10px;
+    padding:10px 8px;
+    font-size:0.85rem;
+    font-weight:700;
+    cursor:pointer;
+    text-align:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .opt-btn .small{display:block;font-size:0.68rem;font-weight:500;color:var(--ink-soft);margin-top:2px;}
+  .opt-btn:active{transform:scale(0.98);}
+  .opt-btn.selected{
+    background:var(--teal-700);
+    color:#fff;
+    border-color:var(--teal-700);
+  }
+  .opt-btn.selected .small{color:#cfe7e4;}
+  .opt-btn.risk-green.selected{background:var(--green);border-color:var(--green);}
+  .opt-btn.risk-amber.selected{background:var(--amber);border-color:var(--amber);}
+  .opt-btn.risk-red.selected{background:var(--red);border-color:var(--red);}
+
+  .result-box{
+    display:none;
+    margin-top:10px;
+  }
+  .result-box.show{display:block;}
+
+  /* tables */
+  table.ref-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.82rem;
+    margin:8px 0;
+  }
+  table.ref-table th, table.ref-table td{
+    border:1px solid var(--line);
+    padding:7px 8px;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.ref-table th{
+    background:var(--teal-100);
+    color:var(--teal-900);
+    font-size:0.74rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  table.ref-table td.num{font-weight:700;white-space:nowrap;}
+  table.ref-table tr.row-active td{background:var(--amber-bg);}
+
+  /* group header for equipment */
+  .group-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:4px;
+  }
+  .group-header .count{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    background:var(--sand-100);
+    border-radius:999px;
+    padding:2px 9px;
+    font-weight:700;
+  }
+  .group-header .count.done{background:var(--green-bg);color:var(--green);}
+
+  /* nav buttons bottom */
+  .flow-nav{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:24px;
+  }
+  .flow-nav button{
+    flex:1;
+    padding:13px 10px;
+    border-radius:10px;
+    font-size:0.88rem;
+    font-weight:700;
+    cursor:pointer;
+    border:1.5px solid var(--teal-700);
+  }
+  .flow-nav .prev{background:#fff;color:var(--teal-700);}
+  .flow-nav .next{background:var(--teal-700);color:#fff;}
+  .flow-nav button:disabled{opacity:0.35;cursor:default;}
+
+  ul.tight{margin:6px 0 6px 18px;padding:0;font-size:0.9rem;}
+  ul.tight li{margin-bottom:4px;}
+  .step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:22px;height:22px;
+    background:var(--teal-700);
+    color:#fff;
+    border-radius:50%;
+    font-size:0.72rem;
+    font-weight:800;
+    margin-right:8px;
+    flex-shrink:0;
+  }
+  .step{display:flex;align-items:flex-start;gap:2px;padding:6px 0;font-size:0.9rem;}
+  .toggle-row{display:flex;gap:8px;margin:8px 0 14px;}
+  .toggle-row .opt-btn{flex:1;}
+  details{margin:8px 0;}
+  details summary{
+    cursor:pointer;
+    font-weight:700;
+    color:var(--teal-700);
+    font-size:0.85rem;
+    padding:4px 0;
+  }
+  details[open] summary{margin-bottom:4px;}
+  .footer-note{
+    text-align:center;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    margin-top:30px;
+    padding:0 20px;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-title">
+    <div>
+      <span class="eyebrow">HITH · Heart Failure Service</span>
+      <h1>Furosemide Infusion — Visit Guide</h1>
+    </div>
+    <button class="reset-btn" id="resetBtn">↺ New visit</button>
+  </div>
+  <div class="visit-meta">
+    <select id="visitDay">
+      <option value="day1">Day 1 (baseline)</option>
+      <option value="subsequent">Day 2 onward</option>
+    </select>
+    <select id="regimen">
+      <option value="812">8–12 hr daytime infusion</option>
+      <option value="24">24 hr continuous infusion</option>
+    </select>
+    <select id="bagPrep">
+      <option value="premade">Bag pharmacy pre-prepared</option>
+      <option value="ward">Prepare bag on visit</option>
+    </select>
+  </div>
+</header>
+
+<nav class="tabs" id="tabNav">
+  <button data-tab="setup"><span class="num">1</span> Safety check <span class="tick" data-tick="setup"></span></button>
+  <button data-tab="equipment"><span class="num">2</span> Equipment <span class="tick" data-tick="equipment"></span></button>
+  <button data-tab="prep"><span class="num">3</span> Prep &amp; pump <span class="tick" data-tick="prep"></span></button>
+  <button data-tab="infusion"><span class="num">4</span> Infusion guide <span class="tick" data-tick="infusion"></span></button>
+  <button data-tab="bloods"><span class="num">5</span> Bloods &amp; plan <span class="tick" data-tick="bloods"></span></button>
+  <button data-tab="hypok"><span class="num">6</span> Hypokalaemia</button>
+  <button data-tab="reference"><span class="num">7</span> Reference</button>
+</nav>
+
+<main>
+
+<!-- ================= TAB 1: SAFETY CHECK ================= -->
+<section class="panel active" id="panel-setup">
+  <h2 class="section-title"><span class="pill">Step 1</span> Before you start</h2>
+
+  <div class="card">
+    <h3>Clinical criteria — confirm all within range</h3>
+    <p class="muted">Unless modified by the HITH Medical Consultant. Tick once measured/confirmed.</p>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_rr"><label for="c_rr">Respiratory rate <strong>15–25 / min</strong></label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_hr"><label for="c_hr">Heart rate <strong>45–120 / min</strong></label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_sbp"><label for="c_sbp">Systolic BP <strong>90–180 mmHg</strong></label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_o2"><label for="c_o2">O₂ saturation <strong>&gt; 92%</strong></label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_temp"><label for="c_temp">Temperature <strong>35.6–37.5°C</strong></label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_alert"><label for="c_alert">Patient awake and alert</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_contact"><label for="c_contact">Patient/carer able to contact HITH to escalate concerns (incl. pump alarms)</label></div>
+  </div>
+
+  <div class="alert red">
+    <strong>If any criteria are outside range</strong>
+    Do not commence/continue the infusion. Contact the HITH medical team to discuss before proceeding.
+  </div>
+
+  <div class="card">
+    <h3>Contraindications — confirm none present</h3>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_allergy"><label for="c_allergy">No allergy / hypersensitivity to furosemide or sulphonamides</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_hypok"><label for="c_hypok">No severe hypokalaemia / hyponatraemia</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_hypov"><label for="c_hypov">No severe hypovolaemia</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_hypot"><label for="c_hypot">No severe hypotension (SBP &lt; 90 mmHg)</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_egfr"><label for="c_egfr">eGFR not &lt; 15–20 mL/min</label></div>
+  </div>
+
+  <div class="card" id="baselineCard">
+    <div class="group-header">
+      <h3 style="margin:0">Day 1 baseline assessments</h3>
+    </div>
+    <p class="muted">Complete once, prior to first infusion.</p>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_bl_vitals"><label for="c_bl_vitals">Baseline vital signs recorded</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_bl_weight"><label for="c_bl_weight">Baseline body weight recorded</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_bl_bloods"><label for="c_bl_bloods">Baseline bloods taken (UEC, CMP, LFT, TFT)</label></div>
+    <div class="check-item" data-group="setup"><input type="checkbox" id="c_bl_ecg"><label for="c_bl_ecg">Baseline ECG completed</label></div>
+  </div>
+
+  <div class="flow-nav">
+    <button class="prev" disabled>Back</button>
+    <button class="next" data-go="equipment">Next: Equipment →</button>
+  </div>
+</section>
+
+<!-- ================= TAB 2: EQUIPMENT ================= -->
+<section class="panel" id="panel-equipment">
+  <h2 class="section-title"><span class="pill">Step 2</span> Equipment check</h2>
+  <p class="muted">Grouped by task. Tap to check off as packed/confirmed on arrival.</p>
+
+  <div class="card">
+    <div class="group-header">
+      <h3 style="margin:0">IV equipment</h3>
+      <span class="count" data-count="iv">0/6</span>
+    </div>
+    <div class="check-item" data-group="iv"><input type="checkbox" id="e_pump"><label for="e_pump">REM Bodyguard infusion pump<span class="sub">+ charger / spare battery</span></label></div>
+    <div class="check-item" data-group="iv"><input type="checkbox" id="e_giveset"><label for="e_giveset">REM Bodyguard giving set (dedicated line)</label></div>
+    <div class="check-item" data-group="iv"><input type="checkbox" id="e_bag"><label for="e_bag">Furosemide infusion bag<span class="sub">Pharmacy pre-prepared, or NaCl bag + ampoules to prepare on visit</span></label></div>
+    <div class="check-item" data-group="iv"><input type="checkbox" id="e_nacl"><label for="e_nacl">0.9% sodium chloride 100 mL bag<span class="sub">If preparing on visit</span></label></div>
+    <div class="check-item" data-group="iv"><input type="checkbox" id="e_flush"><label for="e_flush">Saline flushes</label></div>
+    <div class="check-item" data-group="iv"><input type="checkbox" id="e_syringe"><label for="e_syringe">Syringes &amp; 21G (or finer) drawing-up needles<span class="sub">For preparing furosemide bag</span></label></div>
+  </div>
+
+  <div class="card">
+    <div class="group-header">
+      <h3 style="margin:0">Bloods / pathology</h3>
+      <span class="count" data-count="bloods">0/4</span>
+    </div>
+    <div class="check-item" data-group="bloods"><input type="checkbox" id="e_vac"><label for="e_vac">Vacutainers — UEC / CMP / LFT (+ TFT if Day 1)</label></div>
+    <div class="check-item" data-group="bloods"><input type="checkbox" id="e_form"><label for="e_form">Pathology request form (completed)</label></div>
+    <div class="check-item" data-group="bloods"><input type="checkbox" id="e_cooler"><label for="e_cooler">Specimen transport / cooler bag</label></div>
+    <div class="check-item" data-group="bloods"><input type="checkbox" id="e_labels"><label for="e_labels">Patient ID labels</label></div>
+  </div>
+
+  <div class="card">
+    <div class="group-header">
+      <h3 style="margin:0">Patient monitoring &amp; documentation</h3>
+      <span class="count" data-count="monitor">0/4</span>
+    </div>
+    <div class="check-item" data-group="monitor"><input type="checkbox" id="e_scales"><label for="e_scales">Weigh scales<span class="sub">Use same set each day</span></label></div>
+    <div class="check-item" data-group="monitor"><input type="checkbox" id="e_bp"><label for="e_bp">Blood pressure monitor</label></div>
+    <div class="check-item" data-group="monitor"><input type="checkbox" id="e_thermo"><label for="e_thermo">Thermometer &amp; SpO₂ probe</label></div>
+    <div class="check-item" data-group="monitor"><input type="checkbox" id="e_booklet"><label for="e_booklet">Heart Failure Fluid Balance Booklet</label></div>
+  </div>
+
+  <div class="card">
+    <div class="group-header">
+      <h3 style="margin:0">Potassium supplementation pack</h3>
+      <span class="count" data-count="potassium">0/1</span>
+    </div>
+    <div class="check-item" data-group="potassium"><input type="checkbox" id="e_kpack"><label for="e_kpack">Potassium pack in car<span class="sub">2 × sachets of 5 KCl SR 600 mg tablets, OR 1 × bottle Chlorvescent® tablets</span></label></div>
+  </div>
+
+  <div class="flow-nav">
+    <button class="prev" data-go="setup">← Back</button>
+    <button class="next" data-go="prep">Next: Prep &amp; pump →</button>
+  </div>
+</section>
+
+<!-- ================= TAB 3: PREP & PUMP ================= -->
+<section class="panel" id="panel-prep">
+  <h2 class="section-title"><span class="pill">Step 3</span> Preparation &amp; pump setup</h2>
+
+  <div id="prepStepsCard" class="card">
+    <h3>Preparing the furosemide bag</h3>
+    <p class="muted">Furosemide 500 mg in 100 mL 0.9% sodium chloride. Skip this if pharmacy has pre-prepared the bag.</p>
+    <div class="step"><span class="step-num">1</span> Remove 50 mL of fluid from the 100 mL 0.9% sodium chloride bag.</div>
+    <div class="step"><span class="step-num">2</span> Draw up the total contents of <strong>2 vials of furosemide 250 mg/25 mL</strong> ampoules via a 21-gauge (or finer) needle.</div>
+    <div class="step"><span class="step-num">3</span> Add the furosemide to the 100 mL bag through the same needle.</div>
+    <div class="step"><span class="step-num">4</span> Remove <strong>ALL</strong> air from the bag — ideally with the same needle, before withdrawing it, to minimise how many times the bag is pierced.</div>
+    <div class="step"><span class="step-num">5</span> Label the bag: Furosemide 500 mg in 100 mL 0.9% NaCl, date/time prepared. <strong>Expiry: 24 hours from preparation.</strong></div>
+  </div>
+
+  <div class="alert teal">
+    <strong>Compatibility</strong>
+    0.9% sodium chloride only. Furosemide is incompatible with most medication solutions — run via a dedicated line. Check the Australian Injectable Drugs Handbook or Pharmacy for any compatibility queries.
+  </div>
+
+  <h2 class="section-title" style="margin-top:26px;">Dose selector</h2>
+  <p class="muted">Tap the prescribed rate to see the pump settings.</p>
+  <div class="btn-grid" id="doseGrid">
+    <button class="opt-btn" data-dose="5">5 <span class="small">mg/hr</span></button>
+    <button class="opt-btn" data-dose="10">10 <span class="small">mg/hr · usual start</span></button>
+    <button class="opt-btn" data-dose="15">15 <span class="small">mg/hr</span></button>
+    <button class="opt-btn" data-dose="20">20 <span class="small">mg/hr</span></button>
+    <button class="opt-btn" data-dose="25">25 <span class="small">mg/hr</span></button>
+    <button class="opt-btn" data-dose="30">30 <span class="small">mg/hr</span></button>
+    <button class="opt-btn" data-dose="35">35 <span class="small">mg/hr</span></button>
+    <button class="opt-btn" data-dose="40">40 <span class="small">mg/hr</span></button>
+    <button class="opt-btn" data-dose="50">50 <span class="small">mg/hr · approval req.</span></button>
+    <button class="opt-btn" data-dose="60">60 <span class="small">mg/hr · max</span></button>
+  </div>
+
+  <div class="result-box" id="doseResult">
+    <div class="card">
+      <h3>Pump entry for <span id="doseVal"></span> mg/hr</h3>
+      <table class="ref-table">
+        <tr><th>Enter bag volume</th><td class="num">90 mL</td></tr>
+        <tr><th>Enter dose rate</th><td class="num"><span id="doseRate"></span> mL/hr</td></tr>
+      </table>
+      <p class="muted">Spare volume of 10 mL is intentionally left for priming — bags are larger than usual to avoid running dry before the next change.</p>
+      <div id="doseWarning"></div>
+    </div>
+  </div>
+
+  <h2 class="section-title" style="margin-top:26px;">REM Bodyguard pump — steps</h2>
+  <div class="card">
+    <div class="step"><span class="step-num">1</span> Turn on the REM Bodyguard pump.</div>
+    <div class="step"><span class="step-num">2</span> Select <strong>Continuous Program</strong> and confirm <strong>mL/hr</strong> is selected. Press <strong>START/OK</strong>.</div>
+    <div class="step"><span class="step-num">3</span> Enter the <strong>bag volume (90 mL)</strong>. Press <strong>START/OK</strong>.</div>
+    <div class="step"><span class="step-num">4</span> Enter the <strong>dose rate</strong> for the prescribed mg/hr (see dose selector above). Press <strong>START/OK</strong>.</div>
+    <div class="step"><span class="step-num">5</span> Confirm the displayed settings match the prescription before starting the infusion.</div>
+  </div>
+
+  <div class="alert amber">
+    <strong>Dosing limits</strong>
+    Standard range: 5–40 mg/hr. Start at <strong>10 mg/hr</strong> unless altered by the HITH Consultant. Doses of <strong>40 mg/hr or above require pre-approval</strong> from the HITH Medical Consultant. Maximum dose: <strong>60 mg/hr</strong> (this bag will only last ~7 hours — plan for an earlier bag change).
+  </div>
+
+  <div class="flow-nav">
+    <button class="prev" data-go="equipment">← Back</button>
+    <button class="next" data-go="infusion">Next: Infusion guide →</button>
+  </div>
+</section>
+
+<!-- ================= TAB 4: INFUSION GUIDE ================= -->
+<section class="panel" id="panel-infusion">
+  <h2 class="section-title"><span class="pill">Step 4</span> Infusion guide</h2>
+  <p class="muted">Shows the actions for today's visit, based on the day and regimen selected at the top.</p>
+
+  <!-- Day 1 connection / monitoring -->
+  <div class="card show-day1">
+    <h3>Connecting &amp; first infusion (Day 1)</h3>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_connect"><label for="i_connect">Connect furosemide infusion via a dedicated line — do not co-administer other medications in this line</label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_start"><label for="i_start">Start infusion per programmed pump settings</label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_v5"><label for="i_v5">Vital signs (HR, BP, RR, SpO₂) at <strong>5 minutes</strong></label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_v30"><label for="i_v30">Vital signs at <strong>30 minutes</strong></label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_v60"><label for="i_v60">Vital signs at <strong>60 minutes</strong></label></div>
+    <p class="muted">If vitals remain stable through the first infusion, subsequent days only need a 5-minute check.</p>
+  </div>
+
+  <!-- Subsequent day monitoring -->
+  <div class="card show-subsequent">
+    <h3>Monitoring (Day 2 onward)</h3>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_v5b"><label for="i_v5b">Vital signs (HR, BP, RR, SpO₂) at <strong>5 minutes</strong> after infusion commencement</label></div>
+    <p class="muted">Based on stable vital signs during the first infusion. If anything changes from baseline, repeat 30 / 60-minute checks.</p>
+  </div>
+
+  <div class="card">
+    <h3>Morning routine</h3>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_weight"><label for="i_weight">Weigh patient — same scales as baseline, before infusion</label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_fluid"><label for="i_fluid">Record fluid intake in Heart Failure Fluid Balance Booklet<span class="sub">Target ≤ 1.5 L/day unless altered by the medical team</span></label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_bloods"><label for="i_bloods">Collect AM bloods (UEC, CMP, LFT) — return to SVHM Pathology early for expedited results</label></div>
+    <div class="check-item show-812" data-group="infusion"><input type="checkbox" id="i_commence"><label for="i_commence">Commence today's infusion</label></div>
+    <div class="check-item show-24" data-group="infusion"><input type="checkbox" id="i_changebag"><label for="i_changebag">Change infusion bag<span class="sub">Each bag expires 24 hours from preparation</span></label></div>
+  </div>
+
+  <div class="card">
+    <h3>Midday / early afternoon</h3>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_potassium"><label for="i_potassium">Additional review to administer oral potassium supplementation, if indicated by AM blood results <span class="sub">See Bloods &amp; Plan tab</span></label></div>
+  </div>
+
+  <div class="card">
+    <h3>Throughout the day</h3>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_telehealth"><label for="i_telehealth">Phone / telehealth check-in to confirm patient remains stable on infusion</label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_review"><label for="i_review">HITH nursing review (once or twice daily depending on clinical need — in person or telehealth)</label></div>
+  </div>
+
+  <div class="card">
+    <h3>Evening</h3>
+    <div class="check-item show-812" data-group="infusion"><input type="checkbox" id="i_remove"><label for="i_remove">Remove / disconnect infusion (8–12 hr regimen)</label></div>
+    <div class="check-item show-24" data-group="infusion"><input type="checkbox" id="i_checkin"><label for="i_checkin">Check-in: confirm pump running, line patent, no alarms (24 hr regimen)</label></div>
+  </div>
+
+  <div class="card">
+    <h3>Patient / carer education</h3>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_edu_contact"><label for="i_edu_contact">Confirmed patient/carer can contact HITH for concerns or pump alarms</label></div>
+    <div class="check-item" data-group="infusion"><input type="checkbox" id="i_edu_signs"><label for="i_edu_signs">Educated to report: dizziness, symptoms of low blood pressure, new skin rash</label></div>
+  </div>
+
+  <div class="alert red">
+    <strong>Escalate to HITH medical team immediately if</strong>
+    SBP &lt; 90 or &gt; 180 mmHg · HR &lt; 45 or &gt; 120 · RR outside 15–25 · SpO₂ ≤ 92% · Temp outside 35.6–37.5°C · new dizziness, hypotensive symptoms or skin rash · patient not awake/alert · unresolved pump alarm.
+  </div>
+
+  <div class="flow-nav">
+    <button class="prev" data-go="prep">← Back</button>
+    <button class="next" data-go="bloods">Next: Bloods &amp; plan →</button>
+  </div>
+</section>
+
+<!-- ================= TAB 5: BLOODS & PLAN ================= -->
+<section class="panel" id="panel-bloods">
+  <h2 class="section-title"><span class="pill">Step 5</span> Bloods &amp; plan</h2>
+
+  <div class="card">
+    <h3>Daily bloods</h3>
+    <p>UEC, CMP, LFT every day. TFT at baseline only (Day 1).</p>
+    <p class="muted">Correct electrolytes if abnormal. Renal function (UEC) guides nephrotoxic medication monitoring — see Reference tab.</p>
+  </div>
+
+  <h3 style="color:var(--teal-900)">Weight trend (today vs yesterday)</h3>
+  <div class="btn-grid" id="weightGrid">
+    <button class="opt-btn risk-green" data-weight="ontrack">On track <span class="small">−0.5 to −2 kg</span></button>
+    <button class="opt-btn risk-amber" data-weight="none">No change / gain <span class="small">0 kg or +</span></button>
+    <button class="opt-btn risk-amber" data-weight="excess">Excess loss <span class="small">&gt; −2 kg</span></button>
+  </div>
+  <div class="result-box" id="weightResult"></div>
+
+  <h3 style="color:var(--teal-900); margin-top:24px;">Potassium result</h3>
+  <p class="muted">Normal reference range: 3.5–5.2 mmol/L. Tap the result range to see the recommended action.</p>
+  <div class="btn-grid" id="kGrid">
+    <button class="opt-btn risk-green" data-k="normal">≥ 3.5 <span class="small">normal</span></button>
+    <button class="opt-btn risk-amber" data-k="3to35">3.0–3.5</button>
+    <button class="opt-btn risk-amber" data-k="25to29">2.5–2.9</button>
+    <button class="opt-btn risk-red" data-k="2to24">2.0–2.4</button>
+    <button class="opt-btn risk-red" data-k="lt2">&lt; 2.0</button>
+  </div>
+  <div class="result-box" id="kResult"></div>
+
+  <div class="flow-nav">
+    <button class="prev" data-go="infusion">← Back</button>
+    <button class="next" data-go="hypok">Next: Hypokalaemia →</button>
+  </div>
+</section>
+
+<!-- ================= TAB 6: HYPOKALAEMIA SUMMARY ================= -->
+<section class="panel" id="panel-hypok">
+  <h2 class="section-title"><span class="pill">Step 6</span> Hypokalaemia management — summary</h2>
+
+  <div class="alert teal">
+    <strong>Normal serum potassium</strong>
+    3.5–5.2 mmol/L
+  </div>
+
+  <table class="ref-table">
+    <tr><th>Serum K⁺ (mmol/L)</th><th>Recommended supplementation</th><th>Monitoring</th></tr>
+    <tr>
+      <td class="num">3.0–3.5</td>
+      <td>4 × potassium chloride SR tablets (32 mmol) BD <em>or</em> 3 × Chlorvescent® tablets (42 mmol) BD</td>
+      <td>Repeat bloods at 12–24 hr</td>
+    </tr>
+    <tr>
+      <td class="num">2.5–2.9</td>
+      <td>5 × potassium chloride SR tablets (40 mmol) BD <em>or</em> 4 × Chlorvescent® tablets (56 mmol) BD</td>
+      <td>Repeat bloods every 2–12 hr (per senior clinician) until &gt; 3 mmol/L, then every 12–24 hr</td>
+    </tr>
+    <tr>
+      <td class="num">2.0–2.4</td>
+      <td>Admit for IV replacement if appropriate</td>
+      <td>Discuss with Consultant</td>
+    </tr>
+    <tr>
+      <td class="num">&lt; 2.0</td>
+      <td>Admit for IV replacement if appropriate</td>
+      <td>Discuss with Consultant urgently</td>
+    </tr>
+  </table>
+
+  <div class="card">
+    <h3>Potassium pack contents</h3>
+    <p>Carried in every HITH car, left at the patient's home awaiting instructions:</p>
+    <ul class="tight">
+      <li>2 × sachets of 5 potassium chloride slow-release (SR) 600 mg tablets, <strong>OR</strong></li>
+      <li>1 × bottle of Chlorvescent® tablets</li>
+    </ul>
+    <p class="muted">Based on medical recommendations, the visiting HITH nurse gives the patient the required number of SR sachets and/or Chlorvescent® tablets.</p>
+  </div>
+
+  <div class="alert amber">
+    <strong>PRN replacement</strong>
+    PRN potassium replacement is charted on the medication chart per sliding scale.
+  </div>
+
+  <div class="flow-nav">
+    <button class="prev" data-go="bloods">← Back</button>
+    <button class="next" data-go="reference">Next: Reference →</button>
+  </div>
+</section>
+
+<!-- ================= TAB 7: REFERENCE ================= -->
+<section class="panel" id="panel-reference">
+  <h2 class="section-title"><span class="pill">Step 7</span> Quick reference</h2>
+
+  <details>
+    <summary>Indications</summary>
+    <ul class="tight">
+      <li>Adults aged 18 years or older.</li>
+      <li>Worsening heart failure symptoms with fluid overload.</li>
+      <li>Inadequate diuresis despite maximal intermittent IV furosemide (&gt; 80–120 mg BD bolus doses).</li>
+      <li>Referrals from ED, inpatient, outpatient and community services; suitable for 8–12 hr daytime and/or 24 hr continuous infusion.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Contraindications</summary>
+    <ul class="tight">
+      <li>Allergy / hypersensitivity to furosemide or sulphonamides.</li>
+      <li>Severe hypokalaemia / hyponatraemia.</li>
+      <li>Severe hypovolaemia.</li>
+      <li>Severe hypotension (SBP &lt; 90 mmHg).</li>
+      <li>Renal impairment: eGFR &lt; 15–20 mL/min.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Medication interactions</summary>
+    <table class="ref-table">
+      <tr><th>Medication</th><th>Interaction</th></tr>
+      <tr><td>Aminoglycosides (e.g. gentamicin, amikacin, tobramycin)</td><td>Additive nephrotoxicity with loop diuretics. If unavoidable, closely monitor renal function, auditory function and serum aminoglycoside levels.</td></tr>
+      <tr><td>Potassium-lowering medications (e.g. hydrochlorothiazide, high-dose laxatives)</td><td>Increased hypokalaemia risk — monitor potassium.</td></tr>
+      <tr><td>Nephrotoxic medications (e.g. NSAIDs, ACE inhibitors, digoxin)</td><td>Monitor closely if renal function significantly impaired; dosing intervals may need to be prolonged.</td></tr>
+      <tr><td>Lithium</td><td>Loop-diuretic-induced hyponatraemia may reduce lithium clearance, increasing toxicity risk. Monitor levels and signs of toxicity.</td></tr>
+    </table>
+  </details>
+
+  <details>
+    <summary>Dosage summary</summary>
+    <ul class="tight">
+      <li>Standard continuous infusion range: 5–40 mg/hr.</li>
+      <li>Commence at 10 mg/hr unless altered by the HITH Consultant.</li>
+      <li>Doses ≥ 40 mg/hr require pre-approval from the HITH Medical Consultant.</li>
+      <li>Maximum dose: 60 mg/hr.</li>
+      <li>Aim for 0.5–2 kg fluid weight loss per day; adjust dose to clinical response.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Definitions &amp; acronyms</summary>
+    <table class="ref-table">
+      <tr><td class="num">ACE</td><td>Angiotensin converting enzyme (inhibitors)</td></tr>
+      <tr><td class="num">CMP</td><td>Calcium, magnesium, phosphate</td></tr>
+      <tr><td class="num">ECG</td><td>Electrocardiogram</td></tr>
+      <tr><td class="num">LFT</td><td>Liver function tests</td></tr>
+      <tr><td class="num">NSAID</td><td>Nonsteroidal anti-inflammatory medication</td></tr>
+      <tr><td class="num">SR</td><td>Slow release</td></tr>
+      <tr><td class="num">TFT</td><td>Thyroid function test</td></tr>
+      <tr><td class="num">UEC</td><td>Urea and electrolytes</td></tr>
+    </table>
+  </details>
+
+  <details>
+    <summary>Document details</summary>
+    <p class="muted">
+      Hospital in the Home (HITH) Furosemide Infusion guideline.<br>
+      Endorsed: 23 October 2025 · Next review: October 2029.<br>
+      Primary author: Dr Angeline Leet, Head of Heart Failure Services.<br>
+      Head of Department: Dr Olimpia Mateevici, Clinical Lead HITH.<br>
+      Endorsed by: Clinical Policy and Review Committee.<br><br>
+      Related policies: Potassium Chloride Supplementation in Hypokalaemia · Escalation of Care · Medication Management Policy.
+    </p>
+  </details>
+
+  <div class="flow-nav">
+    <button class="prev" data-go="hypok">← Back</button>
+    <button class="next" data-go="setup">Start of visit ↺</button>
+  </div>
+</section>
+
+</main>
+
+<p class="footer-note">For HITH clinical use alongside the current Hospital in the Home Furosemide Infusion guideline (endorsed 23 Oct 2025). Not a substitute for clinical judgement — escalate per the Escalation of Care policy when in doubt.</p>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'hith_furosemide_state_v1';
+
+  const checkboxIds = [
+    'c_rr','c_hr','c_sbp','c_o2','c_temp','c_alert','c_contact',
+    'c_allergy','c_hypok','c_hypov','c_hypot','c_egfr',
+    'c_bl_vitals','c_bl_weight','c_bl_bloods','c_bl_ecg',
+    'e_pump','e_giveset','e_bag','e_nacl','e_flush','e_syringe',
+    'e_vac','e_form','e_cooler','e_labels',
+    'e_scales','e_bp','e_thermo','e_booklet',
+    'e_kpack',
+    'i_connect','i_start','i_v5','i_v30','i_v60','i_v5b',
+    'i_weight','i_fluid','i_bloods','i_commence','i_changebag',
+    'i_potassium','i_telehealth','i_review','i_remove','i_checkin',
+    'i_edu_contact','i_edu_signs'
+  ];
+
+  const equipmentGroups = {
+    iv: ['e_pump','e_giveset','e_bag','e_nacl','e_flush','e_syringe'],
+    bloods: ['e_vac','e_form','e_cooler','e_labels'],
+    monitor: ['e_scales','e_bp','e_thermo','e_booklet'],
+    potassium: ['e_kpack']
+  };
+
+  const doseTable = {
+    5:1, 10:2, 15:3, 20:4, 25:5, 30:6, 35:7, 40:8, 50:10, 60:12
+  };
+
+  const weightMessages = {
+    ontrack: {cls:'green', title:'On track', text:'Within the target 0.5–2 kg/day fluid weight loss. Continue current management.'},
+    none: {cls:'amber', title:'No weight loss or weight gain', text:'Inadequate diuresis for this patient. Consider escalation to HITH medical team for dose review, in line with their clinical response.'},
+    excess: {cls:'amber', title:'Excess weight loss (> 2 kg)', text:'Watch closely for hypovolaemia / hypotension. Check vitals and clinical hydration status; discuss with HITH medical team if concerned.'}
+  };
+
+  const kMessages = {
+    normal: {cls:'green', title:'K⁺ ≥ 3.5 mmol/L — normal', text:'No additional supplementation required. Continue routine daily monitoring.'},
+    '3to35': {cls:'amber', title:'K⁺ 3.0–3.5 mmol/L', text:'Give 4 × potassium chloride SR tablets (32 mmol) twice a day, OR 3 × Chlorvescent® tablets (42 mmol) twice a day. Repeat bloods at 12–24 hr.'},
+    '25to29': {cls:'amber', title:'K⁺ 2.5–2.9 mmol/L', text:'Give 5 × potassium chloride SR tablets (40 mmol) twice a day, OR 4 × Chlorvescent® tablets (56 mmol) twice a day. Repeat bloods every 2–12 hr (per senior clinician) until > 3 mmol/L, then every 12–24 hr.'},
+    '2to24': {cls:'red', title:'K⁺ 2.0–2.4 mmol/L', text:'Consider admission for IV replacement if appropriate. Discuss with Consultant.'},
+    lt2: {cls:'red', title:'K⁺ < 2.0 mmol/L', text:'Consider admission for IV replacement if appropriate. Discuss with Consultant urgently.'}
+  };
+
+  let state = loadState();
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return { checks:{}, visitDay:'day1', regimen:'812', bagPrep:'premade', dose:null, weight:null, k:null, tab:'setup' };
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  // ---- Tabs ----
+  const tabButtons = document.querySelectorAll('#tabNav button');
+  const panels = document.querySelectorAll('.panel');
+  function showTab(tab){
+    state.tab = tab;
+    tabButtons.forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+    panels.forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
+    window.scrollTo({top:0, behavior:'instant'});
+    saveState();
+  }
+  tabButtons.forEach(b=>b.addEventListener('click', ()=>showTab(b.dataset.tab)));
+  document.querySelectorAll('[data-go]').forEach(b=>{
+    b.addEventListener('click', ()=>showTab(b.dataset.go));
+  });
+
+  // ---- Checkboxes ----
+  checkboxIds.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.checked = !!state.checks[id];
+    syncCheckedClass(el);
+    el.addEventListener('change', ()=>{
+      state.checks[id] = el.checked;
+      syncCheckedClass(el);
+      updateTickMarks();
+      updateEquipmentCounts();
+      saveState();
+    });
+  });
+  function syncCheckedClass(el){
+    el.closest('.check-item').classList.toggle('checked', el.checked);
+  }
+
+  // Tapping the row toggles the checkbox too
+  document.querySelectorAll('.check-item').forEach(row=>{
+    row.addEventListener('click', (e)=>{
+      if(e.target.tagName.toLowerCase()==='input' || e.target.tagName.toLowerCase()==='label') return;
+      const cb = row.querySelector('input[type=checkbox]');
+      if(cb){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
+    });
+  });
+
+  // ---- Equipment group counts ----
+  function updateEquipmentCounts(){
+    Object.keys(equipmentGroups).forEach(g=>{
+      const ids = equipmentGroups[g];
+      const done = ids.filter(id=> state.checks[id]).length;
+      const el = document.querySelector('[data-count="'+g+'"]');
+      if(el){
+        el.textContent = done+'/'+ids.length;
+        el.classList.toggle('done', done===ids.length);
+      }
+    });
+  }
+
+  // ---- Tab completion ticks ----
+  const tabGroups = {
+    setup: ['c_rr','c_hr','c_sbp','c_o2','c_temp','c_alert','c_contact','c_allergy','c_hypok','c_hypov','c_hypot','c_egfr'],
+    equipment: ['e_pump','e_giveset','e_bag','e_flush','e_syringe','e_vac','e_form','e_cooler','e_labels','e_scales','e_bp','e_thermo','e_booklet','e_kpack'],
+    prep: null, // based on dose selection
+    infusion: ['i_weight','i_fluid','i_bloods','i_telehealth','i_review','i_edu_contact','i_edu_signs'],
+    bloods: null // based on selections
+  };
+  function updateTickMarks(){
+    Object.keys(tabGroups).forEach(tab=>{
+      const tickEl = document.querySelector('[data-tick="'+tab+'"]');
+      if(!tickEl) return;
+      let done = false;
+      if(tab==='prep'){
+        done = !!state.dose;
+      } else if(tab==='bloods'){
+        done = !!state.weight && !!state.k;
+      } else if(tabGroups[tab]){
+        done = tabGroups[tab].every(id => state.checks[id]);
+      }
+      tickEl.textContent = done ? '✓' : '';
+    });
+  }
+
+  // ---- Visit meta selectors ----
+  const visitDaySel = document.getElementById('visitDay');
+  const regimenSel = document.getElementById('regimen');
+  const bagPrepSel = document.getElementById('bagPrep');
+  visitDaySel.value = state.visitDay;
+  regimenSel.value = state.regimen;
+  bagPrepSel.value = state.bagPrep;
+
+  function applyVisitMeta(){
+    document.querySelectorAll('.show-day1').forEach(el=> el.style.display = state.visitDay==='day1' ? '' : 'none');
+    document.querySelectorAll('.show-subsequent').forEach(el=> el.style.display = state.visitDay==='subsequent' ? '' : 'none');
+    document.querySelectorAll('.show-812').forEach(el=> el.style.display = state.regimen==='812' ? '' : 'none');
+    document.querySelectorAll('.show-24').forEach(el=> el.style.display = state.regimen==='24' ? '' : 'none');
+
+    const baselineCard = document.getElementById('baselineCard');
+    baselineCard.style.display = state.visitDay==='day1' ? '' : 'none';
+
+    const prepCard = document.getElementById('prepStepsCard');
+    prepCard.style.display = state.bagPrep==='ward' ? '' : 'none';
+  }
+
+  visitDaySel.addEventListener('change', ()=>{ state.visitDay = visitDaySel.value; applyVisitMeta(); saveState(); });
+  regimenSel.addEventListener('change', ()=>{ state.regimen = regimenSel.value; applyVisitMeta(); saveState(); });
+  bagPrepSel.addEventListener('change', ()=>{ state.bagPrep = bagPrepSel.value; applyVisitMeta(); saveState(); });
+
+  // ---- Dose selector ----
+  const doseButtons = document.querySelectorAll('#doseGrid .opt-btn');
+  const doseResult = document.getElementById('doseResult');
+  function applyDose(){
+    doseButtons.forEach(b=> b.classList.toggle('selected', b.dataset.dose===String(state.dose)));
+    if(state.dose){
+      doseResult.classList.add('show');
+      document.getElementById('doseVal').textContent = state.dose;
+      document.getElementById('doseRate').textContent = doseTable[state.dose];
+      let warn = '';
+      if(Number(state.dose) >= 40){
+        warn += '<div class="alert amber"><strong>Pre-approval required</strong>Doses of 40 mg/hr or above require pre-approval from the HITH Medical Consultant.</div>';
+      }
+      if(Number(state.dose) === 60){
+        warn += '<div class="alert red"><strong>Bag duration</strong>At 60 mg/hr this bag will only last approximately 7 hours — plan for an earlier bag change.</div>';
+      }
+      document.getElementById('doseWarning').innerHTML = warn;
+    } else {
+      doseResult.classList.remove('show');
+    }
+    updateTickMarks();
+  }
+  doseButtons.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      state.dose = b.dataset.dose;
+      applyDose();
+      saveState();
+    });
+  });
+
+  // ---- Weight trend ----
+  const weightButtons = document.querySelectorAll('#weightGrid .opt-btn');
+  const weightResult = document.getElementById('weightResult');
+  function applyWeight(){
+    weightButtons.forEach(b=> b.classList.toggle('selected', b.dataset.weight===state.weight));
+    if(state.weight){
+      const m = weightMessages[state.weight];
+      weightResult.innerHTML = '<div class="alert '+m.cls+'"><strong>'+m.title+'</strong>'+m.text+'</div>';
+      weightResult.classList.add('show');
+    } else {
+      weightResult.classList.remove('show');
+    }
+    updateTickMarks();
+  }
+  weightButtons.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      state.weight = b.dataset.weight;
+      applyWeight();
+      saveState();
+    });
+  });
+
+  // ---- Potassium result ----
+  const kButtons = document.querySelectorAll('#kGrid .opt-btn');
+  const kResultEl = document.getElementById('kResult');
+  function applyK(){
+    kButtons.forEach(b=> b.classList.toggle('selected', b.dataset.k===state.k));
+    if(state.k){
+      const m = kMessages[state.k];
+      kResultEl.innerHTML = '<div class="alert '+m.cls+'"><strong>'+m.title+'</strong>'+m.text+'</div>';
+      kResultEl.classList.add('show');
+    } else {
+      kResultEl.classList.remove('show');
+    }
+    updateTickMarks();
+  }
+  kButtons.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      state.k = b.dataset.k;
+      applyK();
+      saveState();
+    });
+  });
+
+  // ---- Reset ----
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if(!confirm('Start a new visit? This clears all checklist progress, dose selection and result lookups (visit settings at the top are kept).')) return;
+    state.checks = {};
+    state.dose = null;
+    state.weight = null;
+    state.k = null;
+    checkboxIds.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ el.checked = false; syncCheckedClass(el); }
+    });
+    applyDose();
+    applyWeight();
+    applyK();
+    updateTickMarks();
+    updateEquipmentCounts();
+    showTab('setup');
+    saveState();
+  });
+
+  // ---- Init ----
+  applyVisitMeta();
+  applyDose();
+  applyWeight();
+  applyK();
+  updateTickMarks();
+  updateEquipmentCounts();
+  showTab(state.tab || 'setup');
+})();
+</script>
+
+</body>
+</html>
