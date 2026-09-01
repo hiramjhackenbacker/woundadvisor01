@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>VAC Therapy Guide – HITH/DN</title>
+<style>
+:root{
+  --navy:#0D2D5E;--navy-mid:#164080;--blue:#1A6FAF;--blue-lt:#E5F0FA;
+  --bg:#EEF2F7;--surface:#FFFFFF;
+  --amber:#C97A00;--amber-bg:#FFFBEB;--amber-bd:#FDE68A;
+  --red:#C91B1B;--red-bg:#FEF2F2;--red-bd:#FEB4B4;
+  --green:#14803D;--green-bg:#F0FDF4;--green-bd:#A7F3C3;
+  --muted:#6B7280;--border:#DDE3EC;--text:#1B2333;
+  --r:13px;--r-sm:8px;
+  --si-b:#DBEAFE;--si-a:#FEF3C7;--si-g:#DCFCE7;--si-r:#FEE2E2;--si-p:#EDE9FE;--si-n:#E0ECF8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px;padding-bottom:80px;}
+
+/* HEADER */
+.site-header{position:sticky;top:0;z-index:100;background:var(--navy);padding:14px 16px 0;}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.header-text{flex:1;min-width:0;}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px;}
+.drug-name{font-size:19px;font-weight:800;color:#fff;line-height:1.2;}
+.drug-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px;}
+.sop-pill{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.06em;white-space:nowrap;margin-top:2px;display:inline-block;}
+
+/* TAB GRID */
+.tab-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px;padding-bottom:0;}
+.tab-btn{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;padding:9px 8px 8px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-align:center;}
+.tab-btn.active{background:#fff;color:var(--navy);}
+
+/* PANE */
+.pane{display:none;padding:14px 14px 0;}
+.pane.active{display:block;}
+
+/* CARD */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden;}
+
+/* ACCORDION */
+.acc-head{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;border:none;background:none;width:100%;text-align:left;}
+.acc-head:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+.acc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.acc-icon.b{background:var(--si-b);}
+.acc-icon.a{background:var(--si-a);}
+.acc-icon.g{background:var(--si-g);}
+.acc-icon.n{background:var(--si-n);}
+.acc-icon.r{background:var(--si-r);}
+.acc-icon.p{background:var(--si-p);}
+.acc-title-wrap{flex:1;min-width:0;}
+.acc-step{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1px;}
+.acc-title{font-size:15px;font-weight:700;color:var(--text);}
+.acc-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+.chevron{font-size:12px;color:var(--muted);transition:transform .2s;flex-shrink:0;}
+.acc-head.open .chevron{transform:rotate(180deg);}
+.acc-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
+.acc-body.open{display:block;}
+
+/* STEPS */
+.step-list{display:flex;flex-direction:column;gap:12px;padding-top:12px;}
+.step-item{display:flex;gap:10px;align-items:flex-start;}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-content{flex:1;}
+.step-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.step-detail{font-size:13px;color:var(--muted);line-height:1.5;}
+
+/* INFO BOXES */
+.ib{border-radius:11px;padding:10px 12px;margin-top:10px;border-left:3px solid;}
+.ib.b{background:var(--blue-lt);border-color:var(--blue);}
+.ib.a{background:var(--amber-bg);border-color:var(--amber);}
+.ib.r{background:var(--red-bg);border-color:var(--red);}
+.ib.g{background:var(--green-bg);border-color:var(--green);}
+.ib strong{display:block;font-size:12px;font-weight:700;margin-bottom:3px;}
+.ib.b strong{color:var(--blue);}
+.ib.a strong{color:var(--amber);}
+.ib.r strong{color:var(--red);}
+.ib.g strong{color:var(--green);}
+.ib p,.ib span{font-size:13px;line-height:1.5;}
+
+/* FOAM COUNTER */
+.foam-counter{background:var(--navy);border-radius:var(--r-sm);padding:14px;margin-top:12px;text-align:center;}
+.foam-counter-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px;}
+.foam-count-display{font-size:54px;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-1px;}
+.foam-btn-row{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+.foam-btn{border:none;border-radius:var(--r-sm);font-size:22px;font-weight:700;width:52px;height:52px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s;}
+.foam-btn.minus{background:var(--red-bg);color:var(--red);}
+.foam-btn.plus{background:var(--green-bg);color:var(--green);}
+.foam-btn:active{opacity:.7;}
+.foam-reset{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.6);font-size:11px;font-weight:600;border-radius:20px;padding:5px 14px;cursor:pointer;margin-top:10px;}
+.foam-label-out{margin-top:10px;background:rgba(255,255,255,.08);border-radius:var(--r-sm);padding:8px 10px;font-size:12px;color:rgba(255,255,255,.7);font-weight:600;text-align:center;line-height:1.4;}
+
+/* SAFETY TABLE */
+.safety-section{margin-top:8px;}
+.safety-row{border-radius:var(--r-sm);overflow:hidden;margin-bottom:8px;}
+.safety-row-head{padding:10px 12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.safety-row-head .cat-icon{font-size:16px;}
+.safety-row-body{padding:10px 12px 12px;font-size:13px;line-height:1.55;color:var(--text);background:var(--surface);}
+.safety-row-body ul{padding-left:16px;margin-top:4px;}
+.safety-row-body li{margin-bottom:4px;}
+
+.cat-contra .safety-row-head{background:var(--red-bg);color:var(--red);border-bottom:1px solid var(--red-bd);}
+.cat-vessel .safety-row-head{background:var(--amber-bg);color:var(--amber);border-bottom:1px solid var(--amber-bd);}
+.cat-freq .safety-row-head{background:var(--blue-lt);color:var(--blue);border-bottom:1px solid var(--border);}
+.cat-alarm .safety-row-head{background:var(--si-p);color:#5B21B6;border-bottom:1px solid #DDD6FE;}
+
+/* ALARM TOGGLES */
+.alarm-item{margin-bottom:10px;border-radius:var(--r-sm);overflow:hidden;}
+.alarm-head{padding:9px 12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;cursor:pointer;border:none;width:100%;text-align:left;}
+.alarm-head.leak{background:#FEF3C7;color:#92400E;}
+.alarm-head.block{background:#EDE9FE;color:#5B21B6;}
+.alarm-head .alarm-chev{margin-left:auto;font-size:11px;color:var(--muted);transition:transform .2s;}
+.alarm-head.open-alarm .alarm-chev{transform:rotate(180deg);}
+.alarm-body{display:none;padding:10px 12px;font-size:13px;line-height:1.5;background:var(--surface);border-top:1px solid var(--border);}
+.alarm-body.open-body{display:block;}
+.alarm-body ol{padding-left:16px;}
+.alarm-body ol li{margin-bottom:4px;}
+
+/* PRESSURE BADGE */
+.pressure-badge{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;margin-top:8px;}
+.pressure-badge .badge-val{font-size:14px;font-weight:800;}
+
+/* CHANGE FREQ PILLS */
+.freq-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.freq-pill{border-radius:20px;padding:5px 13px;font-size:12px;font-weight:700;}
+.freq-pill.std{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
+.freq-pill.inf{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
+
+/* SEAL CHECK */
+.seal-check{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.seal-item{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:var(--r-sm);padding:9px 12px;cursor:pointer;}
+.seal-cb{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s;}
+.seal-item.checked .seal-cb{background:var(--green);border-color:var(--green);}
+.seal-item.checked .seal-cb::after{content:'✓';color:#fff;font-size:13px;font-weight:700;}
+.seal-item.checked .seal-lbl{color:var(--muted);text-decoration:line-through;}
+.seal-lbl{font-size:13px;line-height:1.4;}
+
+/* STICKY ESCALATE */
+.escalate-bar{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--red);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.esc-label{color:#fff;font-size:13px;font-weight:700;}
+.esc-sub{color:rgba(255,255,255,.75);font-size:11px;}
+.esc-btn{background:#fff;color:var(--red);border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-end;}
+.modal-overlay.open{display:flex;}
+.modal-card{background:var(--surface);border-radius:16px 16px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));width:100%;max-height:85vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:14px;}
+.contact-btn{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:var(--r-sm);padding:12px;margin-bottom:8px;text-decoration:none;border:none;width:100%;cursor:pointer;}
+.contact-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.contact-icon.grn{background:var(--green-bg);}
+.contact-icon.red{background:var(--red-bg);}
+.contact-info{flex:1;text-align:left;}
+.contact-name{font-size:13px;font-weight:700;color:var(--text);}
+.contact-num{font-size:12px;color:var(--muted);}
+.modal-close{width:100%;border:none;background:var(--bg);border-radius:var(--r-sm);padding:12px;font-size:14px;font-weight:600;color:var(--muted);margin-top:6px;cursor:pointer;}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+
+/* INFOGRAPHIC */
+.infographic-wrap{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;}
+.infographic-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.infographic-img{width:100%;border-radius:var(--r-sm);display:block;}
+
+/* FOOTER */
+.site-footer{text-align:center;padding:16px 16px 8px;font-size:11px;color:var(--muted);line-height:1.6;}
+.site-footer strong{color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="header-text">
+      <div class="eyebrow">Wound Care</div>
+      <div class="drug-name">VAC / NPWT Therapy</div>
+      <div class="drug-sub">Vacuum-Assisted Closure — Dressing Guide</div>
+      <span class="sop-pill">Clinical Reference</span>
+    </div>
+  </div>
+  <div class="tab-grid">
+    <button class="tab-btn active" onclick="switchTab('dressing',this)">🩹 Dressing Guide</button>
+    <button class="tab-btn" onclick="switchTab('safety',this)">⚠️ Safety Reference</button>
+  </div>
+</header>
+
+<!-- DRESSING PANE -->
+<div id="pane-dressing" class="pane active">
+
+  <div class="ib b" style="margin-top:14px;">
+    <strong>How VAC Therapy Works</strong>
+    <span>Controlled sub-atmospheric pressure removes excess exudate, contracts wound edges (macrostrain), and stimulates granulation tissue through microdeformation of the wound bed.</span>
+  </div>
+
+  <!-- VIDEO CARD -->
+  <div class="card" style="margin-top:10px;">
+    <div style="padding:12px 14px 10px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">3M™ Reference Video</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;">V.A.C.® Dressing Application — Basic Technique</div>
+      <div style="font-size:12px;color:var(--muted);">Watch before working through the steps below.</div>
+    </div>
+    <div style="position:relative;width:100%;padding-bottom:56.25%;background:#000;border-radius:0 0 var(--r) var(--r);overflow:hidden;">
+      <iframe
+        src="https://www.youtube.com/embed/q4Xfcre99DU"
+        title="3M V.A.C. Dressing Application Basic Technique"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="card" style="margin-top:10px;">
+    <button class="acc-head" onclick="toggleAcc(this)" aria-expanded="false">
+      <div class="acc-icon a">🧴</div>
+      <div class="acc-title-wrap">
+        <div class="acc-step">Step 1</div>
+        <div class="acc-title">Assess &amp; Prepare Peri-Wound Skin</div>
+        <div class="acc-sub">Ensures adhesion · protects surrounding tissue</div>
+      </div>
+      <span class="chevron">▼</span>
+    </button>
+    <div class="acc-body">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Pre-medicate</div>
+            <div class="step-detail">Administer prescribed analgesia <strong>30–45 minutes</strong> before the dressing change.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Cleanse</div>
+            <div class="step-detail">Irrigate wound bed with sterile saline or ordered solution. Thoroughly dry intact surrounding skin before proceeding.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Protect Peri-Wound</div>
+            <div class="step-detail">Apply skin protectant barrier wipes to healthy skin surrounding the wound to prevent maceration and improve drape adhesion.</div>
+          </div>
+        </div>
+      </div>
+      <div class="infographic-wrap">
+        <div class="infographic-label">Reference Infographic — Assess &amp; Prepare Peri-Wound Skin</div>
+        <img src="images/VAC1.jpg" alt="Assess and Prepare Peri-Wound Skin nursing infographic" class="infographic-img" loading="lazy"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card">
+    <button class="acc-head" onclick="toggleAcc(this)" aria-expanded="false">
+      <div class="acc-icon g">🟫</div>
+      <div class="acc-title-wrap">
+        <div class="acc-step">Step 2</div>
+        <div class="acc-title">Cut and Fit the Foam Filler</div>
+        <div class="acc-sub">Never cut foam directly over the open wound bed</div>
+      </div>
+      <span class="chevron">▼</span>
+    </button>
+    <div class="acc-body">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Size Foam Precisely</div>
+            <div class="step-detail">Measure wound length, width, and depth. Cut foam — black polyurethane or white polyvinyl alcohol — to fit <strong>within</strong> wound edges only.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Avoid Overlap</div>
+            <div class="step-detail">Ensure foam does <strong>not</strong> rest on intact, healthy skin — this causes skin breakdown and undermines therapy.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Count &amp; Record Pieces</div>
+            <div class="step-detail">If using multiple pieces, ensure piece-to-piece contact to transfer pressure. Record the total count on the drape label and in the patient chart.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOAM COUNTER -->
+      <div class="foam-counter">
+        <div class="foam-counter-label">Foam Piece Counter</div>
+        <div class="foam-count-display" id="foamCount">0</div>
+        <div class="foam-btn-row">
+          <button class="foam-btn minus" onclick="adjustFoam(-1)" aria-label="Remove foam piece">−</button>
+          <button class="foam-btn plus" onclick="adjustFoam(1)" aria-label="Add foam piece">+</button>
+        </div>
+        <button class="foam-reset" onclick="resetFoam()">Reset</button>
+        <div class="foam-label-out" id="foamLabel">Record this count on the drape label and in the chart.</div>
+      </div>
+
+      <div class="ib r" style="margin-top:10px;">
+        <strong>⚠ Critical Safety</strong>
+        <span>Never cut foam directly over the open wound bed. Cut away from the wound, then place.</span>
+      </div>
+      <div class="infographic-wrap">
+        <div class="infographic-label">Reference Infographic — Cut &amp; Fit the Foam Filler</div>
+        <img src="images/VAC2.jpg" alt="Cut and Fit the GranuFoam Filler nursing infographic" class="infographic-img" loading="lazy"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="card">
+    <button class="acc-head" onclick="toggleAcc(this)" aria-expanded="false">
+      <div class="acc-icon n">🔲</div>
+      <div class="acc-title-wrap">
+        <div class="acc-step">Step 3</div>
+        <div class="acc-title">Apply Drape &amp; Cut Access Hole</div>
+        <div class="acc-sub">Creates an airtight seal over the wound cavity</div>
+      </div>
+      <span class="chevron">▼</span>
+    </button>
+    <div class="acc-body">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Apply Drape</div>
+            <div class="step-detail">Trim clear adhesive film to cover the foam and extend <strong>3–5 cm</strong> onto healthy peri-wound skin. Apply smoothly — no stretching or creases.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Create Access Opening</div>
+            <div class="step-detail">Pinch the drape over the foam centre and cut a <strong>1–2.5 cm hole</strong>. Do not cut into the foam itself.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ib b">
+        <strong>Tip — Smooth First, Cut Second</strong>
+        <span>Work from the wound outward when smoothing the drape. Any crease will become a leak pathway under suction.</span>
+      </div>
+      <div class="infographic-wrap">
+        <div class="infographic-label">Reference Infographic — Apply Drape &amp; Cut Access Hole</div>
+        <img src="images/VAC3.jpg" alt="Apply Drape and Cut Access Hole nursing infographic" class="infographic-img" loading="lazy"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="card">
+    <button class="acc-head" onclick="toggleAcc(this)" aria-expanded="false">
+      <div class="acc-icon b">🔌</div>
+      <div class="acc-title-wrap">
+        <div class="acc-step">Step 4</div>
+        <div class="acc-title">Attach Port &amp; Connect Line</div>
+        <div class="acc-sub">Establishes the suction pathway to canister</div>
+      </div>
+      <span class="chevron">▼</span>
+    </button>
+    <div class="acc-body">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Position Port</div>
+            <div class="step-detail">Centre the SensaT.R.A.C. pad or suction head directly over the hole cut in the drape.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Connect &amp; Initiate</div>
+            <div class="step-detail">Connect pad tubing to canister tubing. Turn unit on and set negative pressure to the ordered target.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Verify Seal</div>
+            <div class="step-detail">Confirm foam collapses to a firm, raisin-like texture. Listen for whistling leaks — patch any loose edges with additional drape strips.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pressure-badge">
+        <span>Target Pressure</span>
+        <span class="badge-val">−75 to −125 mmHg</span>
+      </div>
+
+      <!-- Seal verification checklist -->
+      <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:14px;margin-bottom:4px;">Seal Verification Checklist</div>
+      <div class="seal-check" id="sealCheck">
+        <div class="seal-item" onclick="toggleSeal(this)">
+          <div class="seal-cb"></div>
+          <div class="seal-lbl">Foam has collapsed to firm, raisin-like texture</div>
+        </div>
+        <div class="seal-item" onclick="toggleSeal(this)">
+          <div class="seal-cb"></div>
+          <div class="seal-lbl">No audible whistling or air leak at drape edges</div>
+        </div>
+        <div class="seal-item" onclick="toggleSeal(this)">
+          <div class="seal-cb"></div>
+          <div class="seal-lbl">Suction is maintained — unit not alarming</div>
+        </div>
+        <div class="seal-item" onclick="toggleSeal(this)">
+          <div class="seal-cb"></div>
+          <div class="seal-lbl">Foam count recorded on drape label and in chart</div>
+        </div>
+        <div class="seal-item" onclick="toggleSeal(this)">
+          <div class="seal-cb"></div>
+          <div class="seal-lbl">Tubing unobstructed and secured away from bony prominences</div>
+        </div>
+      </div>
+      <div class="infographic-wrap">
+        <div class="infographic-label">Reference Infographic — Attach Port &amp; Connect Line</div>
+        <img src="images/VAC4.jpg" alt="Attach Port and Connect Line nursing infographic" class="infographic-img" loading="lazy"/>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /dressing pane -->
+
+<!-- SAFETY PANE -->
+<div id="pane-safety" class="pane">
+  <div class="safety-section" style="margin-top:14px;">
+
+    <div class="card safety-row cat-contra">
+      <div class="safety-row-head"><span class="cat-icon">🚫</span> Contraindications</div>
+      <div class="safety-row-body">
+        VAC therapy is <strong>contraindicated</strong> in the presence of:
+        <ul>
+          <li>Non-enteric or unexplored fistulas</li>
+          <li>Necrotic tissue or eschar — must be fully debrided first</li>
+          <li>Untreated osteomyelitis</li>
+          <li>Active malignancy within the wound bed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card safety-row cat-vessel">
+      <div class="safety-row-head"><span class="cat-icon">🩸</span> Vessel &amp; Organ Protection</div>
+      <div class="safety-row-body">
+        <ul>
+          <li><strong>Never</strong> place foam directly over exposed blood vessels, organs, or nerves — this applies to any anatomical structure visible in the wound bed.</li>
+          <li>Place a <strong>non-adherent protective layer</strong> (e.g. silicone contact layer or non-adherent interface dressing) over all exposed structures <em>before</em> foam placement.</li>
+          <li>If vessels, tendons, or bowel are visible, <strong>escalate to the treating team</strong> before initiating or continuing VAC therapy.</li>
+          <li>Inspect the wound bed at every dressing change for new exposure — tissue planes can shift as the wound contracts.</li>
+          <li>Document the presence and location of any exposed structures in the clinical record at each change.</li>
+        </ul>
+        <div class="ib a" style="margin-top:10px;">
+          <strong>⚠ Why it matters</strong>
+          <span>Direct foam contact with a vessel under sustained suction risks catastrophic haemorrhage. When in doubt, stop and escalate before proceeding.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card safety-row cat-freq">
+      <div class="safety-row-head"><span class="cat-icon">📅</span> Dressing Change Frequency</div>
+      <div class="safety-row-body">
+        <div class="freq-pills">
+          <div class="freq-pill std">✅ Standard wound — every 48–72 hrs</div>
+          <div class="freq-pill inf">⚠ Infected wound — every 24 hrs</div>
+        </div>
+        <div class="ib b" style="margin-top:10px;">
+          <strong>Note</strong>
+          <span>Frequency may be adjusted by the treating team based on wound aetiology, exudate level, and clinical response.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card safety-row cat-alarm">
+      <div class="safety-row-head"><span class="cat-icon">🔔</span> Troubleshooting Alarms</div>
+      <div class="safety-row-body" style="padding-top:10px;">
+
+        <div class="alarm-item">
+          <button class="alarm-head leak" onclick="toggleAlarm(this)" aria-expanded="false">
+            <span>🟡 Leak Alarm</span>
+            <span class="alarm-chev">▼</span>
+          </button>
+          <div class="alarm-body">
+            <ol>
+              <li>Inspect all drape borders — lift and re-apply any lifted edges.</li>
+              <li>Smooth out air bubbles trapped beneath the drape.</li>
+              <li>Apply additional drape strips over any persistent gaps.</li>
+              <li>Check the port pad is centred and firmly adherent over the access hole.</li>
+              <li>If leak persists, replace the entire dressing.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="alarm-item" style="margin-top:8px;">
+          <button class="alarm-head block" onclick="toggleAlarm(this)" aria-expanded="false">
+            <span>🟣 Blockage Alarm</span>
+            <span class="alarm-chev">▼</span>
+          </button>
+          <div class="alarm-body">
+            <ol>
+              <li>Check all tubing clamps are fully open.</li>
+              <li>Trace the tubing for kinks or patient-positioning compression points.</li>
+              <li>Inspect the canister — if saturated, change the canister.</li>
+              <li>Check the inline filter — replace if visibly contaminated.</li>
+              <li>Confirm the foam has not fully collapsed or been compressed by positioning.</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div><!-- /safety pane -->
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <strong>© Ben Stone 2026</strong><br>
+  Infographics adapted from WCEI &amp; PMC/NCBI, Cleveland Clinic · VAC Therapy Solutions<br>
+  Reference video: 3M™ V.A.C.® Basic Technique<br>
+  For clinical use within SVHM HITH / District Nursing — not a substitute for professional judgement.
+</footer>
+
+<!-- ESCALATION BAR -->
+<div class="escalate-bar">
+  <div>
+    <div class="esc-label">Clinical Concern?</div>
+    <div class="esc-sub">Escalate immediately</div>
+  </div>
+  <button class="esc-btn" onclick="openModal()">📞 Contacts</button>
+</div>
+
+<!-- CONTACTS MODAL -->
+<div class="modal-overlay" id="contactModal" onclick="closeModalOutside(event)">
+  <div class="modal-card">
+    <div class="modal-title">Escalation Contacts</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">HITH Team</div>
+    <a href="tel:0459021952" class="contact-btn">
+      <div class="contact-icon grn">🌅</div>
+      <div class="contact-info">
+        <div class="contact-name">HITH ANUM — AM</div>
+        <div class="contact-num">0459 021 952</div>
+      </div>
+    </a>
+    <a href="tel:0408366359" class="contact-btn">
+      <div class="contact-icon grn">🌆</div>
+      <div class="contact-info">
+        <div class="contact-name">HITH ANUM — PM</div>
+        <div class="contact-num">0408 366 359</div>
+      </div>
+    </a>
+    <a href="tel:0392313817" class="contact-btn">
+      <div class="contact-icon grn">🏥</div>
+      <div class="contact-info">
+        <div class="contact-name">HITH Office</div>
+        <div class="contact-num">(03) 9231 3817</div>
+      </div>
+    </a>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 8px;">Medical &amp; Emergency</div>
+    <a href="tel:0392314444" class="contact-btn">
+      <div class="contact-icon red">🚨</div>
+      <div class="contact-info">
+        <div class="contact-name">SVHM HITH Medical Officer</div>
+        <div class="contact-num">Via Contacts — SVHM switchboard</div>
+      </div>
+    </a>
+    <a href="tel:000" class="contact-btn">
+      <div class="contact-icon red">🚑</div>
+      <div class="contact-info">
+        <div class="contact-name">Emergency — Ambulance</div>
+        <div class="contact-num">000</div>
+      </div>
+    </a>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+// Tab switching
+function switchTab(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Accordion
+function toggleAcc(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  btn.classList.toggle('open', !isOpen);
+  body.classList.toggle('open', !isOpen);
+  btn.setAttribute('aria-expanded', String(!isOpen));
+}
+
+// Foam counter
+let foamCount = 0;
+function adjustFoam(delta) {
+  foamCount = Math.max(0, foamCount + delta);
+  document.getElementById('foamCount').textContent = foamCount;
+  const lbl = document.getElementById('foamLabel');
+  if (foamCount === 0) {
+    lbl.textContent = 'Record this count on the drape label and in the chart.';
+  } else {
+    lbl.innerHTML = `<strong style="color:#fff;">Label: ${foamCount} foam piece${foamCount !== 1 ? 's' : ''} in situ</strong> — record on drape &amp; chart.`;
+  }
+}
+function resetFoam() {
+  foamCount = 0;
+  document.getElementById('foamCount').textContent = '0';
+  document.getElementById('foamLabel').textContent = 'Record this count on the drape label and in the chart.';
+}
+
+// Seal checklist
+function toggleSeal(item) {
+  item.classList.toggle('checked');
+}
+
+// Alarm toggles
+function toggleAlarm(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open-alarm');
+  btn.classList.toggle('open-alarm', !isOpen);
+  body.classList.toggle('open-body', !isOpen);
+}
+
+// Modal
+function openModal() { document.getElementById('contactModal').classList.add('open'); }
+function closeModal() { document.getElementById('contactModal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('contactModal')) closeModal(); }
+</script>
+</body>
+</html>
